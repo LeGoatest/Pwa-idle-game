@@ -14,15 +14,15 @@
 ## 3. Iconography
 - **Library**: Iconify (Tailwind plugin).
 - **Standardization**:
-  - `i-lucide:swords` for Combat/ATK.
-  - `i-lucide:shield` for DEF.
-  - `i-lucide:heart` for HP.
-  - `i-lucide:coins` for Gold.
-  - `i-lucide:package` for Inventory.
-  - `i-lucide:hammer` for Smithing.
-  - `i-lucide:book` for Journal.
-  - `i-lucide:shopping-cart` for Shop.
-  - `i-lucide:settings` for Settings.
+  - `icon-[lucide--swords]` for Combat/ATK.
+  - `icon-[lucide--shield]` for DEF.
+  - `icon-[lucide--heart]` for HP.
+  - `icon-[lucide--coins]` for Gold.
+  - `icon-[lucide--package]` for Inventory.
+  - `icon-[lucide--hammer]` for Smithing.
+  - `icon-[lucide--book]` for Journal.
+  - `icon-[lucide--shopping-cart]` for Shop.
+  - `icon-[lucide--settings]` for Settings.
 
 ## 4. HTMX Integration
 - **Shell**: `index.html` contains the `#view-root`.

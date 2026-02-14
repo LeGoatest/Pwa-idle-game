@@ -1,21 +1,22 @@
 const CACHE = 'idle-frontier-v1';
 const APP_ASSETS = [
-  './',
-  './index.html',
-  './assets/css/style.css',
-  './assets/js/game.js',
-  './manifest.webmanifest',
-  './assets/icons/icon.svg',
-  './assets/icons/icon-maskable.svg',
-  './views/combat.html',
-  './views/gathering.html',
-  './views/crafting.html',
-  './views/inventory.html',
-  './views/settings.html',
-  './views/journal.html',
-  './views/shop.html',
-  './views/equipment.html',
-  './views/shop_item.html'
+  '../../',
+  '../../index.html',
+  '../css/style.css',
+  './game.js',
+  './htmx.min.js',
+  '../../manifest.webmanifest',
+  '../icons/icon.svg',
+  '../icons/icon-maskable.svg',
+  '../../views/combat.html',
+  '../../views/gathering.html',
+  '../../views/crafting.html',
+  '../../views/inventory.html',
+  '../../views/settings.html',
+  '../../views/journal.html',
+  '../../views/shop.html',
+  '../../views/equipment.html',
+  '../../views/shop_item.html'
 ];
 
 self.addEventListener('install', (event) => {
