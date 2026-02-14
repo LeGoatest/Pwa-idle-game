@@ -1,7 +1,0 @@
-
-> pwa-idle-game@1.0.0 build:css
-> npx @tailwindcss/cli -i ./input.css -o ./assets/css/style.css --minify
-
-≈ tailwindcss v4.1.18
-
-Done in 937ms
