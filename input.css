@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@plugin "@iconify/tailwind4";
+@plugin "@iconify/tailwind4" {
+  prefixes: lucide, mdi;
+}
 
 @theme {
   --color-panel: #18181b;
@@ -99,12 +101,16 @@
   }
 
   /* Icon System Utilities */
+  .iconify, [class^="icon-"], [class*=" icon-"] {
+    mask-type: alpha !important;
+    -webkit-mask-type: alpha !important;
+  }
   .icon-ui {
     @apply inline-block align-middle transition-all duration-200;
   }
-  .icon-sm { @apply inline-block align-middle transition-all duration-200 w-4 h-4; }
-  .icon-md { @apply inline-block align-middle transition-all duration-200 w-6 h-6; }
-  .icon-lg { @apply inline-block align-middle transition-all duration-200 w-8 h-8; }
+  .icon-sm { @apply inline-block align-middle transition-all duration-200; width: 1rem !important; height: 1rem !important; }
+  .icon-md { @apply inline-block align-middle transition-all duration-200; width: 1.5rem !important; height: 1.5rem !important; }
+  .icon-lg { @apply inline-block align-middle transition-all duration-200; width: 2rem !important; height: 2rem !important; }
 
   .icon-active {
     @apply text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)];
