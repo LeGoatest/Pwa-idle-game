@@ -11,8 +11,8 @@ Non-negotiable. If a change violates any rule, the correct action is to refuse.
 - `docs/**`: Governance and architectural canon.
 - `views/**`: UI partials loaded via htmx.
 - `assets/js/game.js`: Core game logic, state management, and persistence.
-- `assets/css/style.css`: Generated CSS (DO NOT EDIT DIRECTLY).
-- `input.css`: Tailwind CSS source.
+- `assets/css/style.css`: Generated CSS (DO NOT EDIT DIRECTLY, generated via build).
+- `input.css`: Tailwind CSS source (includes theme configuration).
 - `sw.js`: Service worker for offline support.
 
 ## 2) UI & Interaction Rules

@@ -234,11 +234,23 @@ function wireEvents() {
     render();
   });
 
-  document.querySelector('footer').addEventListener('click', (event) => {
+  document.querySelector('footer nav').addEventListener('click', (event) => {
     const btn = event.target.closest('[data-title]');
     if (!btn) return;
-    const title = document.querySelector('header');
-    title.textContent = `Idle Frontier · ${btn.dataset.title}`;
+
+    // Update dynamic title
+    const titleEl = document.getElementById('station-title');
+    if (titleEl) titleEl.textContent = btn.dataset.title;
+
+    // Update active state in dock
+    document.querySelectorAll('footer nav button').forEach(b => {
+      b.classList.remove('text-cyan-400');
+      b.classList.add('text-zinc-400');
+      b.removeAttribute('aria-selected');
+    });
+    btn.classList.add('text-cyan-400');
+    btn.classList.remove('text-zinc-400');
+    btn.setAttribute('aria-selected', 'true');
   });
 }
 
