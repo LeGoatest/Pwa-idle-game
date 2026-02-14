@@ -15,10 +15,10 @@
       <h1 id="station-title" class="text-xl font-bold tracking-tight text-zinc-100">Idle Frontier</h1>
       <div class="flex items-center gap-3">
         <div class="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1 rounded-full border border-zinc-700/50">
-          <span class="icon-[lucide--coins] icon-sm text-yellow-500"></span>
+          <span class="iconify lucide--coins icon-sm text-yellow-500"></span>
           <span data-bind="gold" class="text-sm font-medium tabular-nums">0</span>
         </div>
-        <button class="icon-[lucide--settings] w-6 h-6 text-zinc-400 hover:text-white transition-colors"
+        <button class="iconify lucide--settings w-6 h-6 text-zinc-400 hover:text-white transition-colors"
                 hx-get="./views/settings.html"
                 hx-target="#modal-content"
                 hx-trigger="click"
@@ -43,32 +43,32 @@
       <nav class="grid grid-cols-6 items-center">
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
                 hx-get="./views/combat.html" hx-target="#view-root" data-title="Combat" aria-selected="true">
-          <span class="icon-[lucide--swords] w-5 h-5 group-aria-selected:text-cyan-400 group-aria-selected:drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] transition-all"></span>
+          <span class="iconify lucide--swords w-5 h-5 group-aria-selected:text-cyan-400 group-aria-selected:drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] transition-all"></span>
           <span class="text-[9px] font-black uppercase tracking-tighter group-aria-selected:text-cyan-400">Hunt</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
                 hx-get="./views/shop.html" hx-target="#view-root" data-title="Shop">
-          <span class="icon-[lucide--shopping-cart] w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
+          <span class="iconify lucide--shopping-cart w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
           <span class="text-[9px] font-black uppercase tracking-tighter">Shop</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
                 hx-get="./views/equipment.html" hx-target="#view-root" data-title="Equipment">
-          <span class="icon-[lucide--shield] w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
+          <span class="iconify lucide--shield w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
           <span class="text-[9px] font-black uppercase tracking-tighter">Gear</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
                 hx-get="./views/crafting.html" hx-target="#view-root" data-title="Crafting">
-          <span class="icon-[lucide--hammer] w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
+          <span class="iconify lucide--hammer w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
           <span class="text-[9px] font-black uppercase tracking-tighter">Forge</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
                 hx-get="./views/inventory.html" hx-target="#view-root" data-title="Inventory">
-          <span class="icon-[lucide--package] w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
+          <span class="iconify lucide--package w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
           <span class="text-[9px] font-black uppercase tracking-tighter">Vault</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
                 hx-get="./views/journal.html" hx-target="#view-root" data-title="Journal">
-          <span class="icon-[lucide--book-open] w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
+          <span class="iconify lucide--book-open w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
           <span class="text-[9px] font-black uppercase tracking-tighter">Logs</span>
         </button>
       </nav>
