@@ -1,18 +1,68 @@
-<section class="space-y-4" data-view="gathering">
-  <div class="card text-center">
-    <h2 class="text-3xl">🌲 Gathering</h2>
-    <p class="text-zinc-300">Chop and mine to feed crafting.</p>
+<section class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500" data-view="gathering">
+  <!-- Sub-Nav Tab -->
+  <div class="flex gap-2 p-1 bg-zinc-900 rounded-xl border border-zinc-800/50">
+    <button class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-300 transition-colors"
+            hx-get="./views/crafting.html" hx-target="#view-root">Smithing</button>
+    <button class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest bg-zinc-800 text-zinc-100 rounded-lg shadow-glow border border-zinc-700/50">Gathering</button>
   </div>
-  <div class="grid grid-cols-2 gap-3">
-    <button class="card text-left" data-action="woodcutting">
-      <div class="text-xl">Woodcutting</div>
-      <div>Logs: <span data-bind="logs">0</span></div>
-      <div>Lvl: <span data-bind="woodLevel">1</span></div>
+
+  <!-- Station Intro -->
+  <div class="pixel-card flex items-center gap-4 bg-gradient-to-br from-zinc-900 to-zinc-800">
+    <div class="w-16 h-16 bg-zinc-800 rounded-2xl flex items-center justify-center border border-zinc-700 shadow-xl">
+      <span class="i-lucide:pickaxe w-10 h-10 text-cyan-400"></span>
+    </div>
+    <div>
+      <h2 class="text-xl font-black uppercase tracking-tight">Resource Extraction</h2>
+      <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Efficiency: 85% · Status: Active</p>
+    </div>
+  </div>
+
+  <!-- Activity Cards -->
+  <div class="grid grid-cols-1 gap-4">
+    <!-- Woodcutting -->
+    <button class="pixel-card group hover:bg-zinc-800/40 transition-colors text-left relative overflow-hidden" data-action="woodcutting">
+      <div class="flex items-center gap-4 relative z-10">
+        <div class="w-12 h-12 rounded-xl bg-orange-950/30 flex items-center justify-center border border-orange-900/50">
+          <span class="i-lucide:trees w-6 h-6 text-orange-400"></span>
+        </div>
+        <div class="flex-1">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-black uppercase text-sm tracking-tight">Sylvan Logging</span>
+            <span class="text-[10px] font-mono text-zinc-500">Lv.<span data-bind="woodLevel">1</span></span>
+          </div>
+          <div class="progress-bar-container h-2">
+            <div class="progress-bar-fill bg-orange-500" style="width: 45%"></div>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-[8px] font-black text-zinc-500 uppercase">Yield</div>
+          <div data-bind="logs" class="text-lg font-black tabular-nums leading-none">0</div>
+        </div>
+      </div>
+      <div class="absolute inset-0 bg-orange-500/5 opacity-0 group-active:opacity-100 transition-opacity"></div>
     </button>
-    <button class="card text-left" data-action="mining">
-      <div class="text-xl">Mining</div>
-      <div>Ore: <span data-bind="ore">0</span></div>
-      <div>Lvl: <span data-bind="mineLevel">1</span></div>
+
+    <!-- Mining -->
+    <button class="pixel-card group hover:bg-zinc-800/40 transition-colors text-left relative overflow-hidden" data-action="mining">
+      <div class="flex items-center gap-4 relative z-10">
+        <div class="w-12 h-12 rounded-xl bg-blue-950/30 flex items-center justify-center border border-blue-900/50">
+          <span class="i-lucide:mountain w-6 h-6 text-blue-400"></span>
+        </div>
+        <div class="flex-1">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-black uppercase text-sm tracking-tight">Deep Core Mining</span>
+            <span class="text-[10px] font-mono text-zinc-500">Lv.<span data-bind="mineLevel">1</span></span>
+          </div>
+          <div class="progress-bar-container h-2">
+            <div class="progress-bar-fill bg-blue-500" style="width: 30%"></div>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-[8px] font-black text-zinc-500 uppercase">Yield</div>
+          <div data-bind="ore" class="text-lg font-black tabular-nums leading-none">0</div>
+        </div>
+      </div>
+      <div class="absolute inset-0 bg-blue-500/5 opacity-0 group-active:opacity-100 transition-opacity"></div>
     </button>
   </div>
 </section>

@@ -8,6 +8,7 @@
     "serve": "python3 -m http.server 4173"
   },
   "devDependencies": {
+    "@iconify/tailwind": "^1.2.0",
     "@tailwindcss/cli": "^4.1.13",
     "tailwindcss": "^4.1.13"
   }

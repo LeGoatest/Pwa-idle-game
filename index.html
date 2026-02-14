@@ -20,8 +20,9 @@
         </div>
         <button class="i-lucide:settings w-6 h-6 text-zinc-400 hover:text-white transition-colors"
                 hx-get="./views/settings.html"
-                hx-target="#view-root"
-                data-title="Settings"></button>
+                hx-target="#modal-content"
+                hx-trigger="click"
+                data-action="open-modal"></button>
       </div>
     </header>
 
@@ -32,33 +33,43 @@
       hx-swap="innerHTML show:top">
     </main>
 
+    <!-- Modal System -->
+    <div id="modal-root" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-in fade-in duration-300">
+       <div id="modal-content" class="w-full max-w-sm pointer-events-auto"></div>
+    </div>
+
     <!-- Bottom Dock -->
-    <footer class="fixed bottom-0 left-0 right-0 mx-auto max-w-md bg-zinc-900/90 backdrop-blur-lg border-t border-zinc-800 px-2 py-3 z-50">
-      <nav class="flex justify-around items-center">
+    <footer class="fixed bottom-0 left-0 right-0 mx-auto max-w-md bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-800/50 px-1 py-2 z-50">
+      <nav class="grid grid-cols-6 items-center">
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
-                hx-get="./views/combat.html" hx-target="#view-root" data-title="Combat">
-          <span class="i-lucide:swords w-6 h-6 group-aria-selected:text-cyan-400"></span>
-          <span class="text-[10px] font-medium uppercase tracking-wider">Combat</span>
+                hx-get="./views/combat.html" hx-target="#view-root" data-title="Combat" aria-selected="true">
+          <span class="i-lucide:swords w-5 h-5 group-aria-selected:text-cyan-400 group-aria-selected:drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] transition-all"></span>
+          <span class="text-[9px] font-black uppercase tracking-tighter group-aria-selected:text-cyan-400">Hunt</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
-                hx-get="./views/gathering.html" hx-target="#view-root" data-title="Gathering">
-          <span class="i-lucide:pickaxe w-6 h-6"></span>
-          <span class="text-[10px] font-medium uppercase tracking-wider">Gather</span>
+                hx-get="./views/shop.html" hx-target="#view-root" data-title="Shop">
+          <span class="i-lucide:shopping-cart w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
+          <span class="text-[9px] font-black uppercase tracking-tighter">Shop</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
+                hx-get="./views/equipment.html" hx-target="#view-root" data-title="Equipment">
+          <span class="i-lucide:shield w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
+          <span class="text-[9px] font-black uppercase tracking-tighter">Gear</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
                 hx-get="./views/crafting.html" hx-target="#view-root" data-title="Crafting">
-          <span class="i-lucide:hammer w-6 h-6"></span>
-          <span class="text-[10px] font-medium uppercase tracking-wider">Craft</span>
+          <span class="i-lucide:hammer w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
+          <span class="text-[9px] font-black uppercase tracking-tighter">Forge</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
                 hx-get="./views/inventory.html" hx-target="#view-root" data-title="Inventory">
-          <span class="i-lucide:package w-6 h-6"></span>
-          <span class="text-[10px] font-medium uppercase tracking-wider">Bag</span>
+          <span class="i-lucide:package w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
+          <span class="text-[9px] font-black uppercase tracking-tighter">Vault</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
                 hx-get="./views/journal.html" hx-target="#view-root" data-title="Journal">
-          <span class="i-lucide:book-open w-6 h-6"></span>
-          <span class="text-[10px] font-medium uppercase tracking-wider">Docs</span>
+          <span class="i-lucide:book-open w-5 h-5 group-aria-selected:text-cyan-400 transition-all"></span>
+          <span class="text-[9px] font-black uppercase tracking-tighter">Logs</span>
         </button>
       </nav>
     </footer>
