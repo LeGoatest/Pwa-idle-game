@@ -9,24 +9,57 @@
     <link rel="stylesheet" href="./assets/css/style.css" />
     <title>Idle Frontier PWA</title>
   </head>
-  <body class="mx-auto max-w-md pb-28">
-    <header class="sticky top-0 z-20 bg-zinc-700/90 backdrop-blur p-4 text-center text-4xl tracking-wide">
-      Idle Frontier
+  <body class="mx-auto max-w-md bg-gamebg text-zinc-100 min-h-screen flex flex-col pb-24 shadow-2xl">
+    <!-- Top Shell -->
+    <header class="sticky top-0 z-50 w-full bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800 p-4 flex items-center justify-between">
+      <h1 id="station-title" class="text-xl font-bold tracking-tight text-zinc-100">Idle Frontier</h1>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1 rounded-full border border-zinc-700/50">
+          <span class="i-lucide:coins w-4 h-4 text-yellow-500"></span>
+          <span data-bind="gold" class="text-sm font-medium tabular-nums">0</span>
+        </div>
+        <button class="i-lucide:settings w-6 h-6 text-zinc-400 hover:text-white transition-colors"
+                hx-get="./views/settings.html"
+                hx-target="#view-root"
+                data-title="Settings"></button>
+      </div>
     </header>
 
-    <main id="view-root" class="p-4"
+    <!-- Main Viewport -->
+    <main id="view-root" class="flex-1 overflow-y-auto p-4"
       hx-get="./views/combat.html"
       hx-trigger="load"
-      hx-swap="innerHTML">
+      hx-swap="innerHTML show:top">
     </main>
 
-    <footer class="fixed bottom-0 left-0 right-0 mx-auto max-w-md border-t border-zinc-700 bg-zinc-900/95 p-3">
-      <nav class="grid grid-cols-5 gap-2 text-xs">
-        <button class="btn" hx-get="./views/combat.html" hx-target="#view-root" data-title="Combat">Combat</button>
-        <button class="btn" hx-get="./views/gathering.html" hx-target="#view-root" data-title="Gathering">Gather</button>
-        <button class="btn" hx-get="./views/crafting.html" hx-target="#view-root" data-title="Craft</button>
-        <button class="btn" hx-get="./views/inventory.html" hx-target="#view-root" data-title="Inventory">Inventory</button>
-        <button class="btn" hx-get="./views/settings.html" hx-target="#view-root" data-title="Settings">Settings</button>
+    <!-- Bottom Dock -->
+    <footer class="fixed bottom-0 left-0 right-0 mx-auto max-w-md bg-zinc-900/90 backdrop-blur-lg border-t border-zinc-800 px-2 py-3 z-50">
+      <nav class="flex justify-around items-center">
+        <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
+                hx-get="./views/combat.html" hx-target="#view-root" data-title="Combat">
+          <span class="i-lucide:swords w-6 h-6 group-aria-selected:text-cyan-400"></span>
+          <span class="text-[10px] font-medium uppercase tracking-wider">Combat</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
+                hx-get="./views/gathering.html" hx-target="#view-root" data-title="Gathering">
+          <span class="i-lucide:pickaxe w-6 h-6"></span>
+          <span class="text-[10px] font-medium uppercase tracking-wider">Gather</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
+                hx-get="./views/crafting.html" hx-target="#view-root" data-title="Crafting">
+          <span class="i-lucide:hammer w-6 h-6"></span>
+          <span class="text-[10px] font-medium uppercase tracking-wider">Craft</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
+                hx-get="./views/inventory.html" hx-target="#view-root" data-title="Inventory">
+          <span class="i-lucide:package w-6 h-6"></span>
+          <span class="text-[10px] font-medium uppercase tracking-wider">Bag</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
+                hx-get="./views/journal.html" hx-target="#view-root" data-title="Journal">
+          <span class="i-lucide:book-open w-6 h-6"></span>
+          <span class="text-[10px] font-medium uppercase tracking-wider">Docs</span>
+        </button>
       </nav>
     </footer>
 
