@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d0f14" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./assets/icons/icon.svg" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <title>Idle Frontier PWA</title>
+  </head>
+  <body class="mx-auto max-w-md pb-28">
+    <header class="sticky top-0 z-20 bg-zinc-700/90 backdrop-blur p-4 text-center text-4xl tracking-wide">
+      Idle Frontier
+    </header>
+
+    <main id="view-root" class="p-4"
+      hx-get="./views/combat.html"
+      hx-trigger="load"
+      hx-swap="innerHTML">
+    </main>
+
+    <footer class="fixed bottom-0 left-0 right-0 mx-auto max-w-md border-t border-zinc-700 bg-zinc-900/95 p-3">
+      <nav class="grid grid-cols-5 gap-2 text-xs">
+        <button class="btn" hx-get="./views/combat.html" hx-target="#view-root" data-title="Combat">Combat</button>
+        <button class="btn" hx-get="./views/gathering.html" hx-target="#view-root" data-title="Gathering">Gather</button>
+        <button class="btn" hx-get="./views/crafting.html" hx-target="#view-root" data-title="Craft</button>
+        <button class="btn" hx-get="./views/inventory.html" hx-target="#view-root" data-title="Inventory">Inventory</button>
+        <button class="btn" hx-get="./views/settings.html" hx-target="#view-root" data-title="Settings">Settings</button>
+      </nav>
+    </footer>
+
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="./assets/js/game.js" defer></script>
+  </body>
+</html>

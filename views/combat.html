@@ -1,0 +1,19 @@
+<section class="space-y-4" data-view="combat">
+  <div class="card text-center">
+    <div class="text-3xl">⚔️ Combat</div>
+    <p class="mt-2 text-zinc-300">Fight monsters for gold and XP.</p>
+    <div class="mt-4 grid grid-cols-3 gap-2 text-sm">
+      <div class="resource-pill">ATK: <span data-bind="attack">1</span></div>
+      <div class="resource-pill">DEF: <span data-bind="defense">1</span></div>
+      <div class="resource-pill">HP: <span data-bind="hp">20</span></div>
+    </div>
+  </div>
+  <div class="card space-y-2">
+    <div class="flex items-center justify-between"><span>Goblin HP</span><span data-bind="enemyHp">12</span></div>
+    <div class="xp-bar"><div class="xp-fill" data-bind-style="enemyHpPct"></div></div>
+    <div class="flex gap-2">
+      <button class="btn-primary flex-1" data-action="combat">Attack</button>
+      <button class="btn flex-1" data-action="toggleAutoCombat">Auto: <span data-bind="autoCombat">Off</span></button>
+    </div>
+  </div>
+</section>

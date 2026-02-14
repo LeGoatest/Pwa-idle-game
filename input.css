@@ -1,0 +1,31 @@
+@config "./tailwind.config.js";
+
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-gamebg text-zinc-100 min-h-screen antialiased;
+    font-family: Inter, system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-zinc-700/80 rounded-2xl p-4 shadow-lg border border-zinc-600;
+  }
+  .btn {
+    @apply rounded-xl bg-zinc-700 px-4 py-2 text-zinc-100 active:scale-95 transition;
+  }
+  .btn-primary {
+    @apply btn bg-cyan-600 hover:bg-cyan-500;
+  }
+  .xp-bar {
+    @apply h-3 w-full rounded-full bg-zinc-800 overflow-hidden;
+  }
+  .xp-fill {
+    @apply h-full bg-cyan-400 transition-all duration-300;
+  }
+  .resource-pill {
+    @apply rounded-xl bg-zinc-700 px-3 py-2 text-sm;
+  }
+}

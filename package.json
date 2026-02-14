@@ -1,0 +1,14 @@
+{
+  "name": "pwa-idle-game",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:css": "npx @tailwindcss/cli -i ./input.css -o ./assets/css/style.css --watch",
+    "build:css": "npx @tailwindcss/cli -i ./input.css -o ./assets/css/style.css --minify",
+    "serve": "python3 -m http.server 4173"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.13",
+    "tailwindcss": "^4.1.13"
+  }
+}

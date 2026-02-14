@@ -1,0 +1,23 @@
+{
+  "name": "Idle Frontier",
+  "short_name": "Frontier",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0d0f14",
+  "theme_color": "#0d0f14",
+  "description": "A lightweight PWA idle game built with htmx and Tailwind CSS.",
+  "icons": [
+    {
+      "src": "./assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
