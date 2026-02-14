@@ -1,11 +1,64 @@
-<section class="space-y-4" data-view="crafting">
-  <div class="card text-center">
-    <h2 class="text-3xl">🛠️ Crafting</h2>
-    <p class="text-zinc-300">Turn resources into gear and power.</p>
+<section class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500" data-view="crafting">
+  <!-- Sub-Nav Tab -->
+  <div class="flex gap-2 p-1 bg-zinc-900 rounded-xl border border-zinc-800/50">
+    <button class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest bg-zinc-800 text-zinc-100 rounded-lg shadow-glow border border-zinc-700/50">Smithing</button>
+    <button class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-300 transition-colors"
+            hx-get="./views/gathering.html" hx-target="#view-root">Gathering</button>
   </div>
-  <div class="card space-y-2">
-    <div>Iron Sword (cost: 5 logs + 3 ore)</div>
-    <button class="btn-primary w-full" data-action="craftSword">Craft Sword</button>
-    <p class="text-sm text-zinc-300">Swords: <span data-bind="swords">0</span> | Attack bonus from swords.</p>
+
+  <!-- Activity Card -->
+  <div class="pixel-card bg-gradient-to-br from-zinc-900 to-zinc-950 flex flex-col items-center py-10">
+    <div class="w-24 h-24 bg-zinc-800 rounded-3xl flex items-center justify-center border-2 border-zinc-700 shadow-[0_0_30px_rgba(34,211,238,0.1)] mb-6 relative">
+      <span class="i-lucide:anvil w-12 h-12 text-cyan-400"></span>
+      <div class="absolute -bottom-2 bg-zinc-900 border border-zinc-800 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase">Forge</div>
+    </div>
+    <div class="text-center">
+      <h2 class="text-2xl font-black uppercase tracking-tighter italic">Arcane Smithing</h2>
+      <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Refine raw materials into instruments of war</p>
+    </div>
+  </div>
+
+  <!-- Recipe Grid -->
+  <div class="pixel-card">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="uppercase text-xs font-black tracking-widest text-zinc-500">Blueprints</h3>
+      <div class="flex items-center gap-2">
+         <span class="i-lucide:filter icon-sm text-zinc-600"></span>
+         <span class="text-[10px] font-bold text-zinc-600 uppercase">Swords Only</span>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <div class="pixel-card bg-zinc-900/40 p-3 border-zinc-800/50">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-zinc-800 rounded-lg flex items-center justify-center border border-zinc-700">
+            <span class="i-lucide:sword icon-md text-cyan-400"></span>
+          </div>
+          <div class="flex-1">
+            <div class="text-sm font-black uppercase italic tracking-tight">Iron Broadsword</div>
+            <div class="flex gap-2 mt-1">
+              <span class="text-[8px] font-bold bg-orange-950/30 text-orange-400 px-1.5 py-0.5 rounded border border-orange-900/30">5 LOGS</span>
+              <span class="text-[8px] font-bold bg-blue-950/30 text-blue-400 px-1.5 py-0.5 rounded border border-blue-900/30">3 ORE</span>
+            </div>
+          </div>
+          <button class="btn-primary py-2 px-4 text-xs font-black uppercase italic" data-action="craftSword">Forge</button>
+        </div>
+        <!-- Progress Bar (Timers) -->
+        <div class="mt-3 opacity-20">
+          <div class="progress-bar-container h-1">
+            <div class="progress-bar-fill bg-zinc-500 w-0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ownership Ribbon -->
+  <div class="stat-ribbon justify-between italic">
+    <span class="text-[10px] font-bold text-zinc-500 uppercase">Armory Count</span>
+    <div class="flex items-center gap-2">
+      <span class="i-lucide:sword icon-sm text-cyan-400"></span>
+      <span data-bind="swords" class="text-sm font-black tabular-nums text-zinc-100">0</span>
+    </div>
   </div>
 </section>

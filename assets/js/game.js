@@ -225,7 +225,22 @@ function wireEvents() {
   document.body.addEventListener('click', (event) => {
     const button = event.target.closest('[data-action]');
     if (!button) return;
+
+    if (button.dataset.action === 'open-modal') {
+      document.getElementById('modal-root').classList.remove('hidden');
+    }
+    if (button.dataset.action === 'close-modal') {
+      document.getElementById('modal-root').classList.add('hidden');
+    }
+
     void act(button.dataset.action);
+  });
+
+  // Close modal on background click
+  document.getElementById('modal-root').addEventListener('click', (event) => {
+    if (event.target.id === 'modal-root') {
+      document.getElementById('modal-root').classList.add('hidden');
+    }
   });
 
   document.body.addEventListener('htmx:afterSwap', () => {

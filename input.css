@@ -1,35 +1,115 @@
 @import "tailwindcss";
+@plugin "./iconify.js";
 
 @theme {
-  --color-panel: #3f3f46;
-  --color-gamebg: #0d0f14;
+  --color-panel: #18181b;
+  --color-gamebg: #09090b;
   --color-accent: #22d3ee;
+
+  --color-surface-low: #18181b;
+  --color-surface-med: #27272a;
+  --color-surface-high: #3f3f46;
+
+  --shadow-glow: 0 0 15px rgba(34, 211, 238, 0.3);
+
+  --spacing-safe-top: env(safe-area-inset-top);
+  --spacing-safe-bottom: env(safe-area-inset-bottom);
 }
 
 @layer base {
   body {
-    @apply bg-gamebg text-zinc-100 min-h-screen antialiased;
-    font-family: Inter, system-ui, sans-serif;
+    @apply bg-gamebg text-zinc-100 min-h-screen antialiased selection:bg-cyan-500/30;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
   }
+
+  h1, h2, h3 { @apply tracking-tight font-bold text-zinc-50; }
+  h1 { @apply text-2xl; }
+  h2 { @apply text-xl; }
+  h3 { @apply text-lg; }
 }
 
 @layer components {
+  /* Pixel-Card Component */
+  .pixel-card {
+    @apply bg-surface-low rounded-2xl p-4 shadow-lg border border-zinc-800/50 relative overflow-hidden;
+    background-image: linear-gradient(to bottom right, rgba(255,255,255,0.02), transparent);
+  }
+  .pixel-card::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none border border-white/5 rounded-2xl;
+  }
+
+  /* Stat Ribbon Component */
+  .stat-ribbon {
+    @apply flex items-center gap-3 bg-zinc-900/50 rounded-xl px-3 py-2 border border-zinc-800/40;
+  }
+  .stat-pill {
+    @apply flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-zinc-800/40 border border-zinc-700/30;
+  }
+
+  /* Progress Bar Component */
+  .progress-bar-container {
+    @apply w-full h-4 bg-zinc-900 rounded-full border border-zinc-800 p-0.5 relative overflow-hidden;
+  }
+  .progress-bar-fill {
+    @apply h-full rounded-full transition-all duration-500 relative;
+    background: linear-gradient(90deg, var(--color-cyan-600), var(--color-cyan-400));
+  }
+  .progress-bar-glow {
+    @apply absolute inset-0 blur-sm opacity-50;
+    background: inherit;
+  }
+
+  /* Grid Primitives */
+  .ui-grid-inventory {
+    @apply grid grid-cols-5 gap-2;
+  }
+  .ui-grid-item-slot {
+    @apply aspect-square bg-zinc-900 rounded-xl border-2 border-dashed border-zinc-800 flex items-center justify-center hover:border-cyan-500/50 transition-colors cursor-pointer;
+  }
+  .ui-grid-item-slot.active {
+    @apply border-solid border-cyan-500 bg-cyan-500/5 shadow-glow;
+  }
+
+  /* Legacy Compat (To be phased out) */
   .card {
-    @apply bg-zinc-700/80 rounded-2xl p-4 shadow-lg border border-zinc-600;
+    @apply bg-surface-low rounded-2xl p-4 shadow-lg border border-zinc-800/50 relative overflow-hidden;
+    background-image: linear-gradient(to bottom right, rgba(255,255,255,0.02), transparent);
+  }
+  .card::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none border border-white/5 rounded-2xl;
   }
   .btn {
-    @apply rounded-xl bg-zinc-700 px-4 py-2 text-zinc-100 active:scale-95 transition;
+    @apply rounded-xl bg-zinc-800 px-4 py-2 text-zinc-100 active:scale-95 transition border border-zinc-700/50 hover:bg-zinc-700;
   }
   .btn-primary {
-    @apply rounded-xl bg-cyan-600 px-4 py-2 text-zinc-100 active:scale-95 transition hover:bg-cyan-500;
+    @apply rounded-xl bg-cyan-600 px-4 py-2 text-zinc-100 active:scale-95 transition hover:bg-cyan-500 shadow-glow border border-cyan-400/30;
   }
   .xp-bar {
-    @apply h-3 w-full rounded-full bg-zinc-800 overflow-hidden;
+    @apply w-full h-4 bg-zinc-900 rounded-full border border-zinc-800 p-0.5 relative overflow-hidden;
   }
   .xp-fill {
-    @apply h-full bg-cyan-400 transition-all duration-300;
+    @apply h-full rounded-full transition-all duration-500 relative;
+    background: linear-gradient(90deg, var(--color-cyan-600), var(--color-cyan-400));
   }
   .resource-pill {
-    @apply rounded-xl bg-zinc-700 px-3 py-2 text-sm;
+    @apply flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-zinc-800/40 border border-zinc-700/30;
+  }
+
+  /* Icon System Utilities */
+  .icon-ui {
+    @apply inline-block align-middle transition-all duration-200;
+  }
+  .icon-sm { @apply inline-block align-middle transition-all duration-200 w-4 h-4; }
+  .icon-md { @apply inline-block align-middle transition-all duration-200 w-6 h-6; }
+  .icon-lg { @apply inline-block align-middle transition-all duration-200 w-8 h-8; }
+
+  .icon-active {
+    @apply text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)];
+  }
+  .icon-locked {
+    @apply text-zinc-600 grayscale;
   }
 }

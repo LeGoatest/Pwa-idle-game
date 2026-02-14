@@ -11,7 +11,11 @@ const APP_ASSETS = [
   './views/gathering.html',
   './views/crafting.html',
   './views/inventory.html',
-  './views/settings.html'
+  './views/settings.html',
+  './views/journal.html',
+  './views/shop.html',
+  './views/equipment.html',
+  './views/shop_item.html'
 ];
 
 self.addEventListener('install', (event) => {
