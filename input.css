@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@plugin "./iconify.js";
+@plugin "@iconify/tailwind4";
 
 @theme {
   --color-panel: #18181b;

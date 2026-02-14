@@ -2,7 +2,7 @@
   <!-- Entity Card -->
   <div class="pixel-card flex flex-col items-center py-8">
     <div class="w-32 h-32 bg-zinc-800/50 rounded-full flex items-center justify-center border-4 border-zinc-900 shadow-inner mb-4 relative group">
-      <span class="i-lucide:skull w-16 h-16 text-zinc-600 group-hover:text-red-500 transition-colors"></span>
+      <span class="icon-[lucide--skull] w-16 h-16 text-zinc-600 group-hover:text-red-500 transition-colors"></span>
       <div class="absolute -top-2 -right-2 bg-red-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-tighter">Elite</div>
     </div>
     <h2 class="text-2xl font-black italic tracking-tighter uppercase mb-1">Dungeon Goblin</h2>
@@ -12,15 +12,15 @@
   <!-- Stat Ribbon -->
   <div class="stat-ribbon justify-between">
     <div class="stat-pill">
-      <span class="i-lucide:sword icon-sm text-orange-400"></span>
+      <span class="icon-[lucide--sword] icon-sm text-orange-400"></span>
       <span data-bind="attack" class="text-sm font-bold tabular-nums">0</span>
     </div>
     <div class="stat-pill">
-      <span class="i-lucide:shield icon-sm text-blue-400"></span>
+      <span class="icon-[lucide--shield] icon-sm text-blue-400"></span>
       <span data-bind="defense" class="text-sm font-bold tabular-nums">0</span>
     </div>
     <div class="stat-pill">
-      <span class="i-lucide:heart icon-sm text-red-500"></span>
+      <span class="icon-[lucide--heart] icon-sm text-red-500"></span>
       <span data-bind="hp" class="text-sm font-bold tabular-nums">0</span>
     </div>
   </div>
@@ -29,7 +29,7 @@
   <div class="pixel-card space-y-4">
     <div class="flex items-center justify-between mb-1">
       <div class="flex items-center gap-2">
-        <span class="i-lucide:flame icon-sm text-red-400"></span>
+        <span class="icon-[lucide--flame] icon-sm text-red-400"></span>
         <span class="text-sm font-bold uppercase tracking-tight">Enemy Vitality</span>
       </div>
       <span data-bind="enemyHp" class="text-xs font-mono text-zinc-400">0 / 0</span>
@@ -43,11 +43,11 @@
 
     <div class="flex gap-3 pt-2">
       <button class="btn-primary flex-1 flex items-center justify-center gap-2" data-action="combat">
-        <span class="i-lucide:zap icon-sm"></span>
+        <span class="icon-[lucide--zap] icon-sm"></span>
         <span>Strike</span>
       </button>
       <button class="btn flex-1 flex items-center justify-center gap-2" data-action="toggleAutoCombat">
-        <span class="i-lucide:repeat icon-sm"></span>
+        <span class="icon-[lucide--repeat] icon-sm"></span>
         <span>Auto: <span data-bind="autoCombat">Off</span></span>
       </button>
     </div>
