@@ -9,7 +9,7 @@ const TICK_MS = 1000;
 const MAX_OFFLINE_MS = 8 * 60 * 60 * 1000;
 
 const defaultState = {
-  version: 1,
+  version: 2,
   gold: 0,
   logs: 0,
   ore: 0,
@@ -27,8 +27,49 @@ const defaultState = {
   combatLevel: 1,
   enemyHp: 12,
   enemyMaxHp: 12,
-  autoCombat: false,
+  activeTask: {
+    kind: 'none',
+    startedAt: 0,
+    lastProcessedAt: 0,
+    progress: 0
+  },
   updatedAt: Date.now()
+};
+
+const TASKS_CONFIG = {
+  combat: {
+    name: 'Hunt',
+    baseDuration: 2000,
+    station: './views/combat.html',
+    onComplete: () => {
+      state.enemyHp -= state.attack + state.swords;
+      if (state.enemyHp <= 0) {
+        state.kills += 1;
+        state.gold += 5 + state.combatLevel;
+        gainXp('combat', 6);
+        state.enemyMaxHp = 10 + state.combatLevel * 3;
+        state.enemyHp = state.enemyMaxHp;
+      }
+    }
+  },
+  woodcutting: {
+    name: 'Woodcutting',
+    baseDuration: 3000,
+    station: './views/gathering.html',
+    onComplete: () => {
+      state.logs += 1 + Math.floor(state.woodLevel / 5);
+      gainXp('wood', 4);
+    }
+  },
+  mining: {
+    name: 'Mining',
+    baseDuration: 4000,
+    station: './views/gathering.html',
+    onComplete: () => {
+      state.ore += 1 + Math.floor(state.mineLevel / 6);
+      gainXp('mine', 4);
+    }
+  }
 };
 
 const defaultMeta = {
@@ -114,39 +155,98 @@ function gainXp(skill, amount) {
   }
 }
 
-function progressOffline() {
-  const elapsed = Math.min(Date.now() - state.updatedAt, MAX_OFFLINE_MS);
-  const ticks = Math.floor(elapsed / TICK_MS);
-  if (ticks <= 0) return;
-  if (state.autoCombat) {
-    for (let i = 0; i < ticks; i += 1) combatTick();
-  }
-  state.logs += Math.floor(ticks * 0.2 * state.woodLevel);
-  state.ore += Math.floor(ticks * 0.15 * state.mineLevel);
+function getCycleDuration(kind) {
+  const config = TASKS_CONFIG[kind];
+  if (!config) return 1000;
+  // Modifiers can be added here
+  return config.baseDuration;
 }
 
-function combatTick() {
-  state.enemyHp -= state.attack + state.swords;
-  if (state.enemyHp <= 0) {
-    state.kills += 1;
-    state.gold += 5 + state.combatLevel;
-    gainXp('combat', 6);
-    state.enemyMaxHp = 10 + state.combatLevel * 3;
-    state.enemyHp = state.enemyMaxHp;
+function processTask(deltaMs) {
+  if (state.activeTask.kind === 'none') return;
+
+  const kind = state.activeTask.kind;
+  const config = TASKS_CONFIG[kind];
+  if (!config) return;
+
+  const duration = getCycleDuration(kind);
+  state.activeTask.progress += deltaMs;
+  state.activeTask.lastProcessedAt = Date.now();
+
+  while (state.activeTask.progress >= duration) {
+    state.activeTask.progress -= duration;
+    config.onComplete();
   }
+}
+
+function progressOffline() {
+  const now = Date.now();
+  const elapsed = Math.min(now - state.updatedAt, MAX_OFFLINE_MS);
+  if (elapsed <= 0) return;
+  processTask(elapsed);
+}
+
+function showToast(title, body) {
+  const existing = document.getElementById('game-toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'game-toast';
+  toast.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 z-[200] w-[90%] max-w-xs bg-zinc-900 border border-zinc-800 p-3 rounded-xl shadow-2xl animate-in slide-in-from-bottom-2 duration-300';
+  toast.innerHTML = `
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center">
+        <span class="icon-[lucide--info] text-cyan-400"></span>
+      </div>
+      <div>
+        <div class="text-[10px] font-black uppercase tracking-widest text-zinc-500">${title}</div>
+        <div class="text-xs font-bold text-zinc-200">${body}</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('animate-out', 'fade-out', 'slide-out-to-bottom-2');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+async function setActiveTask(kind) {
+  const oldKind = state.activeTask.kind;
+
+  if (oldKind === kind) {
+    state.activeTask.kind = 'none';
+    showToast(`${TASKS_CONFIG[kind]?.name || kind} stopped`, 'Activity paused');
+  } else {
+    state.activeTask.kind = kind;
+    state.activeTask.startedAt = Date.now();
+    state.activeTask.lastProcessedAt = Date.now();
+    state.activeTask.progress = 0;
+
+    const config = TASKS_CONFIG[kind];
+    if (config) {
+      showToast(`${TASKS_CONFIG[oldKind]?.name || 'Nothing'} stopped`, `${config.name} started`);
+      // Close launcher if it's open (it will be handled by the click listener usually, but just in case)
+      const launcher = document.getElementById('skills-launcher');
+      if (launcher) launcher.classList.add('hidden');
+
+      // Navigate to station
+      if (typeof htmx !== 'undefined') {
+        htmx.ajax('GET', config.station, { target: '#view-root', swap: 'innerHTML show:top' });
+      }
+    }
+  }
+
+  render();
+  await save();
 }
 
 async function act(action) {
-  if (action === 'combat') combatTick();
-  if (action === 'toggleAutoCombat') state.autoCombat = !state.autoCombat;
-  if (action === 'woodcutting') {
-    state.logs += 1 + Math.floor(state.woodLevel / 5);
-    gainXp('wood', 4);
+  if (TASKS_CONFIG[action]) {
+    await setActiveTask(action);
+    return;
   }
-  if (action === 'mining') {
-    state.ore += 1 + Math.floor(state.mineLevel / 6);
-    gainXp('mine', 4);
-  }
+
   if (action === 'craftSword') {
     if (state.logs >= 5 && state.ore >= 3) {
       state.logs -= 5;
@@ -230,12 +330,82 @@ function render() {
   document.querySelectorAll('[data-bind]').forEach((el) => {
     const key = el.dataset.bind;
     if (key === 'enemyHp') el.textContent = `${Math.max(0, state.enemyHp)} / ${state.enemyMaxHp}`;
-    else if (key === 'autoCombat') el.textContent = state.autoCombat ? 'On' : 'Off';
+    else if (key === 'activeTaskName') el.textContent = TASKS_CONFIG[state.activeTask.kind]?.name || 'Idle';
     else el.textContent = state[key] ?? '0';
   });
+
+  document.querySelectorAll('[data-bind-class]').forEach((el) => {
+    const expr = el.dataset.bindClass;
+    // Simple expression evaluator for specific cases
+    if (expr === "activeTask.kind !== 'none' ? '' : 'hidden'") {
+      if (state.activeTask.kind !== 'none') el.classList.remove('hidden');
+      else el.classList.add('hidden');
+    }
+  });
+
   document.querySelectorAll('[data-bind-style="enemyHpPct"]').forEach((el) => {
     const pct = Math.max(0, Math.min(100, (state.enemyHp / state.enemyMaxHp) * 100));
     el.style.width = `${pct}%`;
+  });
+
+  // Render progress bar for active task
+  const currentKind = state.activeTask.kind;
+  document.querySelectorAll('[data-task-bar]').forEach(el => {
+     const taskKind = el.dataset.taskBar;
+     if (taskKind === currentKind) {
+        const duration = getCycleDuration(currentKind);
+        const pct = Math.min(100, (state.activeTask.progress / duration) * 100);
+        el.style.width = `${pct}%`;
+        el.parentElement.classList.remove('opacity-0');
+     } else {
+        el.style.width = '0%';
+        el.parentElement.classList.add('opacity-0');
+     }
+  });
+
+  // Update Start/Pause buttons
+  document.querySelectorAll('[data-action]').forEach(btn => {
+    const action = btn.dataset.action;
+    if (TASKS_CONFIG[action]) {
+       const icon = btn.querySelector('.icon-contract');
+       if (icon) {
+         if (state.activeTask.kind === action) {
+           icon.classList.remove('icon-[game-icons--play-button]');
+           icon.classList.add('icon-[game-icons--pause-button]');
+         } else {
+           icon.classList.remove('icon-[game-icons--pause-button]');
+           icon.classList.add('icon-[game-icons--play-button]');
+         }
+       }
+    }
+  });
+
+  // Highlight active skill in launcher
+  document.querySelectorAll('#skills-launcher [data-action]').forEach(btn => {
+    const action = btn.dataset.action;
+    if (action === state.activeTask.kind) {
+      btn.classList.add('border-cyan-500/50', 'bg-cyan-500/10');
+      btn.querySelector('span')?.classList.add('text-cyan-400');
+    } else {
+      btn.classList.remove('border-cyan-500/50', 'bg-cyan-500/10');
+      btn.querySelector('span')?.classList.remove('text-cyan-400');
+    }
+  });
+
+  // Dock highlight
+  const activeStation = document.querySelector('#view-root section')?.dataset.view;
+  document.querySelectorAll('footer nav button').forEach(btn => {
+     const hxGet = btn.getAttribute('hx-get');
+     if (hxGet && hxGet.includes(activeStation)) {
+        btn.classList.add('text-cyan-400');
+        btn.classList.remove('text-zinc-400');
+        btn.setAttribute('aria-selected', 'true');
+     } else {
+        // Special case for Skills launcher
+        if (btn.id === 'skills-btn' && (state.activeTask.kind === 'woodcutting' || state.activeTask.kind === 'mining')) {
+           // btn.classList.add('text-cyan-400'); // Maybe?
+        }
+     }
   });
 }
 
@@ -251,6 +421,18 @@ function wireEvents() {
       document.getElementById('modal-root').classList.add('hidden');
     }
 
+    // Skills Launcher toggle
+    if (button.dataset.action === 'toggle-launcher') {
+       const launcher = document.getElementById('skills-launcher');
+       launcher.classList.toggle('hidden');
+    } else {
+       // Close launcher when clicking anything else
+       const launcher = document.getElementById('skills-launcher');
+       if (launcher && !launcher.contains(event.target) && !button.closest('#skills-btn')) {
+          launcher.classList.add('hidden');
+       }
+    }
+
     void act(button.dataset.action);
   });
 
@@ -261,29 +443,34 @@ function wireEvents() {
     }
   });
 
-  document.body.addEventListener('htmx:afterSwap', () => {
+  document.body.addEventListener('htmx:afterSwap', (event) => {
     const install = document.getElementById('install-btn');
     if (install && installPrompt) install.classList.remove('hidden');
+
+    // Update title based on newly swapped content
+    const view = event.detail.elt.querySelector('section')?.dataset.view;
+    if (view) {
+       const titleEl = document.getElementById('station-title');
+       if (titleEl) {
+          titleEl.textContent = view.charAt(0).toUpperCase() + view.slice(1);
+       }
+
+       // Highlight dock
+       document.querySelectorAll('footer nav button').forEach(btn => {
+         const hxGet = btn.getAttribute('hx-get');
+         if (hxGet && hxGet.includes(view)) {
+            btn.classList.add('text-cyan-400');
+            btn.classList.remove('text-zinc-400');
+            btn.setAttribute('aria-selected', 'true');
+         } else {
+            btn.classList.remove('text-cyan-400');
+            btn.classList.add('text-zinc-400');
+            btn.removeAttribute('aria-selected');
+         }
+       });
+    }
+
     render();
-  });
-
-  document.querySelector('footer nav').addEventListener('click', (event) => {
-    const btn = event.target.closest('[data-title]');
-    if (!btn) return;
-
-    // Update dynamic title
-    const titleEl = document.getElementById('station-title');
-    if (titleEl) titleEl.textContent = btn.dataset.title;
-
-    // Update active state in dock
-    document.querySelectorAll('footer nav button').forEach(b => {
-      b.classList.remove('text-cyan-400');
-      b.classList.add('text-zinc-400');
-      b.removeAttribute('aria-selected');
-    });
-    btn.classList.add('text-cyan-400');
-    btn.classList.remove('text-zinc-400');
-    btn.setAttribute('aria-selected', 'true');
   });
 }
 
@@ -311,11 +498,17 @@ async function init() {
   initPwa();
   render();
   await save();
+
+  let lastTick = Date.now();
   setInterval(() => {
-    if (state.autoCombat) combatTick();
+    const now = Date.now();
+    const delta = now - lastTick;
+    lastTick = now;
+
+    processTask(delta);
     void save();
     render();
-  }, TICK_MS);
+  }, 100); // 10fps for smooth bars
 }
 
 void init();

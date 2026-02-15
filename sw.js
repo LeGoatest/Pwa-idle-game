@@ -1,4 +1,4 @@
-const CACHE = 'idle-frontier-v3';
+const CACHE = 'idle-frontier-v4';
 const APP_ASSETS = [
   './',
   './index.html',

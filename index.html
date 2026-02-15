@@ -12,7 +12,13 @@
   <body class="mx-auto max-w-md bg-gamebg text-zinc-100 min-h-screen flex flex-col pb-24 shadow-2xl">
     <!-- Top Shell -->
     <header class="sticky top-0 z-50 w-full bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800 p-4 flex items-center justify-between">
-      <h1 id="station-title" class="text-xl font-bold tracking-tight text-zinc-100">Idle Frontier</h1>
+      <div>
+        <h1 id="station-title" class="text-xl font-bold tracking-tight text-zinc-100">Idle Frontier</h1>
+        <div class="flex items-center gap-1.5 mt-0.5">
+          <div class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></div>
+          <span data-bind="activeTaskName" class="text-[10px] font-black uppercase tracking-widest text-zinc-500">Idle</span>
+        </div>
+      </div>
       <div class="flex items-center gap-3">
         <div class="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1 rounded-full border border-zinc-700/50">
           <span class="icon-[game-icons--coins] icon-sm text-yellow-500"></span>
@@ -38,28 +44,54 @@
        <div id="modal-content" class="w-full max-w-sm pointer-events-auto"></div>
     </div>
 
+    <!-- Skills Launcher Overlay -->
+    <div id="skills-launcher" class="fixed bottom-20 left-0 right-0 mx-auto max-w-md z-40 hidden animate-in slide-in-from-bottom-4 duration-300">
+      <div class="mx-4 p-4 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 rounded-2xl shadow-2xl">
+        <div class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 ml-1">Select Skill</div>
+        <div class="grid grid-cols-4 gap-3">
+          <button class="flex flex-col items-center gap-2 p-3 bg-zinc-800/50 hover:bg-cyan-500/10 rounded-xl transition-all border border-transparent hover:border-cyan-500/30 group"
+                  data-action="woodcutting">
+            <span class="icon-[game-icons--birch-trees] w-6 h-6 text-zinc-400 group-hover:text-cyan-400"></span>
+            <span class="text-[9px] font-bold uppercase tracking-tight">Wood</span>
+          </button>
+          <button class="flex flex-col items-center gap-2 p-3 bg-zinc-800/50 hover:bg-cyan-500/10 rounded-xl transition-all border border-transparent hover:border-cyan-500/30 group"
+                  data-action="mining">
+            <span class="icon-[game-icons--pickelhaube] w-6 h-6 text-zinc-400 group-hover:text-cyan-400"></span>
+            <span class="text-[9px] font-bold uppercase tracking-tight">Mine</span>
+          </button>
+          <!-- Placeholder Skills -->
+          <button class="flex flex-col items-center gap-2 p-3 bg-zinc-800/50 opacity-40 rounded-xl border border-transparent cursor-not-allowed">
+            <span class="icon-[game-icons--fishing-net] w-6 h-6 text-zinc-400"></span>
+            <span class="text-[9px] font-bold uppercase tracking-tight text-zinc-600">Fish</span>
+          </button>
+          <button class="flex flex-col items-center gap-2 p-3 bg-zinc-800/50 opacity-40 rounded-xl border border-transparent cursor-not-allowed">
+            <span class="icon-[game-icons--cauldron] w-6 h-6 text-zinc-400"></span>
+            <span class="text-[9px] font-bold uppercase tracking-tight text-zinc-600">Cook</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Bottom Dock -->
     <footer class="fixed bottom-0 left-0 right-0 mx-auto max-w-md bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-800/50 px-1 py-2 z-50">
-      <nav class="grid grid-cols-6 items-center">
+      <nav class="grid grid-cols-5 items-center">
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
-                hx-get="./views/combat.html" hx-target="#view-root" data-title="Combat" aria-selected="true">
+                hx-get="./views/combat.html" hx-target="#view-root" data-title="Combat">
           <span class="icon-[game-icons--crossed-swords] w-6 h-6 group-aria-selected:text-cyan-400 group-aria-selected:drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] transition-all"></span>
           <span class="text-[9px] font-black uppercase tracking-tighter group-aria-selected:text-cyan-400">Hunt</span>
-        </button>
-        <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
-                hx-get="./views/shop.html" hx-target="#view-root" data-title="Shop">
-          <span class="icon-[game-icons--shop] w-6 h-6 group-aria-selected:text-cyan-400 transition-all"></span>
-          <span class="text-[9px] font-black uppercase tracking-tighter">Shop</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
                 hx-get="./views/equipment.html" hx-target="#view-root" data-title="Equipment">
           <span class="icon-[game-icons--battle-gear] w-6 h-6 group-aria-selected:text-cyan-400 transition-all"></span>
           <span class="text-[9px] font-black uppercase tracking-tighter">Gear</span>
         </button>
-        <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
-                hx-get="./views/crafting.html" hx-target="#view-root" data-title="Crafting">
-          <span class="icon-[game-icons--anvil-impact] w-6 h-6 group-aria-selected:text-cyan-400 transition-all"></span>
-          <span class="text-[9px] font-black uppercase tracking-tighter">Forge</span>
+        <button id="skills-btn" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
+                data-action="toggle-launcher">
+          <div class="relative">
+            <span class="icon-[game-icons--skills] w-6 h-6 group-aria-selected:text-cyan-400 transition-all"></span>
+            <div class="absolute -top-1 -right-1 w-2 h-2 bg-cyan-500 rounded-full border border-zinc-900 hidden" data-bind-class="activeTask.kind !== 'none' ? '' : 'hidden'"></div>
+          </div>
+          <span class="text-[9px] font-black uppercase tracking-tighter">Skills</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
                 hx-get="./views/inventory.html" hx-target="#view-root" data-title="Inventory">
@@ -67,9 +99,9 @@
           <span class="text-[9px] font-black uppercase tracking-tighter">Vault</span>
         </button>
         <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
-                hx-get="./views/journal.html" hx-target="#view-root" data-title="Journal">
-          <span class="icon-[game-icons--scroll-unfurled] w-6 h-6 group-aria-selected:text-cyan-400 transition-all"></span>
-          <span class="text-[9px] font-black uppercase tracking-tighter">Logs</span>
+                hx-get="./views/settings.html" hx-target="#modal-content" data-action="open-modal">
+          <span class="icon-[game-icons--cog] w-6 h-6 group-aria-selected:text-cyan-400 transition-all"></span>
+          <span class="text-[9px] font-black uppercase tracking-tighter">Setup</span>
         </button>
       </nav>
     </footer>

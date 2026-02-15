@@ -6,12 +6,19 @@ All icons MUST use the `game-icons` collection for themed game elements and `luc
 ## 1. Core Navigation (Bottom Dock)
 | Semantic | Icon | Class |
 | :--- | :--- | :--- |
-| Combat | `icon-[game-icons--crossed-swords]` | `icon-md` |
-| Shop | `icon-[game-icons--shop]` | `icon-md` |
+| Hunt | `icon-[game-icons--crossed-swords]` | `icon-md` |
 | Equipment | `icon-[game-icons--battle-gear]` | `icon-md` |
-| Crafting | `icon-[game-icons--anvil-impact]` | `icon-md` |
+| Skills | `icon-[game-icons--skills]` | `icon-md` |
 | Inventory | `icon-[game-icons--locked-chest]` | `icon-md` |
-| Journal | `icon-[game-icons--scroll-unfurled]` | `icon-md` |
+| Settings | `icon-[game-icons--cog]` | `icon-md` |
+
+## 1.1 Skills Launcher
+| Semantic | Icon | Class |
+| :--- | :--- | :--- |
+| Woodcutting | `icon-[game-icons--birch-trees]` | `icon-md` |
+| Mining | `icon-[game-icons--pickelhaube]` | `icon-md` |
+| Fishing | `icon-[game-icons--fishing-net]` | `icon-md` |
+| Cooking | `icon-[game-icons--cauldron]` | `icon-md` |
 
 ## 2. Resource & Stats
 | Semantic | Icon | Class |
