@@ -22,16 +22,19 @@
     <!-- Woodcutting -->
     <button class="pixel-card group hover:bg-zinc-800/40 transition-colors text-left relative overflow-hidden" data-action="woodcutting">
       <div class="flex items-center gap-4 relative z-10">
-        <div class="w-12 h-12 rounded-xl bg-orange-950/30 flex items-center justify-center border border-orange-900/50">
+        <div class="w-12 h-12 rounded-xl bg-orange-950/30 flex items-center justify-center border border-orange-900/50 relative">
           <span class="icon-[game-icons--forest] w-6 h-6 text-orange-400"></span>
+          <div class="absolute -top-1 -right-1">
+            <span class="icon-contract icon-[game-icons--play-button] w-4 h-4 text-white drop-shadow-md"></span>
+          </div>
         </div>
         <div class="flex-1">
           <div class="flex items-center justify-between mb-1">
             <span class="font-black uppercase text-sm tracking-tight">Sylvan Logging</span>
             <span class="text-[10px] font-mono text-zinc-500">Lv.<span data-bind="woodLevel">1</span></span>
           </div>
-          <div class="progress-bar-container h-2">
-            <div class="progress-bar-fill bg-orange-500" style="width: 45%"></div>
+          <div class="progress-bar-container h-2 opacity-0 transition-opacity">
+            <div class="progress-bar-fill bg-orange-500" data-task-bar="woodcutting"></div>
           </div>
         </div>
         <div class="text-right">
@@ -45,16 +48,19 @@
     <!-- Mining -->
     <button class="pixel-card group hover:bg-zinc-800/40 transition-colors text-left relative overflow-hidden" data-action="mining">
       <div class="flex items-center gap-4 relative z-10">
-        <div class="w-12 h-12 rounded-xl bg-blue-950/30 flex items-center justify-center border border-blue-900/50">
+        <div class="w-12 h-12 rounded-xl bg-blue-950/30 flex items-center justify-center border border-blue-900/50 relative">
           <span class="icon-[game-icons--crystal-cluster] w-6 h-6 text-blue-400"></span>
+          <div class="absolute -top-1 -right-1">
+            <span class="icon-contract icon-[game-icons--play-button] w-4 h-4 text-white drop-shadow-md"></span>
+          </div>
         </div>
         <div class="flex-1">
           <div class="flex items-center justify-between mb-1">
             <span class="font-black uppercase text-sm tracking-tight">Deep Core Mining</span>
             <span class="text-[10px] font-mono text-zinc-500">Lv.<span data-bind="mineLevel">1</span></span>
           </div>
-          <div class="progress-bar-container h-2">
-            <div class="progress-bar-fill bg-blue-500" style="width: 30%"></div>
+          <div class="progress-bar-container h-2 opacity-0 transition-opacity">
+            <div class="progress-bar-fill bg-blue-500" data-task-bar="mining"></div>
           </div>
         </div>
         <div class="text-right">

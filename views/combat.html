@@ -41,14 +41,21 @@
       </div>
     </div>
 
-    <div class="flex gap-3 pt-2">
-      <button class="btn-primary flex-1 flex items-center justify-center gap-2" data-action="combat">
-        <span class="icon-[game-icons--sword-clash] icon-sm"></span>
-        <span>Strike</span>
-      </button>
-      <button class="btn flex-1 flex items-center justify-center gap-2" data-action="toggleAutoCombat">
-        <span class="icon-[game-icons--cycle] icon-sm"></span>
-        <span>Auto: <span data-bind="autoCombat">Off</span></span>
+    <!-- Task Progress -->
+    <div class="space-y-2 pt-2">
+      <div class="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-zinc-500">
+        <span>Cycle Progress</span>
+        <span class="text-cyan-400">Active</span>
+      </div>
+      <div class="progress-bar-container h-1.5 opacity-0 transition-opacity">
+        <div class="progress-bar-fill bg-cyan-500" data-task-bar="combat"></div>
+      </div>
+    </div>
+
+    <div class="flex gap-3 pt-4">
+      <button class="btn-primary flex-1 flex items-center justify-center gap-3 py-4" data-action="combat">
+        <span class="icon-contract icon-[game-icons--play-button] icon-md"></span>
+        <span class="text-sm font-black uppercase italic tracking-widest">Begin Hunt</span>
       </button>
     </div>
   </div>

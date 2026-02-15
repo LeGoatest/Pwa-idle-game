@@ -22,8 +22,10 @@ Non-negotiable. If a change violates any rule, the correct action is to refuse.
 
 ## 3) Logic & State Rules
 - **Centralized State**: Game state must be centralized in `assets/js/game.js`.
+- **Single Active Task**: At any moment, only ONE `activeTask` may exist. Starting a new task cancels the previous one.
+- **Cycle Engine**: All progression (XP, resources) must be processed through repeating timed cycles of the `activeTask`.
+- **Offline Engine**: Upon resume, offline rewards are granted only for the `activeTask` based on completed cycles since the last save.
 - **Persistence**: Game progress must be persisted using IndexedDB.
-- **Offline Support**: The application must remain functional offline via the service worker.
 - **Vanilla JS**: Core logic must remain in vanilla JavaScript to maintain low overhead and high performance.
 
 ## 4) Forbidden Patterns
