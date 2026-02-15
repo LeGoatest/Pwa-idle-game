@@ -155,6 +155,24 @@ async function act(action) {
       state.attack += 1;
     }
   }
+  if (action === 'forceUpdate') {
+    if (confirm('Unregister service worker and clear cache? The app will reload.')) {
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (let registration of registrations) {
+          await registration.unregister();
+        }
+      }
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        for (let key of keys) {
+          await caches.delete(key);
+        }
+      }
+      window.location.reload(true);
+      return;
+    }
+  }
   if (action === 'save') await save();
   if (action === 'reset' && confirm('Reset all progress?')) {
     await clearDb();
