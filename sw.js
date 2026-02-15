@@ -1,22 +1,22 @@
-const CACHE = 'idle-frontier-v1';
+const CACHE = 'idle-frontier-v2';
 const APP_ASSETS = [
-  '../../',
-  '../../index.html',
-  '../css/style.css',
-  './game.js',
-  './htmx.min.js',
-  '../../manifest.webmanifest',
-  '../icons/icon.svg',
-  '../icons/icon-maskable.svg',
-  '../../views/combat.html',
-  '../../views/gathering.html',
-  '../../views/crafting.html',
-  '../../views/inventory.html',
-  '../../views/settings.html',
-  '../../views/journal.html',
-  '../../views/shop.html',
-  '../../views/equipment.html',
-  '../../views/shop_item.html'
+  './',
+  './index.html',
+  './assets/css/style.css',
+  './assets/js/game.js',
+  './assets/js/htmx.min.js',
+  './manifest.webmanifest',
+  './assets/icons/icon.svg',
+  './assets/icons/icon-maskable.svg',
+  './views/combat.html',
+  './views/gathering.html',
+  './views/crafting.html',
+  './views/inventory.html',
+  './views/settings.html',
+  './views/journal.html',
+  './views/shop.html',
+  './views/equipment.html',
+  './views/shop_item.html'
 ];
 
 self.addEventListener('install', (event) => {
@@ -35,10 +35,15 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
       return fetch(event.request).then((response) => {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+           return response;
+        }
         const clone = response.clone();
         caches.open(CACHE).then((cache) => cache.put(event.request, clone));
         return response;
       });
+    }).catch(() => {
+        // Fallback or just let it fail
     })
   );
 });
