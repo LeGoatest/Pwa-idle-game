@@ -270,9 +270,6 @@ function wireEvents() {
 }
 
 function initPwa() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./assets/js/sw.js', { scope: '/' });
-  }
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     installPrompt = e;

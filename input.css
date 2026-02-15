@@ -1,7 +1,5 @@
 @import "tailwindcss";
-@plugin "@iconify/tailwind4" {
-  prefixes: lucide;
-}
+@plugin "@iconify/tailwind4";
 
 @theme {
   --color-panel: #18181b;
@@ -100,30 +98,10 @@
     @apply flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-zinc-800/40 border border-zinc-700/30;
   }
 
-  /* Icon System Utilities */
-  .iconify, [class^="icon-"], [class*=" icon-"], [class^="lucide--"], [class*=" lucide--"] {
-    @apply inline-block align-middle;
-    background-color: currentColor;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-size: contain;
-    mask-size: contain;
-    -webkit-mask-position: center;
-    mask-position: center;
-    width: 1em;
-    height: 1em;
-    flex-shrink: 0;
-  }
-
-  /* Force alpha masking for monochrome icons */
-  .iconify, [class*="icon-"], [class*="lucide--"] {
-    -webkit-mask-image: var(--svg);
-    mask-image: var(--svg);
-  }
-
-  .icon-sm { font-size: 1rem !important; width: 1rem !important; height: 1rem !important; }
-  .icon-md { font-size: 1.5rem !important; width: 1.5rem !important; height: 1.5rem !important; }
-  .icon-lg { font-size: 2.5rem !important; width: 2.5rem !important; height: 2.5rem !important; }
+  /* Icon System Sizing */
+  .icon-sm { @apply w-4 h-4; }
+  .icon-md { @apply w-6 h-6; }
+  .icon-lg { @apply w-10 h-10; }
 
   .icon-active {
     @apply text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)];
