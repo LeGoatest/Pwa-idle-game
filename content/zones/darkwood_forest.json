@@ -1,0 +1,14 @@
+{
+  "id": "darkwood_forest",
+  "name": "Darkwood Forest",
+
+  "monsters": [
+    "giant_spider",
+    "young_dragon",
+    "dire_wolf",
+    "orc_warrior",
+    "green_dragon",
+    "forest_troll",
+    "moss_giant_elder"
+  ]
+}
