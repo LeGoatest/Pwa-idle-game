@@ -3,30 +3,59 @@ export const MAX_OFFLINE_MS = 8 * 60 * 60 * 1000;
 export const SAVE_DEBOUNCE_MS = 5000;
 
 export const defaultState = {
-  version: 3,
+  version: 0.0.8,
+
   gold: 0,
   logs: 0,
   ore: 0,
   potions: 0,
   swords: 0,
   kills: 0,
+
   attack: 2,
   defense: 1,
   hp: 20,
+
   woodXp: 0,
   mineXp: 0,
   combatXp: 0,
+
   woodLevel: 1,
   mineLevel: 1,
   combatLevel: 1,
+
   enemyHp: 12,
   enemyMaxHp: 12,
-  activeTask: {
+
+  inventory: {},
+  equipment: {
+    weapon: null,
+    head: null,
+    chest: null,
+    offhand: null,
+    feet: null
+  },
+
+  ui: {
+    tab: 'combat',
+    currentZoneId: null,
+    currentMonsterId: null,
+    currentSkillId: null,
+    combatMode: 'zone',
+    skillsMode: 'list'
+  },
+
+  activity: {
     kind: 'none',
+    skillId: null,
+    nodeId: null,
+    zoneId: null,
+    monsterId: null,
     startedAt: 0,
     lastProcessedAt: 0,
     progress: 0
   },
+
   updatedAt: Date.now()
 };
 
