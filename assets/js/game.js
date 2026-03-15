@@ -18,14 +18,15 @@ import {
 import { initPwa } from './pwa.js';
 import { render, showOfflineSummary, showToast } from './ui.js';
 import {
-  loadZonesIndex,
+  loadRegistryData,
   loadZone,
   loadMonster,
   loadDropTable,
-  loadSkillsIndex,
-  loadSkill
+  loadSkill,
+  loadShopItem
 } from './content_loader.js';
-import { xpForLevel, gainXp } from './systems/progression.js';
+import { loadItemRegistry } from './item_registry.js';
+import { gainXp } from './systems/progression.js';
 
 let state = cloneDefaultState();
 let meta = cloneDefaultMeta();
@@ -35,12 +36,15 @@ let lastSaveAt = 0;
 let dirty = false;
 
 const contentState = {
+  registry: null,
   zonesIndex: null,
   activeZone: null,
   activeMonster: null,
   activeDropTable: null,
   skillsIndex: null,
-  activeSkill: null
+  activeSkill: null,
+  shopIndex: null,
+  shopItems: []
 };
 
 function markDirty() {
@@ -85,6 +89,11 @@ function mergeState(base, saved) {
     ...(saved.inventory || {})
   };
 
+  merged.equipment = {
+    ...(base.equipment || {}),
+    ...(saved.equipment || {})
+  };
+
   return merged;
 }
 
@@ -126,10 +135,15 @@ async function resetGame() {
   meta.launchCount = 1;
   meta.lastLaunchedAt = Date.now();
 
+  contentState.registry = null;
+  contentState.zonesIndex = null;
   contentState.activeZone = null;
   contentState.activeMonster = null;
   contentState.activeDropTable = null;
+  contentState.skillsIndex = null;
   contentState.activeSkill = null;
+  contentState.shopIndex = null;
+  contentState.shopItems = [];
 
   markDirty();
   await save(true);
@@ -332,8 +346,13 @@ function progressOffline() {
 }
 
 async function loadInitialContent() {
-  contentState.zonesIndex = await loadZonesIndex().catch(() => ({ zones: [] }));
-  contentState.skillsIndex = await loadSkillsIndex().catch(() => ({ skills: [] }));
+  contentState.registry = await loadRegistryData();
+  contentState.zonesIndex = contentState.registry.zonesIndex;
+  contentState.skillsIndex = contentState.registry.skillsIndex;
+  contentState.shopIndex = contentState.registry.shopIndex;
+  contentState.shopItems = contentState.registry.shopItemsList || [];
+
+  await loadItemRegistry();
 
   if (state.ui?.currentZoneId) {
     await openZone(state.ui.currentZoneId, false);
@@ -355,6 +374,7 @@ async function openTab(tab, persist = true) {
     combat: './views/combat.html',
     map: './views/map.html',
     skills: './views/skills.html',
+    equipment: './views/equipment.html',
     items: './views/inventory.html',
     shop: './views/shop.html'
   };
@@ -458,7 +478,46 @@ function startMonsterFight() {
   void save();
 }
 
-async function act(action) {
+async function buyItem(itemId) {
+  const item = contentState.shopItems.find((entry) => entry.id === itemId)
+    || await loadShopItem(itemId).catch(() => null);
+
+  if (!item) {
+    showToast('Shop', 'Item not found');
+    return;
+  }
+
+  if ((state.gold ?? 0) < item.price) {
+    showToast('Shop', 'Not enough gold');
+    return;
+  }
+
+  state.gold -= item.price;
+
+  if (item.effect?.type === 'stat' && item.effect.stat) {
+    state[item.effect.stat] = (state[item.effect.stat] ?? 0) + (item.effect.value ?? 0);
+  } else if (item.effect?.type === 'heal') {
+    state.hp = Math.min((state.hp ?? 0) + (item.effect.value ?? 0), 999999);
+  } else if (item.effect?.type === 'item') {
+    ensureInventoryItem(item.effect.itemKey, item.effect.amount ?? 1);
+  }
+
+  if (item.id === 'sword') {
+    state.swords += 1;
+  }
+
+  if (item.id === 'potion') {
+    state.potions += 1;
+    ensureInventoryItem('potion', 1);
+  }
+
+  markDirty();
+  showToast('Shop', `${item.name} purchased`);
+  render(state, contentState);
+  await save();
+}
+
+async function act(action, button = null) {
   if (action === 'save') {
     await save(true);
     return;
@@ -474,6 +533,14 @@ async function act(action) {
 
   if (action === 'fightMonster') {
     startMonsterFight();
+    return;
+  }
+
+  if (action === 'buyItem') {
+    const itemId = button?.dataset.itemId;
+    if (itemId) {
+      await buyItem(itemId);
+    }
     return;
   }
 
@@ -507,6 +574,27 @@ async function act(action) {
   await save();
 }
 
+function renderShop() {
+  const root = document.querySelector('[data-shop-list]');
+  if (!root) return;
+
+  root.innerHTML = (contentState.shopItems || []).map((item) => `
+    <div class="pixel-card flex items-center justify-between gap-4">
+      <div>
+        <div class="font-black">${item.name}</div>
+        <div class="text-sm text-zinc-500">${item.description}</div>
+      </div>
+
+      <button
+        class="btn-primary"
+        data-action="buyItem"
+        data-item-id="${item.id}">
+        Buy (${item.price})
+      </button>
+    </div>
+  `).join('');
+}
+
 function wireEvents() {
   document.body.addEventListener('click', (event) => {
     const button = event.target.closest('[data-action], [data-tab], [data-nav-tab], [data-zone-open], [data-monster-open], [data-skill-open], [data-skill-node]');
@@ -530,7 +618,7 @@ function wireEvents() {
     }
 
     if (action) {
-      void act(action);
+      void act(action, button);
       return;
     }
 
@@ -567,6 +655,7 @@ function wireEvents() {
 
   document.body.addEventListener('htmx:afterSwap', () => {
     render(state, contentState);
+    renderShop();
   });
 
   document.addEventListener('visibilitychange', () => {
@@ -594,6 +683,7 @@ function startLoop() {
     }
 
     render(state, contentState);
+    renderShop();
     void save();
   }, TICK_MS);
 }
@@ -611,6 +701,7 @@ async function init() {
   wireEvents();
   initPwa();
   render(state, contentState);
+  renderShop();
 
   if (offlineReport) {
     showOfflineSummary(offlineReport);
