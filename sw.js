@@ -1,4 +1,5 @@
-const CACHE = 'idle-frontier-v5-shell';
+const CACHE = 'idle-frontier-v6-shell';
+
 const SHELL_ASSETS = [
   './',
   './index.html',
@@ -88,30 +89,5 @@ self.addEventListener('fetch', (event) => {
         return response;
       });
     })
-  );
-});    ])
-  );
-});
-
-// Network-First Strategy (Prefer fresh content, fallback to cache)
-self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
-
-  // Skip caching for external icon requests or similar if needed,
-  // but for local assets we want network-first.
-  event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // If valid response, update cache
-        if (response && response.status === 200 && response.type === 'basic') {
-          const clone = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(event.request, clone));
-        }
-        return response;
-      })
-      .catch(() => {
-        // Fallback to cache if network fails
-        return caches.match(event.request);
-      })
   );
 });
