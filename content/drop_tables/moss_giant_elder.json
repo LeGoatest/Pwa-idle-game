@@ -1,0 +1,13 @@
+{
+  "gold": { "min": 315, "max": 490 },
+
+  "drops": [
+    { "item": "giant_bone", "chance": 1.0, "min": 3, "max": 5 },
+    { "item": "ancient_seed", "chance": 0.15 },
+    { "item": "cobalt_arrows", "chance": 0.12, "min": 10, "max": 25 },
+    { "item": "steel_bar", "chance": 0.08, "min": 5, "max": 10 },
+    { "item": "cobalt_blade", "chance": 0.03 },
+    { "item": "redwood_bow", "chance": 0.03 },
+    { "item": "moss_giant_pet", "chance": 0.00001 }
+  ]
+}
