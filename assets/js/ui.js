@@ -1,21 +1,47 @@
 import { TASKS_CONFIG } from './content.js';
 import { getCycleDuration } from './systems/tasks.js';
 
+let toastTimeoutId = null;
+let toastRemoveTimeoutId = null;
+
 export function showToast(title, body) {
   const existing = document.getElementById('game-toast');
-  if (existing) existing.remove();
+  if (existing) {
+    existing.remove();
+  }
+
+  if (toastTimeoutId) {
+    clearTimeout(toastTimeoutId);
+    toastTimeoutId = null;
+  }
+
+  if (toastRemoveTimeoutId) {
+    clearTimeout(toastRemoveTimeoutId);
+    toastRemoveTimeoutId = null;
+  }
 
   const toast = document.createElement('div');
   toast.id = 'game-toast';
-  toast.className =
-    'fixed bottom-24 left-1/2 -translate-x-1/2 z-[200] w-[90%] max-w-xs bg-zinc-900 border-2 border-cyan-500/30 p-4 rounded-2xl shadow-[0_0_30px_rgba(34,211,238,0.2)] animate-in slide-in-from-bottom-2 duration-300 backdrop-blur-md';
+  toast.className = [
+    'fixed',
+    'z-[200]',
+    'bg-zinc-900/95',
+    'border-2',
+    'border-cyan-500/30',
+    'p-4',
+    'rounded-2xl',
+    'shadow-[0_0_30px_rgba(34,211,238,0.2)]',
+    'backdrop-blur-md',
+    'animate-in',
+    'slide-in-from-bottom-2'
+  ].join(' ');
 
   toast.innerHTML = `
     <div class="flex items-center gap-4">
-      <div class="w-10 h-10 bg-cyan-500/20 rounded-xl flex items-center justify-center border border-cyan-500/40">
+      <div class="w-10 h-10 bg-cyan-500/20 rounded-xl flex items-center justify-center border border-cyan-500/40 shrink-0">
         <span class="icon-[game-icons--radar-sweep] text-cyan-400 icon-md animate-pulse"></span>
       </div>
-      <div class="flex-1">
+      <div class="flex-1 min-w-0">
         <div class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500/70 mb-0.5">${title}</div>
         <div class="text-sm font-black uppercase italic tracking-tight text-zinc-100">${body}</div>
       </div>
@@ -24,9 +50,13 @@ export function showToast(title, body) {
 
   document.body.appendChild(toast);
 
-  setTimeout(() => {
-    toast.classList.add('animate-out', 'fade-out', 'slide-out-to-bottom-2');
-    setTimeout(() => toast.remove(), 300);
+  toastTimeoutId = window.setTimeout(() => {
+    toast.classList.remove('animate-in', 'slide-in-from-bottom-2');
+    toast.classList.add('animate-out', 'slide-out-to-bottom-2');
+
+    toastRemoveTimeoutId = window.setTimeout(() => {
+      toast.remove();
+    }, 300);
   }, 2500);
 }
 
@@ -39,6 +69,8 @@ export function showOfflineSummary(report) {
 
   const modalRoot = document.getElementById('modal-root');
   const modalContent = document.getElementById('modal-content');
+
+  if (!modalRoot || !modalContent) return;
 
   modalContent.innerHTML = `
     <div class="pixel-card bg-zinc-900 border-cyan-500/30 shadow-[0_0_50px_rgba(34,211,238,0.15)] animate-in zoom-in-95 duration-300">
@@ -198,6 +230,7 @@ export function render(state) {
     const task = el.dataset.taskStatus;
     const isActiveTask = state.activeTask.kind === task;
     el.textContent = isActiveTask ? 'Active' : 'Paused';
+
     if (isActiveTask) {
       el.classList.add('text-cyan-400');
       el.classList.remove('text-zinc-500');
@@ -231,4 +264,4 @@ export function render(state) {
       btn.removeAttribute('aria-selected');
     }
   });
-}
+  }
