@@ -46,6 +46,38 @@ function indexById(records) {
   return out;
 }
 
+async function loadMonstersForZones(zones) {
+  const monsterIds = new Set();
+
+  for (const zone of zones) {
+    for (const monsterId of zone?.monsters || []) {
+      monsterIds.add(monsterId);
+    }
+  }
+
+  const monsterRows = await Promise.all(
+    [...monsterIds].map((id) => fetchJSON(`./content/monsters/${id}.json`).catch(() => null))
+  );
+
+  return monsterRows.filter(Boolean);
+}
+
+async function loadDropTablesForMonsters(monsters) {
+  const tableIds = new Set();
+
+  for (const monster of monsters) {
+    if (monster?.dropTable) {
+      tableIds.add(monster.dropTable);
+    }
+  }
+
+  const dropRows = await Promise.all(
+    [...tableIds].map((id) => fetchJSON(`./content/drop_tables/${id}.json`).catch(() => null))
+  );
+
+  return dropRows.filter(Boolean);
+}
+
 export async function loadRegistry() {
   const [
     itemsRows,
@@ -82,7 +114,10 @@ export async function loadRegistry() {
   const shopItems = shopRows.filter(Boolean);
   const items = itemsRows.filter(Boolean);
 
-  const registry = {
+  const monsters = await loadMonstersForZones(zones);
+  const dropTables = await loadDropTablesForMonsters(monsters);
+
+  return {
     items: indexById(items),
     itemsList: items,
 
@@ -92,6 +127,12 @@ export async function loadRegistry() {
     zones: indexById(zones),
     zonesList: zones,
 
+    monsters: indexById(monsters),
+    monstersList: monsters,
+
+    dropTables: indexById(dropTables),
+    dropTablesList: dropTables,
+
     shopItems: indexById(shopItems),
     shopItemsList: shopItems,
 
@@ -99,8 +140,6 @@ export async function loadRegistry() {
     zonesIndex,
     shopIndex
   };
-
-  return registry;
 }
 
 export function clearRegistryCache() {
