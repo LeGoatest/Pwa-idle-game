@@ -32,6 +32,7 @@ const VIEW_ASSETS = [
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
+
   event.waitUntil(
     caches.open(CACHE).then(async (cache) => {
       await cache.addAll(SHELL_ASSETS);
@@ -45,7 +46,11 @@ self.addEventListener('activate', (event) => {
     Promise.all([
       self.clients.claim(),
       caches.keys().then((keys) =>
-        Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)))
+        Promise.all(
+          keys
+            .filter((key) => key !== CACHE)
+            .map((key) => caches.delete(key))
+        )
       )
     ])
   );
