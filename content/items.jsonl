@@ -1,0 +1,23 @@
+{"id":"gold_coin","name":"Gold Coin","type":"currency","stackable":true,"maxStack":1000000,"value":1,"icon":"game-icons--coins","tags":["currency"]}
+{"id":"logs","name":"Logs","type":"material","stackable":true,"maxStack":9999,"value":2,"icon":"game-icons--wood-pile","tags":["material","woodcutting","shop","drop"]}
+{"id":"ore","name":"Ore","type":"material","stackable":true,"maxStack":9999,"value":3,"icon":"game-icons--stone-pile","tags":["material","mining","shop","drop"]}
+{"id":"iron_bar","name":"Iron Bar","type":"material","stackable":true,"maxStack":9999,"value":8,"icon":"game-icons--metal-bar","tags":["material","smithing","shop","drop"]}
+
+{"id":"wooden_sword","name":"Wooden Sword","type":"weapon","equipSlot":"weapon","stackable":false,"value":12,"icon":"game-icons--wooden-sword","stats":{"attack":1},"tags":["equipment","shop","drop"]}
+{"id":"iron_sword","name":"Iron Sword","type":"weapon","equipSlot":"weapon","stackable":false,"value":120,"icon":"game-icons--broadsword","stats":{"attack":6},"tags":["equipment","shop","drop"]}
+{"id":"steel_sword","name":"Steel Sword","type":"weapon","equipSlot":"weapon","stackable":false,"value":340,"icon":"game-icons--two-handed-sword","stats":{"attack":12},"tags":["equipment","shop","drop"]}
+
+{"id":"cloth_hood","name":"Cloth Hood","type":"armor","equipSlot":"head","stackable":false,"value":20,"icon":"game-icons--hood","stats":{"defense":1},"tags":["equipment","shop"]}
+{"id":"iron_helmet","name":"Iron Helmet","type":"armor","equipSlot":"head","stackable":false,"value":90,"icon":"game-icons--visored-helm","stats":{"defense":4},"tags":["equipment","shop","drop"]}
+
+{"id":"leather_armor","name":"Leather Armor","type":"armor","equipSlot":"chest","stackable":false,"value":60,"icon":"game-icons--leather-armor","stats":{"defense":3},"tags":["equipment","shop"]}
+{"id":"iron_armor","name":"Iron Armor","type":"armor","equipSlot":"chest","stackable":false,"value":200,"icon":"game-icons--breastplate","stats":{"defense":6},"tags":["equipment","shop","drop"]}
+
+{"id":"wooden_shield","name":"Wooden Shield","type":"shield","equipSlot":"offhand","stackable":false,"value":40,"icon":"game-icons--round-shield","stats":{"defense":2},"tags":["equipment","shop"]}
+{"id":"iron_shield","name":"Iron Shield","type":"shield","equipSlot":"offhand","stackable":false,"value":150,"icon":"game-icons--shield","stats":{"defense":5},"tags":["equipment","shop","drop"]}
+
+{"id":"healing_potion","name":"Healing Potion","type":"consumable","stackable":true,"maxStack":99,"value":15,"icon":"game-icons--potion-ball","effect":{"type":"heal","value":25},"tags":["consumable","shop","drop"]}
+
+{"id":"goblin_dagger","name":"Goblin Dagger","type":"weapon","equipSlot":"weapon","stackable":false,"value":18,"icon":"game-icons--dagger","stats":{"attack":2},"tags":["equipment","drop"]}
+{"id":"bone_fragment","name":"Bone Fragment","type":"material","stackable":true,"maxStack":9999,"value":4,"icon":"game-icons--bone-knife","tags":["material","drop"]}
+{"id":"spider_silk","name":"Spider Silk","type":"material","stackable":true,"maxStack":9999,"value":9,"icon":"game-icons--cobweb","tags":["material","drop"]}
