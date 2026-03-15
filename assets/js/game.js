@@ -25,7 +25,7 @@ import {
   loadSkill,
   loadShopItem
 } from './content_loader.js';
-import { loadItemRegistry } from './item_registry.js';
+import { loadItemRegistry, getItem } from './item_registry.js';
 import { gainXp } from './systems/progression.js';
 
 let state = cloneDefaultState();
@@ -156,6 +156,16 @@ function ensureInventoryItem(itemKey, amount) {
   state.inventory[itemKey] = (state.inventory[itemKey] || 0) + amount;
 }
 
+function removeInventoryItem(itemKey, amount = 1) {
+  if (!state.inventory?.[itemKey]) return false;
+
+  state.inventory[itemKey] -= amount;
+  if (state.inventory[itemKey] <= 0) {
+    delete state.inventory[itemKey];
+  }
+  return true;
+}
+
 function getSkillMeta(skillId) {
   if (skillId === 'woodcutting') return { short: 'wood', levelKey: 'woodLevel', xpKey: 'woodXp' };
   if (skillId === 'mining') return { short: 'mine', levelKey: 'mineLevel', xpKey: 'mineXp' };
@@ -210,6 +220,26 @@ function clearActivity() {
     progress: 0
   };
   markDirty();
+}
+
+function equipByItemId(itemId) {
+  const item = getItem(itemId);
+  if (!item?.equipSlot) return false;
+  if (!state.inventory?.[itemId]) return false;
+
+  if (!state.equipment) state.equipment = {};
+
+  const previous = state.equipment[item.equipSlot];
+  if (previous === itemId) return true;
+
+  if (previous) {
+    ensureInventoryItem(previous, 1);
+  }
+
+  removeInventoryItem(itemId, 1);
+  state.equipment[item.equipSlot] = itemId;
+  markDirty();
+  return true;
 }
 
 function rollRange(min = 1, max = 1) {
@@ -540,6 +570,20 @@ async function act(action, button = null) {
     const itemId = button?.dataset.itemId;
     if (itemId) {
       await buyItem(itemId);
+    }
+    return;
+  }
+
+  if (action === 'equipItem') {
+    const itemId = button?.dataset.itemId;
+    if (itemId) {
+      if (equipByItemId(itemId)) {
+        showToast('Equipment', `${getItem(itemId)?.name || itemId} equipped`);
+        render(state, contentState);
+        await save();
+      } else {
+        showToast('Equipment', 'Cannot equip that item');
+      }
     }
     return;
   }
