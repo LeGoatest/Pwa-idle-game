@@ -1,14 +1,11 @@
-import { TASKS_CONFIG } from './content.js';
-import { getCycleDuration } from './systems/tasks.js';
+import { xpForLevel } from './systems/progression.js';
 
 let toastTimeoutId = null;
 let toastRemoveTimeoutId = null;
 
 export function showToast(title, body) {
   const existing = document.getElementById('game-toast');
-  if (existing) {
-    existing.remove();
-  }
+  if (existing) existing.remove();
 
   if (toastTimeoutId) {
     clearTimeout(toastTimeoutId);
@@ -131,10 +128,38 @@ export function showOfflineSummary(report) {
   modalRoot.classList.remove('hidden');
 }
 
-export function render(state) {
-  const isIdle = state.activeTask.kind === 'none';
+function setText(selector, value) {
+  document.querySelectorAll(selector).forEach((el) => {
+    el.textContent = value;
+  });
+}
 
+function setWidth(selector, pct) {
+  document.querySelectorAll(selector).forEach((el) => {
+    el.style.width = `${pct}%`;
+  });
+}
+
+function getSkillMeta(skillId) {
+  if (skillId === 'woodcutting') {
+    return { levelKey: 'woodLevel', xpKey: 'woodXp' };
+  }
+  if (skillId === 'mining') {
+    return { levelKey: 'mineLevel', xpKey: 'mineXp' };
+  }
+  if (skillId === 'combat') {
+    return { levelKey: 'combatLevel', xpKey: 'combatXp' };
+  }
+  return {
+    levelKey: `${skillId}Level`,
+    xpKey: `${skillId}Xp`
+  };
+}
+
+export function render(state, contentState) {
   const pulse = document.getElementById('active-pulse');
+  const isIdle = state.activity?.kind === 'none';
+
   if (pulse) {
     if (isIdle) {
       pulse.classList.add('hidden');
@@ -145,123 +170,78 @@ export function render(state) {
     }
   }
 
-  document.querySelectorAll('[data-bind]').forEach((el) => {
-    const key = el.dataset.bind;
-    const val = state[key] ?? '0';
+  setText('[data-bind="gold"]', String(state.gold ?? 0));
+  setText('[data-bind="logs"]', String(state.logs ?? 0));
+  setText('[data-bind="ore"]', String(state.ore ?? 0));
+  setText('[data-bind="swords"]', String(state.swords ?? 0));
+  setText('[data-bind="kills"]', String(state.kills ?? 0));
+  setText('[data-bind="attack"]', String(state.attack ?? 0));
+  setText('[data-bind="defense"]', String(state.defense ?? 0));
+  setText('[data-bind="hp"]', String(state.hp ?? 0));
+  setText('[data-bind="enemyHp"]', `${Math.max(0, state.enemyHp ?? 0)} / ${state.enemyMaxHp ?? 0}`);
 
-    if (key === 'enemyHp') {
-      el.textContent = `${Math.max(0, state.enemyHp)} / ${state.enemyMaxHp}`;
-      return;
+  const activeTaskName = (() => {
+    if (state.activity?.kind === 'combat' && contentState.activeMonster) {
+      return contentState.activeMonster.name;
     }
+    if (state.activity?.kind === 'skilling' && contentState.activeSkill) {
+      const node = contentState.activeSkill.nodes?.find((n) => n.id === state.activity.nodeId);
+      return node ? `${contentState.activeSkill.name}: ${node.name}` : contentState.activeSkill.name;
+    }
+    return 'Idle';
+  })();
 
-    if (key === 'activeTaskName') {
-      el.textContent = TASKS_CONFIG[state.activeTask.kind]?.name || 'Idle';
-      if (!isIdle) el.classList.add('text-cyan-400');
-      else el.classList.remove('text-cyan-400');
-      return;
-    }
+  setText('[data-bind="activeTaskName"]', activeTaskName);
 
-    const next = String(val);
-    if (el.textContent !== next) {
-      el.textContent = next;
-      if (['gold', 'logs', 'ore', 'potions', 'swords'].includes(key)) {
-        el.classList.remove('stat-pop');
-        void el.offsetWidth;
-        el.classList.add('stat-pop');
-      }
-    }
-  });
+  const enemyPct = state.enemyMaxHp > 0 ? Math.max(0, Math.min(100, ((state.enemyHp ?? 0) / state.enemyMaxHp) * 100)) : 0;
+  setWidth('[data-bind-style="enemyHpPct"]', enemyPct);
 
   document.querySelectorAll('[data-bind-class]').forEach((el) => {
     const expr = el.dataset.bindClass;
 
-    if (expr === "activeTask.kind !== 'none' ? '' : 'hidden'") {
-      if (state.activeTask.kind !== 'none') el.classList.remove('hidden');
+    if (expr === "activity.kind !== 'none' ? '' : 'hidden'") {
+      if (state.activity?.kind !== 'none') el.classList.remove('hidden');
       else el.classList.add('hidden');
-    } else if (expr === "activeTask.kind === 'combat' ? '' : 'hidden'") {
-      if (state.activeTask.kind === 'combat') el.classList.remove('hidden');
+    } else if (expr === "activity.kind === 'combat' ? '' : 'hidden'") {
+      if (state.activity?.kind === 'combat') el.classList.remove('hidden');
       else el.classList.add('hidden');
     }
   });
 
-  document.querySelectorAll('[data-bind-style="enemyHpPct"]').forEach((el) => {
-    const pct = Math.max(0, Math.min(100, (state.enemyHp / state.enemyMaxHp) * 100));
-    el.style.width = `${pct}%`;
-  });
-
-  const currentKind = state.activeTask.kind;
   document.querySelectorAll('[data-task-bar]').forEach((el) => {
-    const taskKind = el.dataset.taskBar;
-    if (taskKind === currentKind) {
-      const duration = getCycleDuration(currentKind);
-      const pct = Math.min(100, (state.activeTask.progress / duration) * 100);
-      el.style.width = `${pct}%`;
-      el.parentElement?.classList.remove('opacity-0');
-    } else {
-      el.style.width = '0%';
-      el.parentElement?.classList.add('opacity-0');
-    }
-  });
-
-  document.querySelectorAll('[data-action]').forEach((btn) => {
-    const action = btn.dataset.action;
-    if (!action || !TASKS_CONFIG[action]) return;
-
-    const icon = btn.querySelector('.icon-contract');
-    const textSpan = btn.querySelector('span:not(.icon-contract)');
-    const isActiveTask = state.activeTask.kind === action;
-
-    if (icon) {
-      if (isActiveTask) {
-        icon.classList.remove('icon-[game-icons--play-button]');
-        icon.classList.add('icon-[game-icons--pause-button]');
-      } else {
-        icon.classList.remove('icon-[game-icons--pause-button]');
-        icon.classList.add('icon-[game-icons--play-button]');
+    const duration = (() => {
+      if (state.activity?.kind === 'combat' && contentState.activeMonster) {
+        return contentState.activeMonster.durationMs || 2000;
       }
-    }
+      if (state.activity?.kind === 'skilling' && contentState.activeSkill) {
+        const node = contentState.activeSkill.nodes?.find((n) => n.id === state.activity.nodeId);
+        return node?.durationMs || 1000;
+      }
+      return 1000;
+    })();
 
-    if (textSpan && action === 'combat') {
-      textSpan.textContent = isActiveTask ? 'Stop Hunt' : 'Begin Hunt';
+    const pct = state.activity?.kind === 'none'
+      ? 0
+      : Math.min(100, ((state.activity.progress ?? 0) / duration) * 100);
+
+    el.style.width = `${pct}%`;
+
+    if (state.activity?.kind === 'none') {
+      el.parentElement?.classList.add('opacity-0');
+    } else {
+      el.parentElement?.classList.remove('opacity-0');
     }
   });
 
   document.querySelectorAll('[data-task-status]').forEach((el) => {
     const task = el.dataset.taskStatus;
-    const isActiveTask = state.activeTask.kind === task;
-    el.textContent = isActiveTask ? 'Active' : 'Paused';
+    const isActive = task === state.activity?.kind || task === state.activity?.skillId;
 
-    if (isActiveTask) {
+    el.textContent = isActive ? 'Active' : 'Paused';
+
+    if (isActive) {
       el.classList.add('text-cyan-400');
       el.classList.remove('text-zinc-500');
     } else {
       el.classList.remove('text-cyan-400');
-      el.classList.add('text-zinc-500');
-    }
-  });
-
-  document.querySelectorAll('#skills-launcher [data-action]').forEach((btn) => {
-    const action = btn.dataset.action;
-    if (action === state.activeTask.kind) {
-      btn.classList.add('border-cyan-500/50', 'bg-cyan-500/10');
-      btn.querySelector('span')?.classList.add('text-cyan-400');
-    } else {
-      btn.classList.remove('border-cyan-500/50', 'bg-cyan-500/10');
-      btn.querySelector('span')?.classList.remove('text-cyan-400');
-    }
-  });
-
-  const activeStation = document.querySelector('#view-root section')?.dataset.view;
-  document.querySelectorAll('footer nav button').forEach((btn) => {
-    const hxGet = btn.getAttribute('hx-get');
-    if (hxGet && activeStation && hxGet.includes(activeStation)) {
-      btn.classList.add('text-cyan-400');
-      btn.classList.remove('text-zinc-400');
-      btn.setAttribute('aria-selected', 'true');
-    } else {
-      btn.classList.remove('text-cyan-400');
-      btn.classList.add('text-zinc-400');
-      btn.removeAttribute('aria-selected');
-    }
-  });
-  }
+      el.class
