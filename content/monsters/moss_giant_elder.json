@@ -1,0 +1,12 @@
+{
+  "id": "moss_giant_elder",
+  "name": "Moss Giant Elder",
+
+  "level": 68,
+  "hp": 1250,
+  "attack": 120,
+
+  "boss": true,
+
+  "dropTable": "moss_giant_elder"
+}
