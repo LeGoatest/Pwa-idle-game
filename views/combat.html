@@ -1,62 +1,27 @@
-<section class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500" data-view="combat">
-  <!-- Entity Card -->
-  <div class="pixel-card flex flex-col items-center py-8">
-    <div class="w-32 h-32 bg-zinc-800/50 rounded-full flex items-center justify-center border-4 border-zinc-900 shadow-inner mb-4 relative group">
-      <span class="icon-[game-icons--skull-mask] w-16 h-16 text-zinc-600 group-hover:text-red-500 transition-colors"></span>
-      <div class="absolute -top-2 -right-2 bg-red-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-tighter">Elite</div>
-    </div>
-    <h2 class="text-2xl font-black italic tracking-tighter uppercase mb-1">Dungeon Goblin</h2>
-    <div class="text-xs text-zinc-500 font-medium tracking-widest uppercase">Floor 1 · Normal</div>
+<section class="space-y-6">
+
+  <header class="flex items-center justify-between">
+    <h1 class="text-2xl font-black uppercase tracking-tight italic">
+      Combat
+    </h1>
+
+    <button
+      class="btn-primary px-4 py-2"
+      data-tab="map">
+      Map
+    </button>
+  </header>
+
+  <!-- Monster list -->
+  <div
+    class="space-y-3"
+    data-monster-list>
   </div>
 
-  <!-- Stat Ribbon -->
-  <div class="stat-ribbon justify-between">
-    <div class="stat-pill">
-      <span class="icon-[game-icons--broadsword] icon-sm text-orange-400"></span>
-      <span data-bind="attack" class="text-sm font-bold tabular-nums">0</span>
-    </div>
-    <div class="stat-pill">
-      <span class="icon-[game-icons--shield] icon-sm text-blue-400"></span>
-      <span data-bind="defense" class="text-sm font-bold tabular-nums">0</span>
-    </div>
-    <div class="stat-pill">
-      <span class="icon-[game-icons--health-normal] icon-sm text-red-500"></span>
-      <span data-bind="hp" class="text-sm font-bold tabular-nums">0</span>
-    </div>
+  <!-- Selected monster -->
+  <div
+    class="mt-6"
+    data-monster-panel>
   </div>
 
-  <!-- Combat Controls -->
-  <div class="pixel-card space-y-4">
-    <div class="flex items-center justify-between mb-1">
-      <div class="flex items-center gap-2">
-        <span class="icon-[game-icons--flamer] icon-sm text-red-400"></span>
-        <span class="text-sm font-bold uppercase tracking-tight">Enemy Vitality</span>
-      </div>
-      <span data-bind="enemyHp" class="text-xs font-mono text-zinc-400">0 / 0</span>
-    </div>
-
-    <div class="progress-bar-container">
-      <div class="progress-bar-fill bg-red-500" data-bind-style="enemyHpPct">
-        <div class="progress-bar-glow"></div>
-      </div>
-    </div>
-
-    <!-- Task Progress -->
-    <div class="space-y-2 pt-2">
-      <div class="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-zinc-500">
-        <span>Cycle Progress</span>
-        <span data-task-status="combat" class="text-cyan-400">Active</span>
-      </div>
-      <div class="progress-bar-container h-1.5 opacity-0 transition-opacity">
-        <div class="progress-bar-fill bg-cyan-500" data-task-bar="combat"></div>
-      </div>
-    </div>
-
-    <div class="flex gap-3 pt-4">
-      <button class="btn-primary flex-1 flex items-center justify-center gap-3 py-4" data-action="combat">
-        <span class="icon-contract icon-[game-icons--play-button] icon-md"></span>
-        <span class="text-sm font-black uppercase italic tracking-widest">Begin Hunt</span>
-      </button>
-    </div>
-  </div>
 </section>
