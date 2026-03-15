@@ -1,44 +1,92 @@
-const cache = new Map();
+import { clearRegistryCache, loadRegistry } from './registry_loader.js';
 
-async function loadJSON(path) {
-  if (cache.has(path)) {
-    return cache.get(path);
+let registryPromise = null;
+
+async function getRegistry() {
+  if (!registryPromise) {
+    registryPromise = loadRegistry();
   }
-
-  const response = await fetch(path, { cache: 'no-store' });
-  if (!response.ok) {
-    throw new Error(`Failed to load ${path}: ${response.status}`);
-  }
-
-  const data = await response.json();
-  cache.set(path, data);
-  return data;
+  return registryPromise;
 }
 
 export function clearContentCache() {
-  cache.clear();
+  clearRegistryCache();
+  registryPromise = null;
+}
+
+export async function loadRegistryData() {
+  return getRegistry();
 }
 
 export async function loadZonesIndex() {
-  return loadJSON('./content/zones_index.json');
+  const registry = await getRegistry();
+  return registry.zonesIndex;
 }
 
 export async function loadZone(zoneId) {
-  return loadJSON(`./content/zones/${zoneId}.json`);
+  const registry = await getRegistry();
+  const zone = registry.zones[zoneId];
+  if (!zone) {
+    throw new Error(`Zone not found: ${zoneId}`);
+  }
+  return zone;
 }
 
 export async function loadMonster(monsterId) {
-  return loadJSON(`./content/monsters/${monsterId}.json`);
+  const response = await fetch(`./content/monsters/${monsterId}.json`, { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error(`Monster not found: ${monsterId}`);
+  }
+  return response.json();
 }
 
 export async function loadDropTable(dropTableId) {
-  return loadJSON(`./content/drop_tables/${dropTableId}.json`);
+  const response = await fetch(`./content/drop_tables/${dropTableId}.json`, { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error(`Drop table not found: ${dropTableId}`);
+  }
+  return response.json();
 }
 
 export async function loadSkillsIndex() {
-  return loadJSON('./content/skills_index.json');
+  const registry = await getRegistry();
+  return registry.skillsIndex;
 }
 
 export async function loadSkill(skillId) {
-  return loadJSON(`./content/skills/${skillId}.json`);
+  const registry = await getRegistry();
+  const skill = registry.skills[skillId];
+  if (!skill) {
+    throw new Error(`Skill not found: ${skillId}`);
+  }
+  return skill;
+}
+
+export async function loadShopIndex() {
+  const registry = await getRegistry();
+  return registry.shopIndex;
+}
+
+export async function loadShopItem(itemId) {
+  const registry = await getRegistry();
+  const item = registry.shopItems[itemId];
+  if (!item) {
+    throw new Error(`Shop item not found: ${itemId}`);
+  }
+  return item;
+}
+
+export async function loadItemRegistry() {
+  const registry = await getRegistry();
+  return registry.items;
+}
+
+export async function loadItemList() {
+  const registry = await getRegistry();
+  return registry.itemsList;
+}
+
+export async function loadShopItems() {
+  const registry = await getRegistry();
+  return registry.shopItemsList;
 }
