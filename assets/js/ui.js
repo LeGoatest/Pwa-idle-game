@@ -1,4 +1,5 @@
 import { xpForLevel } from './systems/progression.js';
+import { getItem } from './item_registry.js';
 
 let toastTimeoutId = null;
 let toastRemoveTimeoutId = null;
@@ -141,19 +142,82 @@ function setWidth(selector, pct) {
 }
 
 function getSkillMeta(skillId) {
-  if (skillId === 'woodcutting') {
-    return { levelKey: 'woodLevel', xpKey: 'woodXp' };
+  if (skillId === 'woodcutting') return { levelKey: 'woodLevel', xpKey: 'woodXp' };
+  if (skillId === 'mining') return { levelKey: 'mineLevel', xpKey: 'mineXp' };
+  if (skillId === 'combat') return { levelKey: 'combatLevel', xpKey: 'combatXp' };
+  return { levelKey: `${skillId}Level`, xpKey: `${skillId}Xp` };
+}
+
+function renderInventory(state) {
+  const root = document.querySelector('[data-inventory-list]');
+  if (!root) return;
+
+  const inventory = state.inventory || {};
+  const entries = Object.entries(inventory)
+    .filter(([, amount]) => amount > 0)
+    .map(([itemId, amount]) => {
+      const item = getItem(itemId);
+      return {
+        itemId,
+        amount,
+        name: item?.name || itemId,
+        type: item?.type || 'unknown',
+        icon: item?.icon || 'game-icons--cube'
+      };
+    });
+
+  if (!entries.length) {
+    root.innerHTML = `
+      <div class="pixel-card text-center text-zinc-500">
+        Inventory Empty
+      </div>
+    `;
+    return;
   }
-  if (skillId === 'mining') {
-    return { levelKey: 'mineLevel', xpKey: 'mineXp' };
-  }
-  if (skillId === 'combat') {
-    return { levelKey: 'combatLevel', xpKey: 'combatXp' };
-  }
-  return {
-    levelKey: `${skillId}Level`,
-    xpKey: `${skillId}Xp`
-  };
+
+  root.innerHTML = entries.map((entry) => `
+    <div class="pixel-card flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <span class="icon-[${entry.icon}] icon-md text-cyan-400 shrink-0"></span>
+        <div class="min-w-0">
+          <div class="font-black truncate">${entry.name}</div>
+          <div class="text-xs uppercase tracking-[0.12em] text-zinc-500">${entry.type}</div>
+        </div>
+      </div>
+      <div class="text-sm font-black tabular-nums">${entry.amount}</div>
+    </div>
+  `).join('');
+}
+
+function renderEquipment(state) {
+  const slotEls = document.querySelectorAll('[data-equip-slot]');
+  if (!slotEls.length) return;
+
+  const equipment = state.equipment || {};
+
+  slotEls.forEach((el) => {
+    const slot = el.dataset.equipSlot;
+    const itemId = equipment[slot];
+    const item = itemId ? getItem(itemId) : null;
+
+    const nameEl = el.querySelector('[data-equip-name]');
+    const metaEl = el.querySelector('[data-equip-meta]');
+    const iconEl = el.querySelector('[data-equip-icon]');
+
+    if (nameEl) nameEl.textContent = item?.name || 'Empty';
+    if (metaEl) {
+      if (item?.stats) {
+        const stats = Object.entries(item.stats).map(([key, value]) => `${key}+${value}`).join(' • ');
+        metaEl.textContent = stats || 'No bonuses';
+      } else {
+        metaEl.textContent = 'Nothing equipped';
+      }
+    }
+
+    if (iconEl) {
+      iconEl.className = `${item?.icon ? `icon-[${item.icon}]` : 'icon-[game-icons--checked-shield]'} icon-lg ${item ? 'text-cyan-400' : 'text-zinc-600'}`;
+    }
+  });
 }
 
 export function render(state, contentState) {
@@ -178,6 +242,7 @@ export function render(state, contentState) {
   setText('[data-bind="attack"]', String(state.attack ?? 0));
   setText('[data-bind="defense"]', String(state.defense ?? 0));
   setText('[data-bind="hp"]', String(state.hp ?? 0));
+  setText('[data-bind="potions"]', String(state.potions ?? 0));
   setText('[data-bind="enemyHp"]', `${Math.max(0, state.enemyHp ?? 0)} / ${state.enemyMaxHp ?? 0}`);
 
   const activeTaskName = (() => {
@@ -193,7 +258,9 @@ export function render(state, contentState) {
 
   setText('[data-bind="activeTaskName"]', activeTaskName);
 
-  const enemyPct = state.enemyMaxHp > 0 ? Math.max(0, Math.min(100, ((state.enemyHp ?? 0) / state.enemyMaxHp) * 100)) : 0;
+  const enemyPct = state.enemyMaxHp > 0
+    ? Math.max(0, Math.min(100, ((state.enemyHp ?? 0) / state.enemyMaxHp) * 100))
+    : 0;
   setWidth('[data-bind-style="enemyHpPct"]', enemyPct);
 
   document.querySelectorAll('[data-bind-class]').forEach((el) => {
@@ -244,4 +311,174 @@ export function render(state, contentState) {
       el.classList.remove('text-zinc-500');
     } else {
       el.classList.remove('text-cyan-400');
-      el.class
+      el.classList.add('text-zinc-500');
+    }
+  });
+
+  document.querySelectorAll('[data-nav-tab]').forEach((btn) => {
+    const tab = btn.dataset.navTab;
+    if (tab === state.ui?.tab) {
+      btn.classList.add('text-cyan-400');
+      btn.classList.remove('text-zinc-400');
+      btn.setAttribute('aria-selected', 'true');
+    } else {
+      btn.classList.remove('text-cyan-400');
+      btn.classList.add('text-zinc-400');
+      btn.removeAttribute('aria-selected');
+    }
+  });
+
+  document.querySelectorAll('[data-skill-card]').forEach((el) => {
+    const skillId = el.dataset.skillCard;
+    const meta = getSkillMeta(skillId);
+    const level = state[meta.levelKey] ?? 1;
+    const xp = state[meta.xpKey] ?? 0;
+    const xpNeeded = xpForLevel(level);
+    const pct = Math.max(0, Math.min(100, (xp / xpNeeded) * 100));
+
+    const levelEl = el.querySelector('[data-skill-level]');
+    const xpEl = el.querySelector('[data-skill-xp-text]');
+    const fillEl = el.querySelector('[data-skill-xp-fill]');
+
+    if (levelEl) levelEl.textContent = String(level);
+    if (xpEl) xpEl.textContent = `${xp.toFixed(1)} / ${xpNeeded.toFixed(1)} XP`;
+    if (fillEl) fillEl.style.width = `${pct}%`;
+  });
+
+  const skillDetailRoot = document.querySelector('[data-skill-detail-root]');
+  if (skillDetailRoot && contentState.activeSkill) {
+    const skill = contentState.activeSkill;
+    const meta = getSkillMeta(skill.id);
+    const level = state[meta.levelKey] ?? 1;
+    const xp = state[meta.xpKey] ?? 0;
+    const xpNeeded = xpForLevel(level);
+    const pct = Math.max(0, Math.min(100, (xp / xpNeeded) * 100));
+
+    const nameEl = skillDetailRoot.querySelector('[data-skill-detail-name]');
+    const levelEl = skillDetailRoot.querySelector('[data-skill-detail-level]');
+    const xpEl = skillDetailRoot.querySelector('[data-skill-detail-xp]');
+    const fillEl = skillDetailRoot.querySelector('[data-skill-detail-fill]');
+    const nodesRoot = skillDetailRoot.querySelector('[data-skill-nodes]');
+
+    if (nameEl) nameEl.textContent = skill.name;
+    if (levelEl) levelEl.textContent = String(level);
+    if (xpEl) xpEl.textContent = `${xp.toFixed(1)} / ${xpNeeded.toFixed(1)} XP`;
+    if (fillEl) fillEl.style.width = `${pct}%`;
+
+    if (nodesRoot) {
+      nodesRoot.innerHTML = (skill.nodes || []).map((node) => {
+        const locked = level < node.levelRequired;
+        const active =
+          state.activity?.kind === 'skilling' &&
+          state.activity?.skillId === skill.id &&
+          state.activity?.nodeId === node.id;
+
+        return `
+          <button
+            class="pixel-card w-full text-left ${locked ? 'opacity-50' : ''} ${active ? 'border-cyan-500/50 bg-cyan-500/5' : ''}"
+            data-skill-node="${node.id}"
+            ${locked ? 'disabled' : ''}>
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <div class="text-lg font-black">${node.name}</div>
+                <div class="text-sm text-zinc-400">+${node.xp} XP • ${(node.durationMs / 1000).toFixed(2)}s</div>
+              </div>
+              <div class="text-sm text-zinc-500">Lvl ${node.levelRequired}</div>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+  }
+
+  const zoneListRoot = document.querySelector('[data-zone-list]');
+  if (zoneListRoot && Array.isArray(contentState.zonesIndex?.zones)) {
+    zoneListRoot.innerHTML = contentState.zonesIndex.zones.map((zone) => {
+      const current = state.ui?.currentZoneId === zone.id;
+      const unlocked = (state.combatLevel ?? 1) >= (zone.levelRequired ?? 1);
+
+      return `
+        <button
+          class="pixel-card w-full text-left ${current ? 'border-cyan-500/50 bg-cyan-500/5' : ''} ${!unlocked ? 'opacity-50' : ''}"
+          data-zone-open="${zone.id}"
+          ${!unlocked ? 'disabled' : ''}>
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-2xl font-black">${zone.name}</div>
+              <div class="text-sm ${current ? 'text-cyan-400' : 'text-zinc-500'}">
+                ${current ? 'Current Zone' : unlocked ? 'Travel Here' : 'Locked'}
+              </div>
+            </div>
+            <div class="text-zinc-500">Lvl ${zone.levelRequired}+</div>
+          </div>
+        </button>
+      `;
+    }).join('');
+  }
+
+  const monsterListRoot = document.querySelector('[data-monster-list]');
+  if (monsterListRoot && contentState.activeZone) {
+    monsterListRoot.innerHTML = (contentState.activeZone.monsters || []).map((monsterId) => {
+      const current = state.ui?.currentMonsterId === monsterId;
+      const monster = contentState.registry?.monsters?.[monsterId];
+      const label = monster?.name || monsterId.replaceAll('_', ' ');
+
+      return `
+        <button
+          class="pixel-card w-full text-left ${current ? 'border-cyan-500/50 bg-cyan-500/5' : ''}"
+          data-monster-open="${monsterId}">
+          <div class="flex items-center justify-between gap-4">
+            <div class="text-lg font-black">${label}</div>
+            ${monster?.level ? `<div class="text-sm text-zinc-500">Lvl ${monster.level}</div>` : ''}
+          </div>
+        </button>
+      `;
+    }).join('');
+  }
+
+  const monsterPanelRoot = document.querySelector('[data-monster-panel]');
+  if (monsterPanelRoot && contentState.activeMonster) {
+    const monster = contentState.activeMonster;
+    const table = contentState.activeDropTable;
+
+    monsterPanelRoot.innerHTML = `
+      <div class="pixel-card space-y-4">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <div class="text-2xl font-black">${monster.name}</div>
+            <div class="text-sm text-zinc-500">
+              Lvl ${monster.level ?? 1} • HP ${monster.hp ?? 0} • ATK ${monster.attack ?? 0}
+            </div>
+          </div>
+          ${monster.boss ? '<div class="text-yellow-400 font-black uppercase">Boss</div>' : ''}
+        </div>
+
+        <div class="space-y-2">
+          <div class="text-sm font-black uppercase tracking-[0.15em] text-zinc-500">Possible Drops</div>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-sm">
+              <span>Gold</span>
+              <span>${table?.gold?.min ?? 0}-${table?.gold?.max ?? 0}</span>
+            </div>
+            ${(table?.drops || []).map((drop) => {
+              const item = getItem(drop.item);
+              return `
+                <div class="flex items-center justify-between text-sm">
+                  <span>${item?.name || drop.item}</span>
+                  <span>${(drop.chance * 100).toFixed(drop.chance < 0.01 ? 3 : 1)}%${drop.min ? ` (${drop.min}-${drop.max ?? drop.min})` : ''}</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <button class="btn-primary w-full py-4 text-lg font-black" data-action="fightMonster">
+          Fight ${monster.name}
+        </button>
+      </div>
+    `;
+  }
+
+  renderInventory(state);
+  renderEquipment(state);
+}
