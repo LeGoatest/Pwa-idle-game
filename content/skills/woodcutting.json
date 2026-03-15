@@ -1,0 +1,32 @@
+{
+  "id": "woodcutting",
+  "name": "Woodcutting",
+  "icon": "game-icons--axe",
+
+  "nodes": [
+    {
+      "id": "tree",
+      "name": "Tree",
+      "levelRequired": 1,
+      "xp": 7.6,
+      "durationMs": 860,
+      "yield": { "item": "logs", "amount": 1 }
+    },
+    {
+      "id": "birch",
+      "name": "Birch Tree",
+      "levelRequired": 15,
+      "xp": 14,
+      "durationMs": 1780,
+      "yield": { "item": "birch_logs", "amount": 1 }
+    },
+    {
+      "id": "redwood",
+      "name": "Redwood Tree",
+      "levelRequired": 40,
+      "xp": 47.8,
+      "durationMs": 3040,
+      "yield": { "item": "redwood_logs", "amount": 1 }
+    }
+  ]
+}
