@@ -1,0 +1,19 @@
+{
+  "zones": [
+    {
+      "id": "verdant_meadows",
+      "name": "Verdant Meadows",
+      "levelRequired": 1
+    },
+    {
+      "id": "darkwood_forest",
+      "name": "Darkwood Forest",
+      "levelRequired": 38
+    },
+    {
+      "id": "ancient_dungeon",
+      "name": "Ancient Dungeon",
+      "levelRequired": 65
+    }
+  ]
+}
