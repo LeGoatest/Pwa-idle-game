@@ -33,19 +33,21 @@ export async function loadZone(zoneId) {
 }
 
 export async function loadMonster(monsterId) {
-  const response = await fetch(`./content/monsters/${monsterId}.json`, { cache: 'no-store' });
-  if (!response.ok) {
+  const registry = await getRegistry();
+  const monster = registry.monsters[monsterId];
+  if (!monster) {
     throw new Error(`Monster not found: ${monsterId}`);
   }
-  return response.json();
+  return monster;
 }
 
 export async function loadDropTable(dropTableId) {
-  const response = await fetch(`./content/drop_tables/${dropTableId}.json`, { cache: 'no-store' });
-  if (!response.ok) {
+  const registry = await getRegistry();
+  const dropTable = registry.dropTables[dropTableId];
+  if (!dropTable) {
     throw new Error(`Drop table not found: ${dropTableId}`);
   }
-  return response.json();
+  return dropTable;
 }
 
 export async function loadSkillsIndex() {
@@ -89,4 +91,14 @@ export async function loadItemList() {
 export async function loadShopItems() {
   const registry = await getRegistry();
   return registry.shopItemsList;
+}
+
+export async function loadMonsterList() {
+  const registry = await getRegistry();
+  return registry.monstersList;
+}
+
+export async function loadDropTableList() {
+  const registry = await getRegistry();
+  return registry.dropTablesList;
 }
