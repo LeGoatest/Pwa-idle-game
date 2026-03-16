@@ -1,0 +1,20 @@
+package components
+
+import "github.com/LeGoatest/Pwa-idle-game/internal/content"
+
+templ ZoneButton(zone content.ZoneIndexEntry, active bool) {
+	<button
+		class={ zoneButtonClass(active) }
+		data-zone-id={ zone.ID }
+	>
+		<div class="font-medium">{ zone.Name }</div>
+		<div class="text-xs text-zinc-400">Lv { templ.Sprintf("%d", zone.LevelRequired) }</div>
+	</button>
+}
+
+func zoneButtonClass(active bool) string {
+	if active {
+		return "block w-full rounded border border-emerald-600 bg-emerald-950 px-3 py-2 text-left text-emerald-200"
+	}
+	return "block w-full rounded border border-zinc-800 bg-zinc-950 px-3 py-2 text-left hover:bg-zinc-800"
+}
