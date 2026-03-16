@@ -1,0 +1,22 @@
+package components
+
+import "github.com/LeGoatest/Pwa-idle-game/internal/content"
+
+templ MonsterButton(monster content.Monster, active bool) {
+	<button
+		class={ monsterButtonClass(active) }
+		data-monster-id={ monster.ID }
+	>
+		<div class="font-medium">{ monster.Name }</div>
+		<div class="text-xs text-zinc-400">
+			Lv { templ.Sprintf("%d", monster.Level) } · HP { templ.Sprintf("%d", monster.HP) } · ATK { templ.Sprintf("%d", monster.Attack) }
+		</div>
+	</button>
+}
+
+func monsterButtonClass(active bool) string {
+	if active {
+		return "block w-full rounded border border-rose-600 bg-rose-950 px-3 py-2 text-left text-rose-200"
+	}
+	return "block w-full rounded border border-zinc-800 bg-zinc-950 px-3 py-2 text-left hover:bg-zinc-800"
+}
