@@ -1,0 +1,5 @@
+{
+  "scheduler": "none",
+  "gc": "leaking",
+  "no-debug": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "pwa-idle-game",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build:css": "npx @tailwindcss/cli -i ./input.css -o ./web/static/css/output.css --minify",
+    "watch:css": "npx @tailwindcss/cli -i ./input.css -o ./web/static/css/output.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.12",
+    "tailwindcss": "^4.1.12"
+  }
+}
