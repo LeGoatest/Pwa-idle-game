@@ -3,7 +3,7 @@ TINYGO=tinygo
 TAILWIND=npx @tailwindcss/cli
 TEMPL=templ
 
-.PHONY: generate buildsite buildcss buildwasm build clean
+.PHONY: generate buildsite buildcss buildwasm buildruntime buildcontent validate simulate build clean
 
 generate:
 	$(TEMPL) generate
@@ -25,10 +25,15 @@ buildruntime:
 	cp "$$($(GO) env GOROOT)/lib/wasm/wasm_exec.js" ./dist/static/js/wasm_exec.js
 
 buildcontent:
-	mkdir -p dist/content
-	mkdir -p dist/assets
+	$(GO) run ./cmd/buildcontent
 	cp -R ./content/. ./dist/content/
 	cp -R ./assets/. ./dist/assets/
+
+validate:
+	$(GO) run ./cmd/content-validate
+
+simulate:
+	$(GO) run ./cmd/simulate
 
 build: buildsite buildcss buildwasm buildruntime buildcontent
 
