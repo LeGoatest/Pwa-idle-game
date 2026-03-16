@@ -1,0 +1,85 @@
+name: Archive current codebase into migration branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: "Branch to read from"
+        required: true
+        default: "main"
+      new_branch:
+        description: "Branch to create for migration"
+        required: true
+        default: "migration/tinygo-wasm"
+      legacy_folder:
+        description: "Folder to move the current codebase into"
+        required: true
+        default: "legacy/js"
+      commit_message:
+        description: "Commit message"
+        required: true
+        default: "chore: archive current JS codebase into legacy folder"
+
+permissions:
+  contents: write
+
+jobs:
+  archive-codebase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.source_branch }}
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create migration branch
+        run: |
+          git checkout -b "${{ github.event.inputs.new_branch }}"
+
+      - name: Move current repo contents into legacy folder
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          LEGACY_DIR="${{ github.event.inputs.legacy_folder }}"
+          mkdir -p "$LEGACY_DIR"
+
+          shopt -s dotglob nullglob extglob
+
+          for item in * .*; do
+            case "$item" in
+              .|..|.git)
+                continue
+                ;;
+              .github)
+                continue
+                ;;
+            esac
+
+            if [[ "$item" == "${LEGACY_DIR%%/*}" ]]; then
+              continue
+            fi
+
+            git mv "$item" "$LEGACY_DIR"/
+          done
+
+      - name: Commit changes
+        shell: bash
+        run: |
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "${{ github.event.inputs.commit_message }}"
+
+      - name: Push migration branch
+        run: |
+          git push -u origin "${{ github.event.inputs.new_branch }}"
