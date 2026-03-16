@@ -1,0 +1,42 @@
+package pages
+
+import (
+	"github.com/LeGoatest/Pwa-idle-game/internal/content"
+	"github.com/LeGoatest/Pwa-idle-game/internal/game"
+	"github.com/LeGoatest/Pwa-idle-game/web/views/layouts"
+	"github.com/LeGoatest/Pwa-idle-game/web/views/partials"
+)
+
+templ Index(state *game.GameState, reg *content.Registry) {
+	@layouts.App("Pwa Idle Game") {
+		<main class="mx-auto max-w-6xl p-4 md:p-6">
+			<header class="mb-4 rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+				<h1 class="text-2xl font-bold">Pwa Idle Game</h1>
+				<p class="text-sm text-zinc-400">Static Go + templ build for GitHub Pages</p>
+			</header>
+
+			<nav class="mb-4 flex flex-wrap gap-2">
+				<button class="rounded border border-zinc-700 bg-zinc-800 px-3 py-2 hover:bg-zinc-700" data-tab-open="combat">Combat</button>
+				<button class="rounded border border-zinc-700 bg-zinc-800 px-3 py-2 hover:bg-zinc-700" data-tab-open="map">Map</button>
+				<button class="rounded border border-zinc-700 bg-zinc-800 px-3 py-2 hover:bg-zinc-700" data-tab-open="skills">Skills</button>
+				<button class="rounded border border-zinc-700 bg-zinc-800 px-3 py-2 hover:bg-zinc-700" data-action="stop_activity">Stop</button>
+				<button class="rounded border border-zinc-700 bg-zinc-800 px-3 py-2 hover:bg-zinc-700" data-action="save_now">Save</button>
+			</nav>
+
+			<section class="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
+				@partials.Selections(state, reg)
+
+				<div class="space-y-4">
+					@partials.Stats(state)
+					@partials.Activity(state)
+					@partials.Inventory(state, reg)
+
+					<section class="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+						<h2 class="mb-3 text-lg font-semibold">Debug State JSON</h2>
+						<pre id="app-state" class="overflow-auto rounded border border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-300"></pre>
+					</section>
+				</div>
+			</section>
+		</main>
+	}
+}
