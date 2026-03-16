@@ -1,1 +1,4 @@
 @import "tailwindcss";
+
+@source "./web/views/**/*.templ";
+@source "./web/static/js/**/*.js";
