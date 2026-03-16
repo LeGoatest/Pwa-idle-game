@@ -3,7 +3,7 @@ const cache = new Map()
 async function fetchJSON(path) {
   if (cache.has(path)) return cache.get(path)
 
-  const res = await fetch(path, { cache: "no-store" })
+  const res = await fetch(path, { cache: 'no-store' })
   if (!res.ok) throw new Error(`Failed to load ${path}`)
 
   const json = await res.json()
@@ -14,16 +14,16 @@ async function fetchJSON(path) {
 async function fetchJSONL(path) {
   if (cache.has(path)) return cache.get(path)
 
-  const res = await fetch(path, { cache: "no-store" })
+  const res = await fetch(path, { cache: 'no-store' })
   if (!res.ok) throw new Error(`Failed to load ${path}`)
 
   const text = await res.text()
 
   const rows = text
-    .split("\n")
-    .map(x => x.trim())
+    .split('\n')
+    .map((x) => x.trim())
     .filter(Boolean)
-    .map(line => JSON.parse(line))
+    .map((line) => JSON.parse(line))
 
   cache.set(path, rows)
   return rows
@@ -39,13 +39,11 @@ function index(rows) {
 
 async function loadSkills(skillsIndex) {
   const ids = Array.isArray(skillsIndex?.skills)
-    ? skillsIndex.skills.map(x => typeof x === "string" ? x : x.id).filter(Boolean)
+    ? skillsIndex.skills.map((x) => typeof x === 'string' ? x : x.id).filter(Boolean)
     : []
 
   const rows = await Promise.all(
-    ids.map(id =>
-      fetchJSON(`./content/skills/${id}.json`).catch(() => null)
-    )
+    ids.map((id) => fetchJSON(`./content/skills/${id}.json`).catch(() => null))
   )
 
   return rows.filter(Boolean)
@@ -53,13 +51,11 @@ async function loadSkills(skillsIndex) {
 
 async function loadZones(zonesIndex) {
   const ids = Array.isArray(zonesIndex?.zones)
-    ? zonesIndex.zones.map(x => typeof x === "string" ? x : x.id).filter(Boolean)
+    ? zonesIndex.zones.map((x) => typeof x === 'string' ? x : x.id).filter(Boolean)
     : []
 
   const rows = await Promise.all(
-    ids.map(id =>
-      fetchJSON(`./content/zones/${id}.json`).catch(() => null)
-    )
+    ids.map((id) => fetchJSON(`./content/zones/${id}.json`).catch(() => null))
   )
 
   return rows.filter(Boolean)
@@ -75,25 +71,7 @@ async function loadMonsters(zones) {
   }
 
   const rows = await Promise.all(
-    [...ids].map(id =>
-      fetchJSON(`./content/monsters/${id}.json`).catch(() => null)
-    )
-  )
-
-  return rows.filter(Boolean)
-}
-
-async function loadDropTables(monsters) {
-  const ids = new Set()
-
-  for (const monster of monsters) {
-    if (monster?.dropTable) ids.add(monster.dropTable)
-  }
-
-  const rows = await Promise.all(
-    [...ids].map(id =>
-      fetchJSON(`./content/drop_tables/${id}.json`).catch(() => null)
-    )
+    [...ids].map((id) => fetchJSON(`./content/monsters/${id}.json`).catch(() => null))
   )
 
   return rows.filter(Boolean)
@@ -101,13 +79,11 @@ async function loadDropTables(monsters) {
 
 async function loadShopItems(shopIndex) {
   const ids = Array.isArray(shopIndex?.items)
-    ? shopIndex.items.map(x => typeof x === "string" ? x : x.id).filter(Boolean)
+    ? shopIndex.items.map((x) => typeof x === 'string' ? x : x.id).filter(Boolean)
     : []
 
   const rows = await Promise.all(
-    ids.map(id =>
-      fetchJSON(`./content/shop/${id}.json`).catch(() => null)
-    )
+    ids.map((id) => fetchJSON(`./content/shop/${id}.json`).catch(() => null))
   )
 
   return rows.filter(Boolean)
@@ -120,20 +96,18 @@ export async function loadRegistry() {
     zonesIndex,
     shopIndex
   ] = await Promise.all([
-    fetchJSONL("./content/items.jsonl").catch(() => []),
-    fetchJSON("./content/skills_index.json").catch(() => ({ skills: [] })),
-    fetchJSON("./content/zones_index.json").catch(() => ({ zones: [] })),
-    fetchJSON("./content/shop_index.json").catch(() => ({ items: [] }))
+    fetchJSONL('./content/items.jsonl').catch(() => []),
+    fetchJSON('./content/skills_index.json').catch(() => ({ skills: [] })),
+    fetchJSON('./content/zones_index.json').catch(() => ({ zones: [] })),
+    fetchJSON('./content/shop_index.json').catch(() => ({ items: [] }))
   ])
 
-  const [skills, zones, shopItems] = await Promise.all([
+  const [skills, zones, monsters, shopItems] = await Promise.all([
     loadSkills(skillsIndex),
     loadZones(zonesIndex),
+    loadMonsters(await loadZones(zonesIndex)),
     loadShopItems(shopIndex)
   ])
-
-  const monsters = await loadMonsters(zones)
-  const dropTables = await loadDropTables(monsters)
 
   return {
     items: index(items),
@@ -147,9 +121,6 @@ export async function loadRegistry() {
 
     monsters: index(monsters),
     monstersList: monsters,
-
-    dropTables: index(dropTables),
-    dropTablesList: dropTables,
 
     shopItems: index(shopItems),
     shopItemsList: shopItems,
