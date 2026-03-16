@@ -185,10 +185,7 @@ function renderInventory(state) {
       <div class="flex items-center gap-3">
         <div class="text-sm font-black tabular-nums">${entry.amount}</div>
         ${entry.canEquip ? `
-          <button
-            class="btn-primary px-3 py-2 text-xs"
-            data-action="equipItem"
-            data-item-id="${entry.itemId}">
+          <button class="btn-primary px-3 py-2 text-xs" data-action="equipItem" data-item-id="${entry.itemId}">
             Equip
           </button>
         ` : ''}
@@ -400,22 +397,26 @@ export function render(state, contentState) {
   const zoneListRoot = document.querySelector('[data-zone-list]')
   if (zoneListRoot && Array.isArray(contentState.zonesIndex?.zones)) {
     zoneListRoot.innerHTML = contentState.zonesIndex.zones.map((zone) => {
-      const current = state.ui?.currentZoneId === zone.id
-      const unlocked = (state.combatLevel ?? 1) >= (zone.levelRequired ?? 1)
+      const zoneId = typeof zone === 'string' ? zone : zone.id
+      const zoneName = typeof zone === 'string' ? zone : zone.name
+      const zoneLevel = typeof zone === 'string' ? 1 : (zone.levelRequired ?? 1)
+
+      const current = state.ui?.currentZoneId === zoneId
+      const unlocked = (state.combatLevel ?? 1) >= zoneLevel
 
       return `
         <button
           class="pixel-card w-full text-left ${current ? 'border-cyan-500/50 bg-cyan-500/5' : ''} ${!unlocked ? 'opacity-50' : ''}"
-          data-zone-open="${zone.id}"
+          data-zone-open="${zoneId}"
           ${!unlocked ? 'disabled' : ''}>
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-2xl font-black">${zone.name}</div>
+              <div class="text-2xl font-black">${zoneName}</div>
               <div class="text-sm ${current ? 'text-cyan-400' : 'text-zinc-500'}">
                 ${current ? 'Current Zone' : unlocked ? 'Travel Here' : 'Locked'}
               </div>
             </div>
-            <div class="text-zinc-500">Lvl ${zone.levelRequired}+</div>
+            <div class="text-zinc-500">Lvl ${zoneLevel}+</div>
           </div>
         </button>
       `
@@ -445,7 +446,7 @@ export function render(state, contentState) {
   const monsterPanelRoot = document.querySelector('[data-monster-panel]')
   if (monsterPanelRoot && contentState.activeMonster) {
     const monster = contentState.activeMonster
-    const table = contentState.activeDropTable
+    const table = monster.loot || null
 
     monsterPanelRoot.innerHTML = `
       <div class="pixel-card space-y-4">
