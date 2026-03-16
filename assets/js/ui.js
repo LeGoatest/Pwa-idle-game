@@ -235,16 +235,25 @@ function renderNav(state) {
     const active = btn.dataset.navTab === state.ui?.tab
     btn.setAttribute('aria-selected', active ? 'true' : 'false')
 
+    const tab = btn.dataset.navTab
+
+    if (tab === 'skills') {
+      if (active) {
+        btn.classList.remove('text-zinc-100')
+        btn.classList.add('text-cyan-400')
+      } else {
+        btn.classList.remove('text-cyan-400')
+        btn.classList.add('text-zinc-100')
+      }
+      return
+    }
+
     if (active) {
+      btn.classList.remove('text-zinc-400')
       btn.classList.add('text-cyan-400')
-      btn.classList.remove('text-zinc-400', 'text-zinc-900')
     } else {
       btn.classList.remove('text-cyan-400')
-      if (btn.closest('footer')) {
-        btn.classList.add('text-zinc-400')
-      } else {
-        btn.classList.add('text-zinc-900')
-      }
+      btn.classList.add('text-zinc-400')
     }
   })
 }
