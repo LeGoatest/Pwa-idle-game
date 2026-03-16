@@ -5,7 +5,7 @@
     if (!WebAssembly.instantiateStreaming) {
       WebAssembly.instantiateStreaming = async (resp, importObject) => {
         const source = await (await resp).arrayBuffer();
-        return WebAssembly.instantiate(source, importObject);
+        return await WebAssembly.instantiate(source, importObject);
       };
     }
 
@@ -48,14 +48,13 @@
   }
 
   async function loadByIds(base, ids) {
-    const rows = await Promise.all(
+    return Promise.all(
       (ids || []).map(async (id) => {
         const res = await fetch(`${base}/${id}.json`, { cache: "no-store" });
         if (!res.ok) throw new Error(`Failed to load ${base}/${id}.json`);
         return res.json();
       })
     );
-    return rows;
   }
 
   async function buildRegistry() {
@@ -104,24 +103,15 @@
     };
   }
 
-  async function loadSaveJSON() {
-    try {
-      return localStorage.getItem("game-save-json") || "";
-    } catch {
-      return "";
-    }
-  }
-
-  async function boot() {
+  async function boot(saveJSON = "") {
     if (bootPromise) return bootPromise;
 
     bootPromise = (async () => {
       await instantiateWasm();
 
       const registry = await buildRegistry();
-      const saveJSON = await loadSaveJSON();
-
       const result = window.gameInit(JSON.stringify(registry), saveJSON);
+
       if (!result || !result.ok) {
         throw new Error(result?.error || "gameInit failed");
       }
@@ -133,9 +123,8 @@
   }
 
   window.GameWASM = {
-    boot,
-    async init() {
-      return boot();
+    async init(saveJSON = "") {
+      return boot(saveJSON);
     },
     tick(deltaMS) {
       return window.gameTick(deltaMS);
