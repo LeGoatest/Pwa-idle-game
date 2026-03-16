@@ -18,12 +18,7 @@ import {
 import { initPwa } from './pwa.js';
 import { render, showOfflineSummary, showToast } from './ui.js';
 import {
-  loadRegistryData,
-  loadZone,
-  loadMonster,
-  loadDropTable,
-  loadSkill,
-  loadShopItem
+  loadRegistryData
 } from './content_loader.js';
 import { loadItemRegistry, getItem } from './item_registry.js';
 import { gainXp } from './systems/progression.js';
@@ -385,15 +380,15 @@ async function loadInitialContent() {
   await loadItemRegistry();
 
   if (state.ui?.currentZoneId) {
-    await openZone(state.ui.currentZoneId, false);
+    openZone(state.ui.currentZoneId, false);
   }
 
   if (state.ui?.currentMonsterId) {
-    await openMonster(state.ui.currentMonsterId, false);
+    openMonster(state.ui.currentMonsterId, false);
   }
 
   if (state.ui?.currentSkillId) {
-    await openSkill(state.ui.currentSkillId, false);
+    openSkill(state.ui.currentSkillId, false);
   }
 }
 
@@ -419,8 +414,8 @@ async function openTab(tab, persist = true) {
   }
 }
 
-async function openZone(zoneId, persist = true) {
-  contentState.activeZone = await loadZone(zoneId);
+function openZone(zoneId, persist = true) {
+  contentState.activeZone = contentState.registry?.zones?.[zoneId] || null;
   contentState.activeMonster = null;
   contentState.activeDropTable = null;
 
@@ -434,24 +429,28 @@ async function openZone(zoneId, persist = true) {
   render(state, contentState);
 }
 
-async function openMonster(monsterId, persist = true) {
-  contentState.activeMonster = await loadMonster(monsterId);
-  contentState.activeDropTable = await loadDropTable(contentState.activeMonster.dropTable);
+function openMonster(monsterId, persist = true) {
+  contentState.activeMonster = contentState.registry?.monsters?.[monsterId] || null;
+  contentState.activeDropTable = contentState.activeMonster
+    ? contentState.registry?.dropTables?.[contentState.activeMonster.dropTable] || null
+    : null;
 
   if (persist) {
     setCurrentMonster(monsterId);
   }
 
-  state.ui.combatMode = 'monster';
-  state.enemyMaxHp = contentState.activeMonster.hp || 12;
-  state.enemyHp = state.enemyMaxHp;
+  if (contentState.activeMonster) {
+    state.ui.combatMode = 'monster';
+    state.enemyMaxHp = contentState.activeMonster.hp || 12;
+    state.enemyHp = state.enemyMaxHp;
+  }
 
   markDirty();
   render(state, contentState);
 }
 
-async function openSkill(skillId, persist = true) {
-  contentState.activeSkill = await loadSkill(skillId);
+function openSkill(skillId, persist = true) {
+  contentState.activeSkill = contentState.registry?.skills?.[skillId] || null;
 
   if (persist) {
     setCurrentSkill(skillId);
@@ -509,8 +508,7 @@ function startMonsterFight() {
 }
 
 async function buyItem(itemId) {
-  const item = contentState.shopItems.find((entry) => entry.id === itemId)
-    || await loadShopItem(itemId).catch(() => null);
+  const item = contentState.shopItems.find((entry) => entry.id === itemId) || null;
 
   if (!item) {
     showToast('Shop', 'Item not found');
@@ -672,17 +670,17 @@ function wireEvents() {
     }
 
     if (zoneOpen) {
-      void openZone(zoneOpen, true);
+      openZone(zoneOpen, true);
       return;
     }
 
     if (monsterOpen) {
-      void openMonster(monsterOpen, true);
+      openMonster(monsterOpen, true);
       return;
     }
 
     if (skillOpen) {
-      void openSkill(skillOpen, true);
+      openSkill(skillOpen, true);
       return;
     }
 
