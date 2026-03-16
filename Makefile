@@ -1,38 +1,36 @@
 GO=go
 TINYGO=tinygo
 TAILWIND=npx @tailwindcss/cli
+TEMPL=templ
 
-.PHONY: run build build-server build-wasm build-css test simulate validate-content clean
+.PHONY: generate buildsite buildcss buildwasm build clean
 
-run:
-	$(GO) run ./cmd/web
+generate:
+	$(TEMPL) generate
 
-build:
-	$(MAKE) build-server
-	$(MAKE) build-css
-	$(MAKE) build-wasm
+buildsite: generate
+	$(GO) run ./cmd/buildsite
 
-build-server:
-	mkdir -p build
-	$(GO) build -o build/server ./cmd/web
+buildcss:
+	mkdir -p dist/static/css
+	$(TAILWIND) -i ./input.css -o ./dist/static/css/output.css --minify
 
-build-wasm:
-	mkdir -p web/static/wasm
-	$(TINYGO) build -target wasm -opt=z -no-debug -o web/static/wasm/app.wasm ./frontend/wasm
+buildwasm:
+	mkdir -p dist/static/wasm
+	$(TINYGO) build -target wasm -opt=z -no-debug -o ./dist/static/wasm/app.wasm ./frontend/wasm
 
-build-css:
-	mkdir -p web/static/css
-	$(TAILWIND) -i ./input.css -o ./web/static/css/output.css --minify
+buildruntime:
+	mkdir -p dist/static/js
+	cp ./web/static/js/*.js ./dist/static/js/
+	cp "$$($(GO) env GOROOT)/lib/wasm/wasm_exec.js" ./dist/static/js/wasm_exec.js
 
-test:
-	$(GO) test ./...
+buildcontent:
+	mkdir -p dist/content
+	mkdir -p dist/assets
+	cp -R ./content/. ./dist/content/
+	cp -R ./assets/. ./dist/assets/
 
-simulate:
-	$(GO) run ./cmd/simulate
-
-validate-content:
-	$(GO) run ./cmd/content-validate
+build: buildsite buildcss buildwasm buildruntime buildcontent
 
 clean:
-	rm -rf build
-	rm -f web/static/wasm/app.wasm
+	rm -rf dist
