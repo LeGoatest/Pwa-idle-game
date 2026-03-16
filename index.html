@@ -46,40 +46,63 @@
     <div id="modal-content" class="w-full max-w-sm pointer-events-auto"></div>
   </div>
 
-  <footer class="fixed bottom-0 left-0 right-0 mx-auto max-w-md bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-800/50 px-1 py-2 z-50">
-    <nav class="grid grid-cols-6 items-center">
-      <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group" data-nav-tab="combat" data-tab="combat" aria-label="Combat">
-        <span class="icon-[game-icons--crossed-swords] w-6 h-6 transition-all"></span>
-        <span class="text-[9px] font-black uppercase tracking-tighter">Hunt</span>
-      </button>
+  <footer class="fixed bottom-0 left-0 right-0 z-50">
+  <div class="mx-auto max-w-md px-3 pb-3">
+    <div class="relative rounded-t-3xl bg-zinc-100 text-zinc-900 shadow-2xl">
+      <nav class="grid grid-cols-5 items-end px-2 pt-3 pb-2">
 
-      <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group" data-nav-tab="map" data-tab="map" aria-label="Map">
-        <span class="icon-[game-icons--world] w-6 h-6 transition-all"></span>
-        <span class="text-[9px] font-black uppercase tracking-tighter">Map</span>
-      </button>
+        <button
+          class="flex flex-col items-center justify-end gap-1 py-2 text-[10px] font-black uppercase tracking-tight"
+          data-nav-tab="combat"
+          data-tab="combat"
+          aria-label="Combat">
+          <span class="icon-[game-icons--crossed-swords] w-6 h-6"></span>
+          <span>Combat</span>
+        </button>
 
-      <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group" data-nav-tab="skills" data-tab="skills" aria-label="Skills">
-        <span class="icon-[game-icons--skills] w-6 h-6 transition-all"></span>
-        <span class="text-[9px] font-black uppercase tracking-tighter">Skills</span>
-      </button>
+        <button
+          class="flex flex-col items-center justify-end gap-1 py-2 text-[10px] font-black uppercase tracking-tight"
+          data-nav-tab="map"
+          data-tab="map"
+          aria-label="Map">
+          <span class="icon-[game-icons--world] w-6 h-6"></span>
+          <span>Map</span>
+        </button>
 
-      <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group" data-nav-tab="items" data-tab="items" aria-label="Inventory">
-        <span class="icon-[game-icons--locked-chest] w-6 h-6 transition-all"></span>
-        <span class="text-[9px] font-black uppercase tracking-tighter">Vault</span>
-      </button>
+        <div class="relative flex items-end justify-center">
+          <button
+            class="absolute -top-10 flex h-20 w-20 flex-col items-center justify-center rounded-full bg-zinc-950 text-zinc-100 shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+            data-nav-tab="skills"
+            data-tab="skills"
+            aria-label="Skills">
+            <span class="icon-[game-icons--skills] w-8 h-8"></span>
+          </button>
+          <div class="h-12 w-full"></div>
+          <span class="pb-2 text-[10px] font-black uppercase tracking-tight">Skills</span>
+        </div>
 
-      <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group" data-nav-tab="equipment" data-tab="equipment" aria-label="Equipment">
-        <span class="icon-[game-icons--battle-gear] w-6 h-6 transition-all"></span>
-        <span class="text-[9px] font-black uppercase tracking-tighter">Gear</span>
-      </button>
+        <button
+          class="flex flex-col items-center justify-end gap-1 py-2 text-[10px] font-black uppercase tracking-tight"
+          data-nav-tab="items"
+          data-tab="items"
+          aria-label="Inventory">
+          <span class="icon-[game-icons--locked-chest] w-6 h-6"></span>
+          <span>Vault</span>
+        </button>
 
-      <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group" data-nav-tab="shop" data-tab="shop" aria-label="Shop">
-        <span class="icon-[game-icons--receive-money] w-6 h-6 transition-all"></span>
-        <span class="text-[9px] font-black uppercase tracking-tighter">Shop</span>
-      </button>
-    </nav>
-  </footer>
+        <button
+          class="flex flex-col items-center justify-end gap-1 py-2 text-[10px] font-black uppercase tracking-tight"
+          data-nav-tab="equipment"
+          data-tab="equipment"
+          aria-label="Equipment">
+          <span class="icon-[game-icons--battle-gear] w-6 h-6"></span>
+          <span>Gear</span>
+        </button>
 
+      </nav>
+    </div>
+  </div>
+</footer>
   <script src="./assets/js/htmx.min.js"></script>
   <script type="module" src="./assets/js/game.js?v=15"></script>
   <script>
