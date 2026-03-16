@@ -2,7 +2,7 @@ package main
 
 import "github.com/LeGoatest/Pwa-idle-game/internal/game"
 
-func loadStateFromSave(saveJSON string, nowMS int64) (*game.GameState, error) {
+func loadState(saveJSON string, nowMS int64) (*game.GameState, error) {
 	if saveJSON == "" || saveJSON == "null" {
 		return game.NewDefaultState(nowMS), nil
 	}
@@ -19,7 +19,7 @@ func loadStateFromSave(saveJSON string, nowMS int64) (*game.GameState, error) {
 	return state, nil
 }
 
-func applyOfflineIfNeeded(state *game.GameState, contentState game.ContentState, nowMS int64) bool {
+func applyOffline(state *game.GameState, contentState game.ContentState, nowMS int64) bool {
 	if state == nil {
 		return false
 	}
