@@ -1,7 +1,7 @@
 package game
 
 func AddItem(state *GameState, itemID string, amount int) {
-	if amount <= 0 {
+	if itemID == "" || amount <= 0 {
 		return
 	}
 
@@ -13,8 +13,8 @@ func AddItem(state *GameState, itemID string, amount int) {
 }
 
 func RemoveItem(state *GameState, itemID string, amount int) bool {
-	if amount <= 0 {
-		return true
+	if itemID == "" || amount <= 0 {
+		return false
 	}
 
 	current := state.Inventory[itemID]
@@ -22,16 +22,12 @@ func RemoveItem(state *GameState, itemID string, amount int) bool {
 		return false
 	}
 
-	current -= amount
-	if current == 0 {
+	next := current - amount
+	if next == 0 {
 		delete(state.Inventory, itemID)
 	} else {
-		state.Inventory[itemID] = current
+		state.Inventory[itemID] = next
 	}
 
 	return true
-}
-
-func GetItemCount(state *GameState, itemID string) int {
-	return state.Inventory[itemID]
 }
