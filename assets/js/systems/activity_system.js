@@ -1,5 +1,4 @@
 export function startActivity(state, payload) {
-
   state.activity = {
     ...payload,
     startedAt: Date.now(),
@@ -9,7 +8,6 @@ export function startActivity(state, payload) {
 }
 
 export function stopActivity(state) {
-
   state.activity = {
     kind: "none",
     progress: 0
