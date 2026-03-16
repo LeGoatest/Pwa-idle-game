@@ -22,26 +22,29 @@ export function showToast(title, body) {
   toast.id = 'game-toast'
   toast.className = [
     'fixed',
+    'left-1/2',
+    '-translate-x-1/2',
+    'bottom-28',
     'z-[200]',
+    'w-[calc(100%-2rem)]',
+    'max-w-sm',
     'bg-zinc-900/95',
-    'border-2',
+    'border',
     'border-cyan-500/30',
-    'p-4',
     'rounded-2xl',
+    'p-4',
     'shadow-[0_0_30px_rgba(34,211,238,0.2)]',
-    'backdrop-blur-md',
-    'animate-in',
-    'slide-in-from-bottom-2'
+    'backdrop-blur-md'
   ].join(' ')
 
   toast.innerHTML = `
-    <div class="flex items-center gap-4">
-      <div class="w-10 h-10 bg-cyan-500/20 rounded-xl flex items-center justify-center border border-cyan-500/40 shrink-0">
-        <span class="icon-[game-icons--radar-sweep] text-cyan-400 icon-md animate-pulse"></span>
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0">
+        <span class="icon-[game-icons--radar-sweep] icon-md text-cyan-400"></span>
       </div>
-      <div class="flex-1 min-w-0">
-        <div class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500/70 mb-0.5">${title}</div>
-        <div class="text-sm font-black uppercase italic tracking-tight text-zinc-100">${body}</div>
+      <div class="min-w-0">
+        <div class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500/70">${title}</div>
+        <div class="text-sm font-black text-zinc-100 truncate">${body}</div>
       </div>
     </div>
   `
@@ -49,8 +52,7 @@ export function showToast(title, body) {
   document.body.appendChild(toast)
 
   toastTimeoutId = window.setTimeout(() => {
-    toast.classList.remove('animate-in', 'slide-in-from-bottom-2')
-    toast.classList.add('animate-out', 'slide-out-to-bottom-2')
+    toast.classList.add('opacity-0', 'translate-y-2', 'transition-all', 'duration-300')
 
     toastRemoveTimeoutId = window.setTimeout(() => {
       toast.remove()
@@ -84,10 +86,10 @@ export function showOfflineSummary(report) {
   }).join('')
 
   modalContent.innerHTML = `
-    <div class="pixel-card bg-zinc-900 border-cyan-500/30 shadow-[0_0_50px_rgba(34,211,238,0.15)] animate-in zoom-in-95 duration-300">
+    <div class="pixel-card bg-zinc-900 border-cyan-500/30 shadow-[0_0_50px_rgba(34,211,238,0.15)]">
       <div class="text-center mb-6">
         <div class="inline-flex items-center justify-center w-16 h-16 bg-cyan-500/10 rounded-full mb-4 border border-cyan-500/20">
-          <span class="icon-[game-icons--sunrise] text-cyan-400 w-10 h-10 animate-pulse"></span>
+          <span class="icon-[game-icons--sunrise] text-cyan-400 w-10 h-10"></span>
         </div>
         <h2 class="text-2xl font-black uppercase tracking-tighter italic">Welcome Back</h2>
         <p class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Gains during ${timeStr} absence</p>
@@ -117,7 +119,7 @@ export function showOfflineSummary(report) {
 
       <button class="btn-primary w-full py-4 flex items-center justify-center gap-2" data-action="close-modal">
         <span class="icon-[game-icons--check-mark] icon-sm"></span>
-        <span class="text-xs font-black uppercase italic tracking-widest">Acknowledge</span>
+        <span class="text-xs font-black uppercase tracking-widest">Acknowledge</span>
       </button>
     </div>
   `
@@ -228,26 +230,33 @@ function renderEquipment(state) {
   })
 }
 
-export function render(state, contentState) {
+function renderNav(state) {
+  document.querySelectorAll('[data-nav-tab]').forEach((btn) => {
+    const active = btn.dataset.navTab === state.ui?.tab
+    btn.setAttribute('aria-selected', active ? 'true' : 'false')
+
+    if (active) {
+      btn.classList.add('text-cyan-400')
+      btn.classList.remove('text-zinc-400', 'text-zinc-900')
+    } else {
+      btn.classList.remove('text-cyan-400')
+      if (btn.closest('footer')) {
+        btn.classList.add('text-zinc-400')
+      } else {
+        btn.classList.add('text-zinc-900')
+      }
+    }
+  })
+}
+
+function renderActivity(state, contentState) {
   const pulse = document.getElementById('active-pulse')
   const isIdle = state.activity?.kind === 'none'
 
   if (pulse) {
-    if (isIdle) {
-      pulse.classList.add('hidden')
-      pulse.classList.remove('animate-pulse', 'activity-pulse')
-    } else {
-      pulse.classList.remove('hidden')
-      pulse.classList.add('animate-pulse', 'activity-pulse')
-    }
+    if (isIdle) pulse.classList.add('hidden')
+    else pulse.classList.remove('hidden')
   }
-
-  setText('[data-bind="gold"]', String(state.gold ?? 0))
-  setText('[data-bind="kills"]', String(state.kills ?? 0))
-  setText('[data-bind="attack"]', String(state.attack ?? 0))
-  setText('[data-bind="defense"]', String(state.defense ?? 0))
-  setText('[data-bind="hp"]', String(state.hp ?? 0))
-  setText('[data-bind="enemyHp"]', `${Math.max(0, state.enemyHp ?? 0)} / ${state.enemyMaxHp ?? 0}`)
 
   const activeTaskName = (() => {
     if (state.activity?.kind === 'combat' && contentState.activeMonster) {
@@ -261,23 +270,6 @@ export function render(state, contentState) {
   })()
 
   setText('[data-bind="activeTaskName"]', activeTaskName)
-
-  const enemyPct = state.enemyMaxHp > 0
-    ? Math.max(0, Math.min(100, ((state.enemyHp ?? 0) / state.enemyMaxHp) * 100))
-    : 0
-  setWidth('[data-bind-style="enemyHpPct"]', enemyPct)
-
-  document.querySelectorAll('[data-bind-class]').forEach((el) => {
-    const expr = el.dataset.bindClass
-
-    if (expr === "activity.kind !== 'none' ? '' : 'hidden'") {
-      if (state.activity?.kind !== 'none') el.classList.remove('hidden')
-      else el.classList.add('hidden')
-    } else if (expr === "activity.kind === 'combat' ? '' : 'hidden'") {
-      if (state.activity?.kind === 'combat') el.classList.remove('hidden')
-      else el.classList.add('hidden')
-    }
-  })
 
   document.querySelectorAll('[data-task-bar]').forEach((el) => {
     const duration = (() => {
@@ -295,12 +287,6 @@ export function render(state, contentState) {
       : Math.min(100, ((state.activity.progress ?? 0) / duration) * 100)
 
     el.style.width = `${pct}%`
-
-    if (state.activity?.kind === 'none') {
-      el.parentElement?.classList.add('opacity-0')
-    } else {
-      el.parentElement?.classList.remove('opacity-0')
-    }
   })
 
   document.querySelectorAll('[data-task-status]').forEach((el) => {
@@ -318,19 +304,35 @@ export function render(state, contentState) {
     }
   })
 
-  document.querySelectorAll('[data-nav-tab]').forEach((btn) => {
-    const tab = btn.dataset.navTab
-    if (tab === state.ui?.tab) {
-      btn.classList.add('text-cyan-400')
-      btn.classList.remove('text-zinc-400')
-      btn.setAttribute('aria-selected', 'true')
-    } else {
-      btn.classList.remove('text-cyan-400')
-      btn.classList.add('text-zinc-400')
-      btn.removeAttribute('aria-selected')
+  document.querySelectorAll('[data-bind-class]').forEach((el) => {
+    const expr = el.dataset.bindClass
+
+    if (expr === "activity.kind !== 'none' ? '' : 'hidden'") {
+      if (state.activity?.kind !== 'none') el.classList.remove('hidden')
+      else el.classList.add('hidden')
+    } else if (expr === "activity.kind === 'combat' ? '' : 'hidden'") {
+      if (state.activity?.kind === 'combat') el.classList.remove('hidden')
+      else el.classList.add('hidden')
     }
   })
+}
 
+function renderStats(state) {
+  setText('[data-bind="gold"]', String(state.gold ?? 0))
+  setText('[data-bind="kills"]', String(state.kills ?? 0))
+  setText('[data-bind="attack"]', String(state.attack ?? 0))
+  setText('[data-bind="defense"]', String(state.defense ?? 0))
+  setText('[data-bind="hp"]', String(state.hp ?? 0))
+  setText('[data-bind="enemyHp"]', `${Math.max(0, state.enemyHp ?? 0)} / ${state.enemyMaxHp ?? 0}`)
+
+  const enemyPct = state.enemyMaxHp > 0
+    ? Math.max(0, Math.min(100, ((state.enemyHp ?? 0) / state.enemyMaxHp) * 100))
+    : 0
+
+  setWidth('[data-bind-style="enemyHpPct"]', enemyPct)
+}
+
+function renderSkills(state, contentState) {
   document.querySelectorAll('[data-skill-card]').forEach((el) => {
     const skillId = el.dataset.skillCard
     const meta = getSkillMeta(skillId)
@@ -349,143 +351,193 @@ export function render(state, contentState) {
   })
 
   const skillDetailRoot = document.querySelector('[data-skill-detail-root]')
-  if (skillDetailRoot && contentState.activeSkill) {
-    const skill = contentState.activeSkill
-    const meta = getSkillMeta(skill.id)
-    const level = state[meta.levelKey] ?? 1
-    const xp = state[meta.xpKey] ?? 0
-    const xpNeeded = xpForLevel(level)
-    const pct = Math.max(0, Math.min(100, (xp / xpNeeded) * 100))
+  if (!skillDetailRoot) return
 
-    const nameEl = skillDetailRoot.querySelector('[data-skill-detail-name]')
-    const levelEl = skillDetailRoot.querySelector('[data-skill-detail-level]')
-    const xpEl = skillDetailRoot.querySelector('[data-skill-detail-xp]')
-    const fillEl = skillDetailRoot.querySelector('[data-skill-detail-fill]')
-    const nodesRoot = skillDetailRoot.querySelector('[data-skill-nodes]')
+  if (!contentState.activeSkill) {
+    skillDetailRoot.innerHTML = ''
+    return
+  }
 
-    if (nameEl) nameEl.textContent = skill.name
-    if (levelEl) levelEl.textContent = String(level)
-    if (xpEl) xpEl.textContent = `${xp.toFixed(1)} / ${xpNeeded.toFixed(1)} XP`
-    if (fillEl) fillEl.style.width = `${pct}%`
+  const skill = contentState.activeSkill
+  const meta = getSkillMeta(skill.id)
+  const level = state[meta.levelKey] ?? 1
+  const xp = state[meta.xpKey] ?? 0
+  const xpNeeded = xpForLevel(level)
+  const pct = Math.max(0, Math.min(100, (xp / xpNeeded) * 100))
 
-    if (nodesRoot) {
-      nodesRoot.innerHTML = (skill.nodes || []).map((node) => {
-        const locked = level < node.levelRequired
-        const active =
-          state.activity?.kind === 'node' &&
-          state.activity?.skillId === skill.id &&
-          state.activity?.nodeId === node.id
+  const nameEl = skillDetailRoot.querySelector('[data-skill-detail-name]')
+  const levelEl = skillDetailRoot.querySelector('[data-skill-detail-level]')
+  const xpEl = skillDetailRoot.querySelector('[data-skill-detail-xp]')
+  const fillEl = skillDetailRoot.querySelector('[data-skill-detail-fill]')
+  const nodesRoot = skillDetailRoot.querySelector('[data-skill-nodes]')
+
+  if (nameEl) nameEl.textContent = skill.name
+  if (levelEl) levelEl.textContent = String(level)
+  if (xpEl) xpEl.textContent = `${xp.toFixed(1)} / ${xpNeeded.toFixed(1)} XP`
+  if (fillEl) fillEl.style.width = `${pct}%`
+
+  if (nodesRoot) {
+    nodesRoot.innerHTML = (skill.nodes || []).map((node) => {
+      const locked = level < node.levelRequired
+      const active = state.activity?.kind === 'node' &&
+        state.activity?.skillId === skill.id &&
+        state.activity?.nodeId === node.id
+
+      const yieldText = node.yield?.item
+        ? (() => {
+            const item = getItem(node.yield.item)
+            const amount = node.yield.amount || 1
+            return `${item?.name || node.yield.item} x${amount}`
+          })()
+        : 'No yield'
+
+      return `
+        <button
+          class="pixel-card w-full text-left ${locked ? 'opacity-50' : ''} ${active ? 'border-cyan-500/50 bg-cyan-500/5' : ''}"
+          data-skill-node="${node.id}"
+          ${locked ? 'disabled' : ''}>
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <div class="text-lg font-black">${node.name}</div>
+              <div class="text-sm text-zinc-400">+${node.xp} XP • ${(node.durationMs / 1000).toFixed(2)}s</div>
+              <div class="text-xs text-zinc-500 mt-1">${yieldText}</div>
+            </div>
+            <div class="text-sm text-zinc-500">Lvl ${node.levelRequired}</div>
+          </div>
+        </button>
+      `
+    }).join('')
+  }
+}
+
+function renderZones(state, contentState) {
+  const zoneListRoot = document.querySelector('[data-zone-list]')
+  if (!zoneListRoot || !Array.isArray(contentState.zonesIndex?.zones)) return
+
+  zoneListRoot.innerHTML = contentState.zonesIndex.zones.map((zone) => {
+    const zoneId = typeof zone === 'string' ? zone : zone.id
+    const zoneName = typeof zone === 'string' ? zone : zone.name
+    const zoneLevel = typeof zone === 'string' ? 1 : (zone.levelRequired ?? 1)
+
+    const current = state.ui?.currentZoneId === zoneId
+    const unlocked = (state.combatLevel ?? 1) >= zoneLevel
+
+    return `
+      <button
+        class="pixel-card w-full text-left ${current ? 'border-cyan-500/50 bg-cyan-500/5' : ''} ${!unlocked ? 'opacity-50' : ''}"
+        data-zone-open="${zoneId}"
+        ${!unlocked ? 'disabled' : ''}>
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-2xl font-black">${zoneName}</div>
+            <div class="text-sm ${current ? 'text-cyan-400' : 'text-zinc-500'}">
+              ${current ? 'Current Zone' : unlocked ? 'Travel Here' : 'Locked'}
+            </div>
+          </div>
+          <div class="text-zinc-500">Lvl ${zoneLevel}+</div>
+        </div>
+      </button>
+    `
+  }).join('')
+}
+
+function renderCombat(state, contentState) {
+  const monsterListRoot = document.querySelector('[data-monster-list]')
+  if (monsterListRoot) {
+    if (contentState.activeZone) {
+      monsterListRoot.innerHTML = (contentState.activeZone.monsters || []).map((monsterId) => {
+        const current = state.ui?.currentMonsterId === monsterId
+        const monster = contentState.registry?.monsters?.[monsterId]
+        const label = monster?.name || monsterId.replaceAll('_', ' ')
 
         return `
           <button
-            class="pixel-card w-full text-left ${locked ? 'opacity-50' : ''} ${active ? 'border-cyan-500/50 bg-cyan-500/5' : ''}"
-            data-skill-node="${node.id}"
-            ${locked ? 'disabled' : ''}>
+            class="pixel-card w-full text-left ${current ? 'border-cyan-500/50 bg-cyan-500/5' : ''}"
+            data-monster-open="${monsterId}">
             <div class="flex items-center justify-between gap-4">
-              <div>
-                <div class="text-lg font-black">${node.name}</div>
-                <div class="text-sm text-zinc-400">+${node.xp} XP • ${(node.durationMs / 1000).toFixed(2)}s</div>
-              </div>
-              <div class="text-sm text-zinc-500">Lvl ${node.levelRequired}</div>
+              <div class="text-lg font-black">${label}</div>
+              ${monster?.level ? `<div class="text-sm text-zinc-500">Lvl ${monster.level}</div>` : ''}
             </div>
           </button>
         `
       }).join('')
+    } else {
+      monsterListRoot.innerHTML = `
+        <div class="pixel-card text-center text-zinc-500">
+          No zone selected
+        </div>
+      `
     }
   }
 
-  const zoneListRoot = document.querySelector('[data-zone-list]')
-  if (zoneListRoot && Array.isArray(contentState.zonesIndex?.zones)) {
-    zoneListRoot.innerHTML = contentState.zonesIndex.zones.map((zone) => {
-      const zoneId = typeof zone === 'string' ? zone : zone.id
-      const zoneName = typeof zone === 'string' ? zone : zone.name
-      const zoneLevel = typeof zone === 'string' ? 1 : (zone.levelRequired ?? 1)
-
-      const current = state.ui?.currentZoneId === zoneId
-      const unlocked = (state.combatLevel ?? 1) >= zoneLevel
-
-      return `
-        <button
-          class="pixel-card w-full text-left ${current ? 'border-cyan-500/50 bg-cyan-500/5' : ''} ${!unlocked ? 'opacity-50' : ''}"
-          data-zone-open="${zoneId}"
-          ${!unlocked ? 'disabled' : ''}>
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="text-2xl font-black">${zoneName}</div>
-              <div class="text-sm ${current ? 'text-cyan-400' : 'text-zinc-500'}">
-                ${current ? 'Current Zone' : unlocked ? 'Travel Here' : 'Locked'}
-              </div>
-            </div>
-            <div class="text-zinc-500">Lvl ${zoneLevel}+</div>
-          </div>
-        </button>
-      `
-    }).join('')
-  }
-
-  const monsterListRoot = document.querySelector('[data-monster-list]')
-  if (monsterListRoot && contentState.activeZone) {
-    monsterListRoot.innerHTML = (contentState.activeZone.monsters || []).map((monsterId) => {
-      const current = state.ui?.currentMonsterId === monsterId
-      const monster = contentState.registry?.monsters?.[monsterId]
-      const label = monster?.name || monsterId.replaceAll('_', ' ')
-
-      return `
-        <button
-          class="pixel-card w-full text-left ${current ? 'border-cyan-500/50 bg-cyan-500/5' : ''}"
-          data-monster-open="${monsterId}">
-          <div class="flex items-center justify-between gap-4">
-            <div class="text-lg font-black">${label}</div>
-            ${monster?.level ? `<div class="text-sm text-zinc-500">Lvl ${monster.level}</div>` : ''}
-          </div>
-        </button>
-      `
-    }).join('')
-  }
-
   const monsterPanelRoot = document.querySelector('[data-monster-panel]')
-  if (monsterPanelRoot && contentState.activeMonster) {
-    const monster = contentState.activeMonster
-    const table = monster.loot || null
+  if (!monsterPanelRoot) return
 
+  if (!contentState.activeMonster) {
     monsterPanelRoot.innerHTML = `
-      <div class="pixel-card space-y-4">
-        <div class="flex items-center justify-between gap-4">
-          <div>
-            <div class="text-2xl font-black">${monster.name}</div>
-            <div class="text-sm text-zinc-500">
-              Lvl ${monster.level ?? 1} • HP ${monster.hp ?? 0} • ATK ${monster.attack ?? 0}
-            </div>
-          </div>
-          ${monster.boss ? '<div class="text-yellow-400 font-black uppercase">Boss</div>' : ''}
-        </div>
-
-        <div class="space-y-2">
-          <div class="text-sm font-black uppercase tracking-[0.15em] text-zinc-500">Possible Drops</div>
-          <div class="space-y-2">
-            <div class="flex items-center justify-between text-sm">
-              <span>Gold</span>
-              <span>${table?.gold?.min ?? 0}-${table?.gold?.max ?? 0}</span>
-            </div>
-            ${(table?.drops || []).map((drop) => {
-              const item = getItem(drop.item)
-              return `
-                <div class="flex items-center justify-between text-sm">
-                  <span>${item?.name || drop.item}</span>
-                  <span>${(drop.chance * 100).toFixed(drop.chance < 0.01 ? 3 : 1)}%${drop.min ? ` (${drop.min}-${drop.max ?? drop.min})` : ''}</span>
-                </div>
-              `
-            }).join('')}
-          </div>
-        </div>
-
-        <button class="btn-primary w-full py-4 text-lg font-black" data-action="fightMonster">
-          Fight ${monster.name}
-        </button>
+      <div class="pixel-card text-center text-zinc-500">
+        Select a monster
       </div>
     `
+    return
   }
 
+  const monster = contentState.activeMonster
+  const loot = monster.loot || null
+
+  monsterPanelRoot.innerHTML = `
+    <div class="pixel-card space-y-4">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <div class="text-2xl font-black">${monster.name}</div>
+          <div class="text-sm text-zinc-500">
+            Lvl ${monster.level ?? 1} • HP ${monster.hp ?? 0} • ATK ${monster.attack ?? 0}
+          </div>
+        </div>
+        ${monster.boss ? '<div class="text-yellow-400 font-black uppercase">Boss</div>' : ''}
+      </div>
+
+      <div class="space-y-2">
+        <div class="text-sm font-black uppercase tracking-[0.15em] text-zinc-500">Enemy Vitality</div>
+        <div class="h-3 rounded-full bg-zinc-800 overflow-hidden">
+          <div data-bind-style="enemyHpPct" class="h-full bg-cyan-500"></div>
+        </div>
+        <div class="text-sm text-zinc-400" data-bind="enemyHp">${Math.max(0, state.enemyHp ?? 0)} / ${state.enemyMaxHp ?? 0}</div>
+      </div>
+
+      <div class="space-y-2">
+        <div class="text-sm font-black uppercase tracking-[0.15em] text-zinc-500">Possible Drops</div>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-sm">
+            <span>Gold</span>
+            <span>${loot?.gold?.min ?? 0}-${loot?.gold?.max ?? 0}</span>
+          </div>
+          ${(loot?.drops || []).map((drop) => {
+            const item = getItem(drop.item)
+            return `
+              <div class="flex items-center justify-between text-sm">
+                <span>${item?.name || drop.item}</span>
+                <span>${(drop.chance * 100).toFixed(drop.chance < 0.01 ? 3 : 1)}%${drop.min ? ` (${drop.min}-${drop.max ?? drop.min})` : ''}</span>
+              </div>
+            `
+          }).join('')}
+        </div>
+      </div>
+
+      <button class="btn-primary w-full py-4 text-lg font-black" data-action="fightMonster">
+        Fight ${monster.name}
+      </button>
+    </div>
+  `
+}
+
+export function render(state, contentState) {
+  renderActivity(state, contentState)
+  renderStats(state)
+  renderNav(state)
+  renderSkills(state, contentState)
+  renderZones(state, contentState)
+  renderCombat(state, contentState)
   renderInventory(state)
   renderEquipment(state)
 }
