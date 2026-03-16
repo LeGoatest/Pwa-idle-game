@@ -1,25 +1,25 @@
-import { xpForLevel } from './systems/progression.js';
-import { getItem } from './item_registry.js';
+import { xpForLevel } from './systems/progression.js'
+import { getItem } from './item_registry.js'
 
-let toastTimeoutId = null;
-let toastRemoveTimeoutId = null;
+let toastTimeoutId = null
+let toastRemoveTimeoutId = null
 
 export function showToast(title, body) {
-  const existing = document.getElementById('game-toast');
-  if (existing) existing.remove();
+  const existing = document.getElementById('game-toast')
+  if (existing) existing.remove()
 
   if (toastTimeoutId) {
-    clearTimeout(toastTimeoutId);
-    toastTimeoutId = null;
+    clearTimeout(toastTimeoutId)
+    toastTimeoutId = null
   }
 
   if (toastRemoveTimeoutId) {
-    clearTimeout(toastRemoveTimeoutId);
-    toastRemoveTimeoutId = null;
+    clearTimeout(toastRemoveTimeoutId)
+    toastRemoveTimeoutId = null
   }
 
-  const toast = document.createElement('div');
-  toast.id = 'game-toast';
+  const toast = document.createElement('div')
+  toast.id = 'game-toast'
   toast.className = [
     'fixed',
     'z-[200]',
@@ -32,7 +32,7 @@ export function showToast(title, body) {
     'backdrop-blur-md',
     'animate-in',
     'slide-in-from-bottom-2'
-  ].join(' ');
+  ].join(' ')
 
   toast.innerHTML = `
     <div class="flex items-center gap-4">
@@ -44,31 +44,44 @@ export function showToast(title, body) {
         <div class="text-sm font-black uppercase italic tracking-tight text-zinc-100">${body}</div>
       </div>
     </div>
-  `;
+  `
 
-  document.body.appendChild(toast);
+  document.body.appendChild(toast)
 
   toastTimeoutId = window.setTimeout(() => {
-    toast.classList.remove('animate-in', 'slide-in-from-bottom-2');
-    toast.classList.add('animate-out', 'slide-out-to-bottom-2');
+    toast.classList.remove('animate-in', 'slide-in-from-bottom-2')
+    toast.classList.add('animate-out', 'slide-out-to-bottom-2')
 
     toastRemoveTimeoutId = window.setTimeout(() => {
-      toast.remove();
-    }, 300);
-  }, 2500);
+      toast.remove()
+    }, 300)
+  }, 2500)
 }
 
 export function showOfflineSummary(report) {
-  if (!report) return;
+  if (!report) return
 
-  const hours = Math.floor(report.elapsed / (1000 * 60 * 60));
-  const mins = Math.floor((report.elapsed % (1000 * 60 * 60)) / (1000 * 60));
-  const timeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  const hours = Math.floor(report.elapsed / (1000 * 60 * 60))
+  const mins = Math.floor((report.elapsed % (1000 * 60 * 60)) / (1000 * 60))
+  const timeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`
 
-  const modalRoot = document.getElementById('modal-root');
-  const modalContent = document.getElementById('modal-content');
+  const modalRoot = document.getElementById('modal-root')
+  const modalContent = document.getElementById('modal-content')
 
-  if (!modalRoot || !modalContent) return;
+  if (!modalRoot || !modalContent) return
+
+  const inventoryCards = Object.entries(report.inventory || {}).map(([itemId, amount]) => {
+    const item = getItem(itemId)
+    return `
+      <div class="bg-zinc-800/50 p-3 rounded-xl border border-zinc-700/30 flex items-center gap-3">
+        <span class="icon-[${item?.icon || 'game-icons--cube'}] text-cyan-400 w-5 h-5"></span>
+        <div>
+          <div class="text-[8px] font-black uppercase text-zinc-500">${item?.name || itemId}</div>
+          <div class="text-sm font-black tabular-nums">+${amount}</div>
+        </div>
+      </div>
+    `
+  }).join('')
 
   modalContent.innerHTML = `
     <div class="pixel-card bg-zinc-900 border-cyan-500/30 shadow-[0_0_50px_rgba(34,211,238,0.15)] animate-in zoom-in-95 duration-300">
@@ -90,24 +103,6 @@ export function showOfflineSummary(report) {
             </div>
           </div>
         ` : ''}
-        ${report.logs > 0 ? `
-          <div class="bg-zinc-800/50 p-3 rounded-xl border border-zinc-700/30 flex items-center gap-3">
-            <span class="icon-[game-icons--birch-trees] text-orange-400 w-5 h-5"></span>
-            <div>
-              <div class="text-[8px] font-black uppercase text-zinc-500">Logs</div>
-              <div class="text-sm font-black tabular-nums">+${report.logs}</div>
-            </div>
-          </div>
-        ` : ''}
-        ${report.ore > 0 ? `
-          <div class="bg-zinc-800/50 p-3 rounded-xl border border-zinc-700/30 flex items-center gap-3">
-            <span class="icon-[game-icons--pickelhaube] text-blue-400 w-5 h-5"></span>
-            <div>
-              <div class="text-[8px] font-black uppercase text-zinc-500">Ore</div>
-              <div class="text-sm font-black tabular-nums">+${report.ore}</div>
-            </div>
-          </div>
-        ` : ''}
         ${report.kills > 0 ? `
           <div class="bg-zinc-800/50 p-3 rounded-xl border border-zinc-700/30 flex items-center gap-3">
             <span class="icon-[game-icons--skull-mask] text-red-400 w-5 h-5"></span>
@@ -117,6 +112,7 @@ export function showOfflineSummary(report) {
             </div>
           </div>
         ` : ''}
+        ${inventoryCards}
       </div>
 
       <button class="btn-primary w-full py-4 flex items-center justify-center gap-2" data-action="close-modal">
@@ -124,55 +120,56 @@ export function showOfflineSummary(report) {
         <span class="text-xs font-black uppercase italic tracking-widest">Acknowledge</span>
       </button>
     </div>
-  `;
+  `
 
-  modalRoot.classList.remove('hidden');
+  modalRoot.classList.remove('hidden')
 }
 
 function setText(selector, value) {
   document.querySelectorAll(selector).forEach((el) => {
-    el.textContent = value;
-  });
+    el.textContent = value
+  })
 }
 
 function setWidth(selector, pct) {
   document.querySelectorAll(selector).forEach((el) => {
-    el.style.width = `${pct}%`;
-  });
+    el.style.width = `${pct}%`
+  })
 }
 
 function getSkillMeta(skillId) {
-  if (skillId === 'woodcutting') return { levelKey: 'woodLevel', xpKey: 'woodXp' };
-  if (skillId === 'mining') return { levelKey: 'mineLevel', xpKey: 'mineXp' };
-  if (skillId === 'combat') return { levelKey: 'combatLevel', xpKey: 'combatXp' };
-  return { levelKey: `${skillId}Level`, xpKey: `${skillId}Xp` };
+  if (skillId === 'woodcutting') return { levelKey: 'woodLevel', xpKey: 'woodXp' }
+  if (skillId === 'mining') return { levelKey: 'mineLevel', xpKey: 'mineXp' }
+  if (skillId === 'combat') return { levelKey: 'combatLevel', xpKey: 'combatXp' }
+  return { levelKey: `${skillId}Level`, xpKey: `${skillId}Xp` }
 }
 
 function renderInventory(state) {
-  const root = document.querySelector('[data-inventory-list]');
-  if (!root) return;
+  const root = document.querySelector('[data-inventory-list]')
+  if (!root) return
 
-  const inventory = state.inventory || {};
+  const inventory = state.inventory || {}
   const entries = Object.entries(inventory)
     .filter(([, amount]) => amount > 0)
     .map(([itemId, amount]) => {
-      const item = getItem(itemId);
+      const item = getItem(itemId)
       return {
         itemId,
         amount,
         name: item?.name || itemId,
         type: item?.type || 'unknown',
-        icon: item?.icon || 'game-icons--cube'
-      };
-    });
+        icon: item?.icon || 'game-icons--cube',
+        canEquip: Boolean(item?.equipSlot)
+      }
+    })
 
   if (!entries.length) {
     root.innerHTML = `
       <div class="pixel-card text-center text-zinc-500">
         Inventory Empty
       </div>
-    `;
-    return;
+    `
+    return
   }
 
   root.innerHTML = entries.map((entry) => `
@@ -184,194 +181,203 @@ function renderInventory(state) {
           <div class="text-xs uppercase tracking-[0.12em] text-zinc-500">${entry.type}</div>
         </div>
       </div>
-      <div class="text-sm font-black tabular-nums">${entry.amount}</div>
+
+      <div class="flex items-center gap-3">
+        <div class="text-sm font-black tabular-nums">${entry.amount}</div>
+        ${entry.canEquip ? `
+          <button
+            class="btn-primary px-3 py-2 text-xs"
+            data-action="equipItem"
+            data-item-id="${entry.itemId}">
+            Equip
+          </button>
+        ` : ''}
+      </div>
     </div>
-  `).join('');
+  `).join('')
 }
 
 function renderEquipment(state) {
-  const slotEls = document.querySelectorAll('[data-equip-slot]');
-  if (!slotEls.length) return;
+  const slotEls = document.querySelectorAll('[data-equip-slot]')
+  if (!slotEls.length) return
 
-  const equipment = state.equipment || {};
+  const equipment = state.equipment || {}
 
   slotEls.forEach((el) => {
-    const slot = el.dataset.equipSlot;
-    const itemId = equipment[slot];
-    const item = itemId ? getItem(itemId) : null;
+    const slot = el.dataset.equipSlot
+    const itemId = equipment[slot]
+    const item = itemId ? getItem(itemId) : null
 
-    const nameEl = el.querySelector('[data-equip-name]');
-    const metaEl = el.querySelector('[data-equip-meta]');
-    const iconEl = el.querySelector('[data-equip-icon]');
+    const nameEl = el.querySelector('[data-equip-name]')
+    const metaEl = el.querySelector('[data-equip-meta]')
+    const iconEl = el.querySelector('[data-equip-icon]')
 
-    if (nameEl) nameEl.textContent = item?.name || 'Empty';
+    if (nameEl) nameEl.textContent = item?.name || 'Empty'
+
     if (metaEl) {
       if (item?.stats) {
-        const stats = Object.entries(item.stats).map(([key, value]) => `${key}+${value}`).join(' • ');
-        metaEl.textContent = stats || 'No bonuses';
+        const stats = Object.entries(item.stats)
+          .map(([key, value]) => `${key}+${value}`)
+          .join(' • ')
+        metaEl.textContent = stats || 'No bonuses'
       } else {
-        metaEl.textContent = 'Nothing equipped';
+        metaEl.textContent = 'Nothing equipped'
       }
     }
 
     if (iconEl) {
-      iconEl.className = `${item?.icon ? `icon-[${item.icon}]` : 'icon-[game-icons--checked-shield]'} icon-lg ${item ? 'text-cyan-400' : 'text-zinc-600'}`;
+      iconEl.className = `${item?.icon ? `icon-[${item.icon}]` : 'icon-[game-icons--checked-shield]'} icon-lg ${item ? 'text-cyan-400' : 'text-zinc-600'}`
     }
-  });
+  })
 }
 
 export function render(state, contentState) {
-  const pulse = document.getElementById('active-pulse');
-  const isIdle = state.activity?.kind === 'none';
+  const pulse = document.getElementById('active-pulse')
+  const isIdle = state.activity?.kind === 'none'
 
   if (pulse) {
     if (isIdle) {
-      pulse.classList.add('hidden');
-      pulse.classList.remove('animate-pulse', 'activity-pulse');
+      pulse.classList.add('hidden')
+      pulse.classList.remove('animate-pulse', 'activity-pulse')
     } else {
-      pulse.classList.remove('hidden');
-      pulse.classList.add('animate-pulse', 'activity-pulse');
+      pulse.classList.remove('hidden')
+      pulse.classList.add('animate-pulse', 'activity-pulse')
     }
   }
 
-  setText('[data-bind="gold"]', String(state.gold ?? 0));
-  setText('[data-bind="logs"]', String(state.logs ?? 0));
-  setText('[data-bind="ore"]', String(state.ore ?? 0));
-  setText('[data-bind="swords"]', String(state.swords ?? 0));
-  setText('[data-bind="kills"]', String(state.kills ?? 0));
-  setText('[data-bind="attack"]', String(state.attack ?? 0));
-  setText('[data-bind="defense"]', String(state.defense ?? 0));
-  setText('[data-bind="hp"]', String(state.hp ?? 0));
-  setText('[data-bind="potions"]', String(state.potions ?? 0));
-  setText('[data-bind="enemyHp"]', `${Math.max(0, state.enemyHp ?? 0)} / ${state.enemyMaxHp ?? 0}`);
+  setText('[data-bind="gold"]', String(state.gold ?? 0))
+  setText('[data-bind="kills"]', String(state.kills ?? 0))
+  setText('[data-bind="attack"]', String(state.attack ?? 0))
+  setText('[data-bind="defense"]', String(state.defense ?? 0))
+  setText('[data-bind="hp"]', String(state.hp ?? 0))
+  setText('[data-bind="enemyHp"]', `${Math.max(0, state.enemyHp ?? 0)} / ${state.enemyMaxHp ?? 0}`)
 
   const activeTaskName = (() => {
     if (state.activity?.kind === 'combat' && contentState.activeMonster) {
-      return contentState.activeMonster.name;
+      return contentState.activeMonster.name
     }
-    if (state.activity?.kind === 'skilling' && contentState.activeSkill) {
-      const node = contentState.activeSkill.nodes?.find((n) => n.id === state.activity.nodeId);
-      return node ? `${contentState.activeSkill.name}: ${node.name}` : contentState.activeSkill.name;
+    if (state.activity?.kind === 'node' && contentState.activeSkill) {
+      const node = contentState.activeSkill.nodes?.find((n) => n.id === state.activity.nodeId)
+      return node ? `${contentState.activeSkill.name}: ${node.name}` : contentState.activeSkill.name
     }
-    return 'Idle';
-  })();
+    return 'Idle'
+  })()
 
-  setText('[data-bind="activeTaskName"]', activeTaskName);
+  setText('[data-bind="activeTaskName"]', activeTaskName)
 
   const enemyPct = state.enemyMaxHp > 0
     ? Math.max(0, Math.min(100, ((state.enemyHp ?? 0) / state.enemyMaxHp) * 100))
-    : 0;
-  setWidth('[data-bind-style="enemyHpPct"]', enemyPct);
+    : 0
+  setWidth('[data-bind-style="enemyHpPct"]', enemyPct)
 
   document.querySelectorAll('[data-bind-class]').forEach((el) => {
-    const expr = el.dataset.bindClass;
+    const expr = el.dataset.bindClass
 
     if (expr === "activity.kind !== 'none' ? '' : 'hidden'") {
-      if (state.activity?.kind !== 'none') el.classList.remove('hidden');
-      else el.classList.add('hidden');
+      if (state.activity?.kind !== 'none') el.classList.remove('hidden')
+      else el.classList.add('hidden')
     } else if (expr === "activity.kind === 'combat' ? '' : 'hidden'") {
-      if (state.activity?.kind === 'combat') el.classList.remove('hidden');
-      else el.classList.add('hidden');
+      if (state.activity?.kind === 'combat') el.classList.remove('hidden')
+      else el.classList.add('hidden')
     }
-  });
+  })
 
   document.querySelectorAll('[data-task-bar]').forEach((el) => {
     const duration = (() => {
       if (state.activity?.kind === 'combat' && contentState.activeMonster) {
-        return contentState.activeMonster.durationMs || 2000;
+        return contentState.activeMonster.durationMs || 2000
       }
-      if (state.activity?.kind === 'skilling' && contentState.activeSkill) {
-        const node = contentState.activeSkill.nodes?.find((n) => n.id === state.activity.nodeId);
-        return node?.durationMs || 1000;
+      if (state.activity?.kind === 'node' && contentState.activeNode) {
+        return contentState.activeNode.durationMs || 1000
       }
-      return 1000;
-    })();
+      return 1000
+    })()
 
     const pct = state.activity?.kind === 'none'
       ? 0
-      : Math.min(100, ((state.activity.progress ?? 0) / duration) * 100);
+      : Math.min(100, ((state.activity.progress ?? 0) / duration) * 100)
 
-    el.style.width = `${pct}%`;
+    el.style.width = `${pct}%`
 
     if (state.activity?.kind === 'none') {
-      el.parentElement?.classList.add('opacity-0');
+      el.parentElement?.classList.add('opacity-0')
     } else {
-      el.parentElement?.classList.remove('opacity-0');
+      el.parentElement?.classList.remove('opacity-0')
     }
-  });
+  })
 
   document.querySelectorAll('[data-task-status]').forEach((el) => {
-    const task = el.dataset.taskStatus;
-    const isActive = task === state.activity?.kind || task === state.activity?.skillId;
+    const task = el.dataset.taskStatus
+    const isActive = task === state.activity?.kind || task === state.activity?.skillId
 
-    el.textContent = isActive ? 'Active' : 'Paused';
+    el.textContent = isActive ? 'Active' : 'Paused'
 
     if (isActive) {
-      el.classList.add('text-cyan-400');
-      el.classList.remove('text-zinc-500');
+      el.classList.add('text-cyan-400')
+      el.classList.remove('text-zinc-500')
     } else {
-      el.classList.remove('text-cyan-400');
-      el.classList.add('text-zinc-500');
+      el.classList.remove('text-cyan-400')
+      el.classList.add('text-zinc-500')
     }
-  });
+  })
 
   document.querySelectorAll('[data-nav-tab]').forEach((btn) => {
-    const tab = btn.dataset.navTab;
+    const tab = btn.dataset.navTab
     if (tab === state.ui?.tab) {
-      btn.classList.add('text-cyan-400');
-      btn.classList.remove('text-zinc-400');
-      btn.setAttribute('aria-selected', 'true');
+      btn.classList.add('text-cyan-400')
+      btn.classList.remove('text-zinc-400')
+      btn.setAttribute('aria-selected', 'true')
     } else {
-      btn.classList.remove('text-cyan-400');
-      btn.classList.add('text-zinc-400');
-      btn.removeAttribute('aria-selected');
+      btn.classList.remove('text-cyan-400')
+      btn.classList.add('text-zinc-400')
+      btn.removeAttribute('aria-selected')
     }
-  });
+  })
 
   document.querySelectorAll('[data-skill-card]').forEach((el) => {
-    const skillId = el.dataset.skillCard;
-    const meta = getSkillMeta(skillId);
-    const level = state[meta.levelKey] ?? 1;
-    const xp = state[meta.xpKey] ?? 0;
-    const xpNeeded = xpForLevel(level);
-    const pct = Math.max(0, Math.min(100, (xp / xpNeeded) * 100));
+    const skillId = el.dataset.skillCard
+    const meta = getSkillMeta(skillId)
+    const level = state[meta.levelKey] ?? 1
+    const xp = state[meta.xpKey] ?? 0
+    const xpNeeded = xpForLevel(level)
+    const pct = Math.max(0, Math.min(100, (xp / xpNeeded) * 100))
 
-    const levelEl = el.querySelector('[data-skill-level]');
-    const xpEl = el.querySelector('[data-skill-xp-text]');
-    const fillEl = el.querySelector('[data-skill-xp-fill]');
+    const levelEl = el.querySelector('[data-skill-level]')
+    const xpEl = el.querySelector('[data-skill-xp-text]')
+    const fillEl = el.querySelector('[data-skill-xp-fill]')
 
-    if (levelEl) levelEl.textContent = String(level);
-    if (xpEl) xpEl.textContent = `${xp.toFixed(1)} / ${xpNeeded.toFixed(1)} XP`;
-    if (fillEl) fillEl.style.width = `${pct}%`;
-  });
+    if (levelEl) levelEl.textContent = String(level)
+    if (xpEl) xpEl.textContent = `${xp.toFixed(1)} / ${xpNeeded.toFixed(1)} XP`
+    if (fillEl) fillEl.style.width = `${pct}%`
+  })
 
-  const skillDetailRoot = document.querySelector('[data-skill-detail-root]');
+  const skillDetailRoot = document.querySelector('[data-skill-detail-root]')
   if (skillDetailRoot && contentState.activeSkill) {
-    const skill = contentState.activeSkill;
-    const meta = getSkillMeta(skill.id);
-    const level = state[meta.levelKey] ?? 1;
-    const xp = state[meta.xpKey] ?? 0;
-    const xpNeeded = xpForLevel(level);
-    const pct = Math.max(0, Math.min(100, (xp / xpNeeded) * 100));
+    const skill = contentState.activeSkill
+    const meta = getSkillMeta(skill.id)
+    const level = state[meta.levelKey] ?? 1
+    const xp = state[meta.xpKey] ?? 0
+    const xpNeeded = xpForLevel(level)
+    const pct = Math.max(0, Math.min(100, (xp / xpNeeded) * 100))
 
-    const nameEl = skillDetailRoot.querySelector('[data-skill-detail-name]');
-    const levelEl = skillDetailRoot.querySelector('[data-skill-detail-level]');
-    const xpEl = skillDetailRoot.querySelector('[data-skill-detail-xp]');
-    const fillEl = skillDetailRoot.querySelector('[data-skill-detail-fill]');
-    const nodesRoot = skillDetailRoot.querySelector('[data-skill-nodes]');
+    const nameEl = skillDetailRoot.querySelector('[data-skill-detail-name]')
+    const levelEl = skillDetailRoot.querySelector('[data-skill-detail-level]')
+    const xpEl = skillDetailRoot.querySelector('[data-skill-detail-xp]')
+    const fillEl = skillDetailRoot.querySelector('[data-skill-detail-fill]')
+    const nodesRoot = skillDetailRoot.querySelector('[data-skill-nodes]')
 
-    if (nameEl) nameEl.textContent = skill.name;
-    if (levelEl) levelEl.textContent = String(level);
-    if (xpEl) xpEl.textContent = `${xp.toFixed(1)} / ${xpNeeded.toFixed(1)} XP`;
-    if (fillEl) fillEl.style.width = `${pct}%`;
+    if (nameEl) nameEl.textContent = skill.name
+    if (levelEl) levelEl.textContent = String(level)
+    if (xpEl) xpEl.textContent = `${xp.toFixed(1)} / ${xpNeeded.toFixed(1)} XP`
+    if (fillEl) fillEl.style.width = `${pct}%`
 
     if (nodesRoot) {
       nodesRoot.innerHTML = (skill.nodes || []).map((node) => {
-        const locked = level < node.levelRequired;
+        const locked = level < node.levelRequired
         const active =
-          state.activity?.kind === 'skilling' &&
+          state.activity?.kind === 'node' &&
           state.activity?.skillId === skill.id &&
-          state.activity?.nodeId === node.id;
+          state.activity?.nodeId === node.id
 
         return `
           <button
@@ -386,16 +392,16 @@ export function render(state, contentState) {
               <div class="text-sm text-zinc-500">Lvl ${node.levelRequired}</div>
             </div>
           </button>
-        `;
-      }).join('');
+        `
+      }).join('')
     }
   }
 
-  const zoneListRoot = document.querySelector('[data-zone-list]');
+  const zoneListRoot = document.querySelector('[data-zone-list]')
   if (zoneListRoot && Array.isArray(contentState.zonesIndex?.zones)) {
     zoneListRoot.innerHTML = contentState.zonesIndex.zones.map((zone) => {
-      const current = state.ui?.currentZoneId === zone.id;
-      const unlocked = (state.combatLevel ?? 1) >= (zone.levelRequired ?? 1);
+      const current = state.ui?.currentZoneId === zone.id
+      const unlocked = (state.combatLevel ?? 1) >= (zone.levelRequired ?? 1)
 
       return `
         <button
@@ -412,16 +418,16 @@ export function render(state, contentState) {
             <div class="text-zinc-500">Lvl ${zone.levelRequired}+</div>
           </div>
         </button>
-      `;
-    }).join('');
+      `
+    }).join('')
   }
 
-  const monsterListRoot = document.querySelector('[data-monster-list]');
+  const monsterListRoot = document.querySelector('[data-monster-list]')
   if (monsterListRoot && contentState.activeZone) {
     monsterListRoot.innerHTML = (contentState.activeZone.monsters || []).map((monsterId) => {
-      const current = state.ui?.currentMonsterId === monsterId;
-      const monster = contentState.registry?.monsters?.[monsterId];
-      const label = monster?.name || monsterId.replaceAll('_', ' ');
+      const current = state.ui?.currentMonsterId === monsterId
+      const monster = contentState.registry?.monsters?.[monsterId]
+      const label = monster?.name || monsterId.replaceAll('_', ' ')
 
       return `
         <button
@@ -432,14 +438,14 @@ export function render(state, contentState) {
             ${monster?.level ? `<div class="text-sm text-zinc-500">Lvl ${monster.level}</div>` : ''}
           </div>
         </button>
-      `;
-    }).join('');
+      `
+    }).join('')
   }
 
-  const monsterPanelRoot = document.querySelector('[data-monster-panel]');
+  const monsterPanelRoot = document.querySelector('[data-monster-panel]')
   if (monsterPanelRoot && contentState.activeMonster) {
-    const monster = contentState.activeMonster;
-    const table = contentState.activeDropTable;
+    const monster = contentState.activeMonster
+    const table = contentState.activeDropTable
 
     monsterPanelRoot.innerHTML = `
       <div class="pixel-card space-y-4">
@@ -461,13 +467,13 @@ export function render(state, contentState) {
               <span>${table?.gold?.min ?? 0}-${table?.gold?.max ?? 0}</span>
             </div>
             ${(table?.drops || []).map((drop) => {
-              const item = getItem(drop.item);
+              const item = getItem(drop.item)
               return `
                 <div class="flex items-center justify-between text-sm">
                   <span>${item?.name || drop.item}</span>
                   <span>${(drop.chance * 100).toFixed(drop.chance < 0.01 ? 3 : 1)}%${drop.min ? ` (${drop.min}-${drop.max ?? drop.min})` : ''}</span>
                 </div>
-              `;
+              `
             }).join('')}
           </div>
         </div>
@@ -476,9 +482,9 @@ export function render(state, contentState) {
           Fight ${monster.name}
         </button>
       </div>
-    `;
+    `
   }
 
-  renderInventory(state);
-  renderEquipment(state);
+  renderInventory(state)
+  renderEquipment(state)
 }
