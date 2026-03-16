@@ -1,0 +1,10 @@
+{
+  "id": "field_rat",
+  "name": "Field Rat",
+  "level": 1,
+  "hp": 12,
+  "attack": 2,
+  "durationMs": 2000,
+  "xp": 5,
+  "dropTable": "field_rat"
+}
