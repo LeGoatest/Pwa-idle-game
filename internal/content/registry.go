@@ -6,10 +6,6 @@ import (
 	"sort"
 )
 
-type registryError string
-
-func (e registryError) Error() string { return string(e) }
-
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
@@ -86,20 +82,27 @@ func LoadRegistry(basePath string) (*Registry, error) {
 		}
 	}
 
+	dropTables, err := LoadDropTables(basePath)
+	if err != nil {
+		return nil, err
+	}
+
 	reg := &Registry{
-		Items:         IndexByID(items),
-		ItemsList:     items,
-		Skills:        IndexByID(skills),
-		SkillsList:    skills,
-		Zones:         IndexByID(zones),
-		ZonesList:     zones,
-		Monsters:      IndexByID(monsters),
-		MonstersList:  monsters,
-		ShopItems:     IndexByID(shopItems),
-		ShopItemsList: shopItems,
-		SkillsIndex:   skillsIndex,
-		ZonesIndex:    zonesIndex,
-		ShopIndex:     shopIndex,
+		Items:          IndexByID(items),
+		ItemsList:      items,
+		Skills:         IndexByID(skills),
+		SkillsList:     skills,
+		Zones:          IndexByID(zones),
+		ZonesList:      zones,
+		Monsters:       IndexByID(monsters),
+		MonstersList:   monsters,
+		ShopItems:      IndexByID(shopItems),
+		ShopItemsList:  shopItems,
+		DropTables:     IndexByID(dropTables),
+		DropTablesList: dropTables,
+		SkillsIndex:    skillsIndex,
+		ZonesIndex:     zonesIndex,
+		ShopIndex:      shopIndex,
 	}
 
 	if err := ValidateRegistry(reg); err != nil {
