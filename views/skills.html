@@ -1,103 +1,55 @@
-<section class="space-y-6">
+<div class="space-y-6">
 
-  <header class="flex items-center justify-between">
-    <h1 class="text-2xl font-black uppercase italic tracking-tight">
-      Skills
-    </h1>
-  </header>
-
-  <!-- Skill cards -->
-  <div class="grid grid-cols-2 gap-4">
-
-    <button
-      class="pixel-card"
-      data-skill-card="woodcutting"
-      data-skill-open="woodcutting">
-
-      <div class="text-lg font-black">Woodcutting</div>
-
-      <div class="text-sm text-zinc-500">
-        Level <span data-skill-level></span>
-      </div>
-
-      <div class="h-2 bg-zinc-800 rounded mt-2 overflow-hidden">
-        <div
-          class="h-full bg-green-500"
-          data-skill-xp-fill></div>
-      </div>
-
-      <div
-        class="text-xs mt-1 text-zinc-400"
-        data-skill-xp-text>
-      </div>
-
-    </button>
-
-    <button
-      class="pixel-card"
-      data-skill-card="mining"
-      data-skill-open="mining">
-
-      <div class="text-lg font-black">Mining</div>
-
-      <div class="text-sm text-zinc-500">
-        Level <span data-skill-level></span>
-      </div>
-
-      <div class="h-2 bg-zinc-800 rounded mt-2 overflow-hidden">
-        <div
-          class="h-full bg-blue-500"
-          data-skill-xp-fill></div>
-      </div>
-
-      <div
-        class="text-xs mt-1 text-zinc-400"
-        data-skill-xp-text>
-      </div>
-
-    </button>
-
+  <div class="text-xl font-black uppercase italic tracking-tight">
+    Skills
   </div>
 
-  <!-- Skill detail -->
-  <div
-    class="mt-6"
-    data-skill-detail-root>
+  <div class="grid grid-cols-1 gap-3">
 
-    <div class="pixel-card space-y-4">
-
-      <div class="flex items-center justify-between">
-        <div>
-          <div
-            class="text-xl font-black"
-            data-skill-detail-name>
-          </div>
-
-          <div class="text-sm text-zinc-500">
-            Level
-            <span data-skill-detail-level></span>
-          </div>
-        </div>
+    <div data-skill-card="woodcutting" class="pixel-card space-y-2">
+      <div class="flex justify-between">
+        <span class="font-black">Woodcutting</span>
+        <span data-skill-level></span>
       </div>
 
       <div class="h-2 bg-zinc-800 rounded overflow-hidden">
-        <div
-          class="h-full bg-cyan-500"
-          data-skill-detail-fill></div>
+        <div data-skill-xp-fill class="h-full bg-cyan-500"></div>
       </div>
 
-      <div
-        class="text-sm text-zinc-400"
-        data-skill-detail-xp>
+      <div data-skill-xp-text class="text-xs text-zinc-500"></div>
+    </div>
+
+    <div data-skill-card="mining" class="pixel-card space-y-2">
+      <div class="flex justify-between">
+        <span class="font-black">Mining</span>
+        <span data-skill-level></span>
       </div>
 
-      <div
-        class="space-y-3"
-        data-skill-nodes>
+      <div class="h-2 bg-zinc-800 rounded overflow-hidden">
+        <div data-skill-xp-fill class="h-full bg-cyan-500"></div>
       </div>
 
+      <div data-skill-xp-text class="text-xs text-zinc-500"></div>
     </div>
 
   </div>
 
-</section>
+  <div data-skill-detail-root class="space-y-4">
+
+    <div class="text-lg font-black" data-skill-detail-name></div>
+
+    <div class="text-sm">
+      Level <span data-skill-detail-level></span>
+    </div>
+
+    <div class="h-2 bg-zinc-800 rounded overflow-hidden">
+      <div data-skill-detail-fill class="h-full bg-cyan-500"></div>
+    </div>
+
+    <div data-skill-detail-xp class="text-xs text-zinc-500"></div>
+
+    <div data-skill-nodes class="space-y-2"></div>
+
+  </div>
+
+</div>
