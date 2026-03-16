@@ -446,59 +446,6 @@ jobs:
           touch web/templates/.keep
           touch web/views/.keep
 
-      - name: Write build workflow
-        run: |
-          mkdir -p .github/workflows
-          cat > .github/workflows/build-migration.yml <<'EOF'
-          name: Build migration branch
-
-          on:
-            push:
-              branches:
-                - migration/tinygo-wasm
-            pull_request:
-
-          jobs:
-            build:
-              runs-on: ubuntu-latest
-
-              steps:
-                - name: Checkout
-                  uses: actions/checkout@v4
-
-                - name: Setup Go
-                  uses: actions/setup-go@v5
-                  with:
-                    go-version: '1.24.0'
-
-                - name: Setup Node
-                  uses: actions/setup-node@v4
-                  with:
-                    node-version: '22'
-
-                - name: Setup TinyGo
-                  uses: acifani/setup-tinygo@v2
-                  with:
-                    tinygo-version: '0.35.0'
-
-                - name: Install Tailwind deps
-                  run: npm install
-
-                - name: Build server
-                  run: go build ./cmd/web
-
-                - name: Build css
-                  run: npx @tailwindcss/cli -i ./input.css -o ./web/static/css/output.css --minify
-
-                - name: Copy wasm_exec.js
-                  run: cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" ./web/static/js/wasm_exec.js
-
-                - name: Build wasm
-                  run: tinygo build -target wasm -opt=z -no-debug -o ./web/static/wasm/app.wasm ./frontend/wasm
-
-                - name: Test
-                  run: go test ./...
-          EOF
 
       - name: Commit changes
         shell: bash
