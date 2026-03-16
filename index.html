@@ -7,17 +7,17 @@
   <title>Idle Frontier PWA</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/icons/icon.svg">
-  <link rel="stylesheet" href="./assets/css/style.css?v=7">
+  <link rel="stylesheet" href="./assets/css/style.css?v=9">
   <script src="./assets/js/htmx.min.js"></script>
 </head>
 <body class="bg-zinc-950 text-zinc-100">
   <div class="mx-auto max-w-md min-h-screen bg-zinc-950 flex flex-col">
 
     <header class="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur">
-      <div class="px-4 pt-6 pb-4 space-y-4">
+      <div class="px-4 pt-5 pb-4 space-y-4">
 
         <div class="flex items-start justify-between gap-4">
-          <div>
+          <div class="min-w-0">
             <h1 class="text-2xl font-black tracking-tight">Idle Frontier PWA</h1>
             <div class="mt-1 flex items-center gap-2">
               <div id="active-pulse" class="hidden h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.65)]"></div>
@@ -25,9 +25,9 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3 shrink-0">
             <div class="flex items-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900/80 px-3 py-2">
-              <span class="icon-[game-icons--coins] text-yellow-500 w-4 h-4"></span>
+              <span class="icon-[game-icons--coins] w-4 h-4 text-yellow-500"></span>
               <span data-bind="gold" class="font-black tabular-nums">0</span>
             </div>
 
@@ -41,15 +41,22 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
+        <div class="grid grid-cols-4 gap-3">
           <div class="pixel-card !p-3 text-center">
             <div class="text-[10px] uppercase tracking-[0.18em] text-zinc-500">Kills</div>
             <div data-bind="kills" class="text-lg font-black tabular-nums">0</div>
           </div>
+
+          <div class="pixel-card !p-3 text-center">
+            <div class="text-[10px] uppercase tracking-[0.18em] text-zinc-500">HP</div>
+            <div data-bind="hp" class="text-lg font-black tabular-nums">0</div>
+          </div>
+
           <div class="pixel-card !p-3 text-center">
             <div class="text-[10px] uppercase tracking-[0.18em] text-zinc-500">Attack</div>
             <div data-bind="attack" class="text-lg font-black tabular-nums">0</div>
           </div>
+
           <div class="pixel-card !p-3 text-center">
             <div class="text-[10px] uppercase tracking-[0.18em] text-zinc-500">Defense</div>
             <div data-bind="defense" class="text-lg font-black tabular-nums">0</div>
@@ -83,32 +90,32 @@
     <footer class="fixed bottom-0 left-0 right-0 z-40 border-t border-zinc-800 bg-zinc-950/95 backdrop-blur">
       <div class="mx-auto max-w-md">
         <nav class="grid grid-cols-6 gap-1 p-2">
-          <button class="flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-3 text-xs font-black uppercase tracking-tight text-zinc-400" data-nav-tab="combat" data-tab="combat">
+          <button class="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-3 text-[10px] font-black uppercase tracking-tight text-zinc-400" data-nav-tab="combat" data-tab="combat">
             <span class="icon-[game-icons--crossed-swords] w-6 h-6"></span>
             <span>Combat</span>
           </button>
 
-          <button class="flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-3 text-xs font-black uppercase tracking-tight text-zinc-400" data-nav-tab="map" data-tab="map">
+          <button class="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-3 text-[10px] font-black uppercase tracking-tight text-zinc-400" data-nav-tab="map" data-tab="map">
             <span class="icon-[game-icons--world] w-6 h-6"></span>
             <span>Map</span>
           </button>
 
-          <button class="flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-3 text-xs font-black uppercase tracking-tight text-zinc-400" data-nav-tab="skills" data-tab="skills">
+          <button class="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-3 text-[10px] font-black uppercase tracking-tight text-zinc-400" data-nav-tab="skills" data-tab="skills">
             <span class="icon-[game-icons--skills] w-6 h-6"></span>
             <span>Skills</span>
           </button>
 
-          <button class="flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-3 text-xs font-black uppercase tracking-tight text-zinc-400" data-nav-tab="items" data-tab="items">
+          <button class="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-3 text-[10px] font-black uppercase tracking-tight text-zinc-400" data-nav-tab="items" data-tab="items">
             <span class="icon-[game-icons--locked-chest] w-6 h-6"></span>
             <span>Vault</span>
           </button>
 
-          <button class="flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-3 text-xs font-black uppercase tracking-tight text-zinc-400" data-nav-tab="equipment" data-tab="equipment">
+          <button class="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-3 text-[10px] font-black uppercase tracking-tight text-zinc-400" data-nav-tab="equipment" data-tab="equipment">
             <span class="icon-[game-icons--checked-shield] w-6 h-6"></span>
             <span>Gear</span>
           </button>
 
-          <button class="flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-3 text-xs font-black uppercase tracking-tight text-zinc-400" data-nav-tab="shop" data-tab="shop">
+          <button class="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-3 text-[10px] font-black uppercase tracking-tight text-zinc-400" data-nav-tab="shop" data-tab="shop">
             <span class="icon-[game-icons--receive-money] w-6 h-6"></span>
             <span>Shop</span>
           </button>
@@ -122,6 +129,6 @@
     <div id="modal-content"></div>
   </div>
 
-  <script type="module" src="./assets/js/game.js?v=7"></script>
+  <script type="module" src="./assets/js/game.js?v=9"></script>
 </body>
 </html>
