@@ -63,27 +63,27 @@
     const zonesIndex = await loadJSON("/content/zones_index.json", { zones: [] });
     const shopIndex = await loadJSON("/content/shop_index.json", { items: [] });
 
-    const skillIds = Array.isArray(skillsIndex.skills)
+    const skillIDs = Array.isArray(skillsIndex.skills)
       ? skillsIndex.skills.map((x) => (typeof x === "string" ? x : x.id)).filter(Boolean)
       : [];
 
-    const zoneIds = Array.isArray(zonesIndex.zones)
+    const zoneIDs = Array.isArray(zonesIndex.zones)
       ? zonesIndex.zones.map((x) => (typeof x === "string" ? x : x.id)).filter(Boolean)
       : [];
 
-    const skills = await loadByIds("/content/skills", skillIds);
-    const zones = await loadByIds("/content/zones", zoneIds);
+    const skills = await loadByIds("/content/skills", skillIDs);
+    const zones = await loadByIds("/content/zones", zoneIDs);
 
-    const monsterIds = [...new Set(
+    const monsterIDs = [...new Set(
       zones.flatMap((zone) => Array.isArray(zone.monsters) ? zone.monsters : [])
     )];
 
-    const monsters = await loadByIds("/content/monsters", monsterIds);
+    const monsters = await loadByIds("/content/monsters", monsterIDs);
 
     let shopItems = [];
     if (Array.isArray(shopIndex.items) && shopIndex.items.length > 0) {
-      const shopIds = shopIndex.items.map((x) => (typeof x === "string" ? x : x.id)).filter(Boolean);
-      shopItems = await loadByIds("/content/shop", shopIds);
+      const shopIDs = shopIndex.items.map((x) => (typeof x === "string" ? x : x.id)).filter(Boolean);
+      shopItems = await loadByIds("/content/shop", shopIDs);
     }
 
     return {
@@ -99,7 +99,7 @@
       shopItemsList: shopItems,
       skillsIndex,
       zonesIndex,
-      shopIndex
+      shopIndex,
     };
   }
 
@@ -110,8 +110,9 @@
       await instantiateWasm();
 
       const registry = await buildRegistry();
-      const result = window.gameInit(JSON.stringify(registry), saveJSON);
+      window.__GAME_WASM_REGISTRY__ = registry;
 
+      const result = window.gameInit(JSON.stringify(registry), saveJSON);
       if (!result || !result.ok) {
         throw new Error(result?.error || "gameInit failed");
       }
@@ -137,6 +138,6 @@
     },
     getState() {
       return window.gameGetState();
-    }
+    },
   };
 })();
