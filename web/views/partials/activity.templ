@@ -1,0 +1,66 @@
+package partials
+
+import "github.com/LeGoatest/Pwa-idle-game/internal/game"
+
+templ Activity(state *game.GameState) {
+	<section id="activity-panel" class="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+		<h2 class="mb-3 text-lg font-semibold">Activity</h2>
+
+		<div class="grid gap-3 md:grid-cols-2">
+			<div class="rounded border border-zinc-800 p-3">
+				<div class="flex justify-between gap-4">
+					<span class="text-zinc-400">Kind</span>
+					<span id="activity-kind">{ valueOrDash(state.Activity.Kind) }</span>
+				</div>
+
+				<div class="mt-1 flex justify-between gap-4">
+					<span class="text-zinc-400">Zone</span>
+					<span id="activity-zone">{ valueOrDash(state.Activity.ZoneID) }</span>
+				</div>
+
+				<div class="mt-1 flex justify-between gap-4">
+					<span class="text-zinc-400">Monster</span>
+					<span id="activity-monster">{ valueOrDash(state.Activity.MonsterID) }</span>
+				</div>
+
+				<div class="mt-1 flex justify-between gap-4">
+					<span class="text-zinc-400">Skill</span>
+					<span id="activity-skill">{ valueOrDash(state.Activity.SkillID) }</span>
+				</div>
+
+				<div class="mt-1 flex justify-between gap-4">
+					<span class="text-zinc-400">Node</span>
+					<span id="activity-node">{ valueOrDash(state.Activity.NodeID) }</span>
+				</div>
+
+				<div class="mt-1 flex justify-between gap-4">
+					<span class="text-zinc-400">Progress</span>
+					<span id="activity-progress">{ templ.Sprintf("%.0f", state.Activity.Progress) }</span>
+				</div>
+			</div>
+
+			<div class="rounded border border-zinc-800 p-3">
+				<div class="flex justify-between gap-4">
+					<span class="text-zinc-400">Enemy HP</span>
+					<span id="enemy-hp">{ templ.Sprintf("%d / %d", state.EnemyHP, state.EnemyMaxHP) }</span>
+				</div>
+
+				if state.UI.CurrentMonsterID != "" {
+					<button
+						class="mt-4 rounded border border-emerald-700 bg-emerald-800 px-3 py-2 hover:bg-emerald-700"
+						data-action="start_current_combat"
+					>
+						Start Combat
+					</button>
+				}
+			</div>
+		</div>
+	</section>
+}
+
+func valueOrDash(v string) string {
+	if v == "" {
+		return "-"
+	}
+	return v
+}
