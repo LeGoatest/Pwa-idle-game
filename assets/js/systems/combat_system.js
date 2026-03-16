@@ -28,13 +28,13 @@ export function processCombat(state, contentState, deltaMs) {
     if (state.enemyHp <= 0) {
       state.kills += 1
 
-      const table = contentState.registry?.dropTables?.[monster.dropTable] || null
+      const loot = monster.loot || null
 
-      if (table?.gold) {
-        state.gold += roll(table.gold.min, table.gold.max)
+      if (loot?.gold) {
+        state.gold += roll(loot.gold.min, loot.gold.max)
       }
 
-      for (const drop of table?.drops || []) {
+      for (const drop of loot?.drops || []) {
         if (Math.random() < drop.chance) {
           const amount = roll(drop.min || 1, drop.max || 1)
           addItem(state, drop.item, amount)
