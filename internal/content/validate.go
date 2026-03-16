@@ -13,6 +13,7 @@ func ValidateRegistry(r *Registry) error {
 		if zone.ID == "" {
 			return fmt.Errorf("zone missing id")
 		}
+
 		for _, monsterID := range zone.Monsters {
 			if _, ok := r.Monsters[monsterID]; !ok {
 				return fmt.Errorf("zone %s references missing monster %s", zone.ID, monsterID)
@@ -24,6 +25,7 @@ func ValidateRegistry(r *Registry) error {
 		if monster.ID == "" {
 			return fmt.Errorf("monster missing id")
 		}
+
 		if monster.Loot != nil {
 			for _, drop := range monster.Loot.Drops {
 				if drop.Item == "" {
@@ -40,6 +42,7 @@ func ValidateRegistry(r *Registry) error {
 		if skill.ID == "" {
 			return fmt.Errorf("skill missing id")
 		}
+
 		for _, node := range skill.Nodes {
 			if node.Yield.Item == "" {
 				return fmt.Errorf("skill %s node %s missing yield item", skill.ID, node.ID)
@@ -47,6 +50,12 @@ func ValidateRegistry(r *Registry) error {
 			if _, ok := r.Items[node.Yield.Item]; !ok {
 				return fmt.Errorf("skill %s node %s references missing item %s", skill.ID, node.ID, node.Yield.Item)
 			}
+		}
+	}
+
+	for _, shopItem := range r.ShopItemsList {
+		if shopItem.ID == "" {
+			return fmt.Errorf("shop item missing id")
 		}
 	}
 
