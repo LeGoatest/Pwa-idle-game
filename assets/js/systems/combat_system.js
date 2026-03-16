@@ -22,8 +22,8 @@ export function processCombat(state, contentState, deltaMs) {
   while (state.activity.progress >= duration) {
     state.activity.progress -= duration
 
-    const dmg = Math.max(1, (state.attack || 0) + (state.swords || 0))
-    state.enemyHp -= dmg
+    const damage = Math.max(1, state.attack || 1)
+    state.enemyHp -= damage
 
     if (state.enemyHp <= 0) {
       state.kills += 1
@@ -36,8 +36,8 @@ export function processCombat(state, contentState, deltaMs) {
 
       for (const drop of table?.drops || []) {
         if (Math.random() < drop.chance) {
-          const amt = roll(drop.min || 1, drop.max || 1)
-          addItem(state, drop.item, amt)
+          const amount = roll(drop.min || 1, drop.max || 1)
+          addItem(state, drop.item, amount)
         }
       }
 
