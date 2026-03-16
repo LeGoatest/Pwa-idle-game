@@ -7,7 +7,7 @@
   <title>Idle Frontier PWA</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/icons/icon.svg">
-  <link rel="stylesheet" href="./assets/css/style.css?v=12">
+  <link rel="stylesheet" href="./assets/css/style.css?v=13">
 </head>
 <body class="mx-auto max-w-md bg-gamebg text-zinc-100 min-h-screen flex flex-col pb-24 shadow-2xl">
   <header class="sticky top-0 z-50 w-full bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800 p-4 space-y-4">
@@ -85,56 +85,32 @@
 
   <footer class="fixed bottom-0 left-0 right-0 mx-auto max-w-md bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-800/50 px-1 py-2 z-50">
     <nav class="grid grid-cols-6 items-center">
-      <button
-        class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
-        data-nav-tab="combat"
-        data-tab="combat"
-        aria-label="Combat">
+      <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group" data-nav-tab="combat" data-tab="combat" aria-label="Combat">
         <span class="icon-[game-icons--crossed-swords] w-6 h-6 transition-all"></span>
         <span class="text-[9px] font-black uppercase tracking-tighter">Hunt</span>
       </button>
 
-      <button
-        class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
-        data-nav-tab="map"
-        data-tab="map"
-        aria-label="Map">
+      <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group" data-nav-tab="map" data-tab="map" aria-label="Map">
         <span class="icon-[game-icons--world] w-6 h-6 transition-all"></span>
         <span class="text-[9px] font-black uppercase tracking-tighter">Map</span>
       </button>
 
-      <button
-        class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
-        data-nav-tab="skills"
-        data-tab="skills"
-        aria-label="Skills">
+      <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group" data-nav-tab="skills" data-tab="skills" aria-label="Skills">
         <span class="icon-[game-icons--skills] w-6 h-6 transition-all"></span>
         <span class="text-[9px] font-black uppercase tracking-tighter">Skills</span>
       </button>
 
-      <button
-        class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
-        data-nav-tab="items"
-        data-tab="items"
-        aria-label="Inventory">
+      <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group" data-nav-tab="items" data-tab="items" aria-label="Inventory">
         <span class="icon-[game-icons--locked-chest] w-6 h-6 transition-all"></span>
         <span class="text-[9px] font-black uppercase tracking-tighter">Vault</span>
       </button>
 
-      <button
-        class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
-        data-nav-tab="equipment"
-        data-tab="equipment"
-        aria-label="Equipment">
+      <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group" data-nav-tab="equipment" data-tab="equipment" aria-label="Equipment">
         <span class="icon-[game-icons--battle-gear] w-6 h-6 transition-all"></span>
         <span class="text-[9px] font-black uppercase tracking-tighter">Gear</span>
       </button>
 
-      <button
-        class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
-        data-nav-tab="shop"
-        data-tab="shop"
-        aria-label="Shop">
+      <button class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group" data-nav-tab="shop" data-tab="shop" aria-label="Shop">
         <span class="icon-[game-icons--receive-money] w-6 h-6 transition-all"></span>
         <span class="text-[9px] font-black uppercase tracking-tighter">Shop</span>
       </button>
@@ -142,7 +118,7 @@
   </footer>
 
   <script src="./assets/js/htmx.min.js"></script>
-  <script type="module" src="./assets/js/game.js?v=12"></script>
+  <script type="module" src="./assets/js/game.js?v=13"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
