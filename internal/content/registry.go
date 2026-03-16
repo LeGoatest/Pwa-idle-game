@@ -1,3 +1,88 @@
 package content
 
-type Registry struct{}
+import "path/filepath"
+
+func LoadRegistry(basePath string) (*Registry, error) {
+	items, err := LoadJSONL[Item](filepath.Join(basePath, "items.jsonl"))
+	if err != nil {
+		return nil, err
+	}
+
+	skillsIndex, err := LoadJSON[SkillsIndex](filepath.Join(basePath, "skills_index.json"))
+	if err != nil {
+		return nil, err
+	}
+
+	zonesIndex, err := LoadJSON[ZonesIndex](filepath.Join(basePath, "zones_index.json"))
+	if err != nil {
+		return nil, err
+	}
+
+	shopIndex, _ := LoadJSON[ShopIndex](filepath.Join(basePath, "shop_index.json"))
+
+	skills, err := loadByIDs[Skill](filepath.Join(basePath, "skills"), skillsIndex.Skills)
+	if err != nil {
+		return nil, err
+	}
+
+	zoneIDs := make([]string, 0, len(zonesIndex.Zones))
+	for _, z := range zonesIndex.Zones {
+		if z.ID != "" {
+			zoneIDs = append(zoneIDs, z.ID)
+		}
+	}
+
+	zones, err := loadByIDs[Zone](filepath.Join(basePath, "zones"), zoneIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	monsterSet := make(map[string]struct{})
+	for _, zone := range zones {
+		for _, monsterID := range zone.Monsters {
+			if monsterID != "" {
+				monsterSet[monsterID] = struct{}{}
+			}
+		}
+	}
+
+	monsterIDs := make([]string, 0, len(monsterSet))
+	for id := range monsterSet {
+		monsterIDs = append(monsterIDs, id)
+	}
+
+	monsters, err := loadByIDs[Monster](filepath.Join(basePath, "monsters"), monsterIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	var shopItems []ShopItem
+	if len(shopIndex.Items) > 0 {
+		shopItems, err = loadByIDs[ShopItem](filepath.Join(basePath, "shop"), shopIndex.Items)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	reg := &Registry{
+		Items:         IndexByID(items),
+		ItemsList:     items,
+		Skills:        IndexByID(skills),
+		SkillsList:    skills,
+		Zones:         IndexByID(zones),
+		ZonesList:     zones,
+		Monsters:      IndexByID(monsters),
+		MonstersList:  monsters,
+		ShopItems:     IndexByID(shopItems),
+		ShopItemsList: shopItems,
+		SkillsIndex:   skillsIndex,
+		ZonesIndex:    zonesIndex,
+		ShopIndex:     shopIndex,
+	}
+
+	if err := ValidateRegistry(reg); err != nil {
+		return nil, err
+	}
+
+	return reg, nil
+}
