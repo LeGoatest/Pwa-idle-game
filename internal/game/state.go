@@ -9,12 +9,12 @@ type EquipmentState struct {
 }
 
 type UIState struct {
-	Tab            string `json:"tab"`
-	CurrentZoneID  string `json:"currentZoneId"`
+	Tab              string `json:"tab"`
+	CurrentZoneID    string `json:"currentZoneId"`
 	CurrentMonsterID string `json:"currentMonsterId"`
-	CurrentSkillID string `json:"currentSkillId"`
-	CombatMode     string `json:"combatMode"`
-	SkillsMode     string `json:"skillsMode"`
+	CurrentSkillID   string `json:"currentSkillId"`
+	CombatMode       string `json:"combatMode"`
+	SkillsMode       string `json:"skillsMode"`
 }
 
 type ActivityState struct {
@@ -59,21 +59,27 @@ type GameState struct {
 func NewDefaultState() *GameState {
 	return &GameState{
 		Version: 1,
+
 		Attack:  2,
 		Defense: 1,
 		HP:      20,
 		MaxHP:   20,
-		EnemyHP: 12,
+
+		EnemyHP:    12,
 		EnemyMaxHP: 12,
+
 		CombatLevel: 1,
 		WoodLevel:   1,
 		MineLevel:   1,
-		Inventory:   map[string]int{},
+
+		Inventory: map[string]int{},
+
 		UI: UIState{
 			Tab:        "combat",
 			CombatMode: "zone",
 			SkillsMode: "list",
 		},
+
 		Activity: ActivityState{
 			Kind: "none",
 		},
