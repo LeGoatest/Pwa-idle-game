@@ -3,167 +3,155 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"syscall/js"
 
 	"github.com/LeGoatest/Pwa-idle-game/internal/content"
 	"github.com/LeGoatest/Pwa-idle-game/internal/game"
 )
 
-type wasmRuntime struct {
-	registry      *content.Registry
-	state         *game.GameState
-	contentState  game.ContentState
-	lastTickAtMS  int64
+type Runtime struct {
+	Registry     *content.Registry
+	State        *game.GameState
+	ContentState game.ContentState
 }
 
-type wasmAction struct {
+type ActionPayload struct {
 	Type string `json:"type"`
 	ID   string `json:"id"`
 }
 
-func newRuntime() *wasmRuntime {
-	return &wasmRuntime{}
+func NewRuntime() *Runtime {
+	return &Runtime{}
 }
 
-func (rt *wasmRuntime) init(contentJSON string, saveJSON string, nowMS int64) error {
-	reg, err := loadRegistryFromJSON(contentJSON)
-	if err != nil {
-		return err
+func (rt *Runtime) Init(reg *content.Registry, saveJSON string, nowMS int64) error {
+	if reg == nil {
+		return errors.New("registry is nil")
 	}
 
-	var state *game.GameState
+	rt.Registry = reg
+
 	if saveJSON != "" && saveJSON != "null" {
-		state, err = game.ImportSave([]byte(saveJSON))
+		state, err := game.ImportSave([]byte(saveJSON))
 		if err != nil {
 			return err
 		}
+		rt.State = state
 	} else {
-		state = game.NewDefaultState(nowMS)
+		rt.State = game.NewDefaultState(nowMS)
 	}
 
-	rt.registry = reg
-	rt.state = state
-	rt.lastTickAtMS = nowMS
-
-	rt.hydrateFromState()
-
-	if state.UpdatedAt > 0 && nowMS > state.UpdatedAt {
-		elapsed := nowMS - state.UpdatedAt
-		game.ApplyOfflineProgress(rt.state, rt.contentState, elapsed, nowMS)
+	if rt.State.UI.CurrentZoneID == "" && len(reg.ZonesIndex.Zones) > 0 {
+		rt.State.UI.CurrentZoneID = reg.ZonesIndex.Zones[0].ID
 	}
 
-	if rt.state.UI.CurrentZoneID == "" && len(rt.registry.ZonesIndex.Zones) > 0 {
-		firstZone := rt.registry.ZonesIndex.Zones[0]
-		rt.state.UI.CurrentZoneID = firstZone.ID
+	if rt.State.UI.CurrentSkillID == "" && len(reg.SkillsIndex.Skills) > 0 {
+		rt.State.UI.CurrentSkillID = reg.SkillsIndex.Skills[0]
 	}
 
-	rt.hydrateFromState()
-
-	return nil
-}
-
-func (rt *wasmRuntime) ensureReady() error {
-	if rt.registry == nil {
-		return errors.New("registry not initialized")
-	}
-	if rt.state == nil {
-		return errors.New("state not initialized")
-	}
-	return nil
-}
-
-func (rt *wasmRuntime) hydrateFromState() {
-	if rt.registry == nil || rt.state == nil {
-		return
-	}
-
-	rt.contentState.ActiveMonster = nil
-	rt.contentState.ActiveNode = nil
-	rt.contentState.ActiveSkill = nil
-
-	if rt.state.Activity.Kind == "combat" && rt.state.Activity.MonsterID != "" {
-		if monster, ok := rt.registry.Monsters[rt.state.Activity.MonsterID]; ok {
-			m := monster
-			rt.contentState.ActiveMonster = &m
+	if rt.State.UI.CurrentZoneID != "" && rt.State.UI.CurrentMonsterID == "" {
+		if zone, ok := reg.Zones[rt.State.UI.CurrentZoneID]; ok && len(zone.Monsters) > 0 {
+			rt.State.UI.CurrentMonsterID = zone.Monsters[0]
 		}
 	}
 
-	skillID := rt.state.Activity.SkillID
-	if skillID == "" {
-		skillID = rt.state.UI.CurrentSkillID
+	rt.hydrate()
+
+	if rt.State.UpdatedAt > 0 && nowMS > rt.State.UpdatedAt {
+		elapsed := nowMS - rt.State.UpdatedAt
+		game.ApplyOfflineProgress(rt.State, rt.ContentState, elapsed, nowMS)
+	}
+
+	rt.hydrate()
+	return nil
+}
+
+func (rt *Runtime) hydrate() {
+	rt.ContentState = game.ContentState{}
+
+	if rt.Registry == nil || rt.State == nil {
+		return
+	}
+
+	if rt.State.Activity.Kind == "combat" && rt.State.Activity.MonsterID != "" {
+		if monster, ok := rt.Registry.Monsters[rt.State.Activity.MonsterID]; ok {
+			m := monster
+			rt.ContentState.ActiveMonster = &m
+		}
+	} else if rt.State.UI.CurrentMonsterID != "" {
+		if monster, ok := rt.Registry.Monsters[rt.State.UI.CurrentMonsterID]; ok {
+			m := monster
+			rt.ContentState.ActiveMonster = &m
+		}
+	}
+
+	skillID := rt.State.UI.CurrentSkillID
+	if rt.State.Activity.SkillID != "" {
+		skillID = rt.State.Activity.SkillID
 	}
 
 	if skillID != "" {
-		if skill, ok := rt.registry.Skills[skillID]; ok {
+		if skill, ok := rt.Registry.Skills[skillID]; ok {
 			s := skill
-			rt.contentState.ActiveSkill = &s
+			rt.ContentState.ActiveSkill = &s
 
-			nodeID := rt.state.Activity.NodeID
+			nodeID := rt.State.Activity.NodeID
 			if nodeID != "" {
 				for i := range s.Nodes {
 					if s.Nodes[i].ID == nodeID {
-						rt.contentState.ActiveNode = &s.Nodes[i]
+						rt.ContentState.ActiveNode = &s.Nodes[i]
 						break
 					}
 				}
 			}
 		}
 	}
-
-	if rt.state.UI.CurrentMonsterID != "" && rt.contentState.ActiveMonster == nil {
-		if monster, ok := rt.registry.Monsters[rt.state.UI.CurrentMonsterID]; ok {
-			m := monster
-			rt.contentState.ActiveMonster = &m
-		}
-	}
 }
 
-func (rt *wasmRuntime) tick(deltaMS int64, nowMS int64) (bool, error) {
-	if err := rt.ensureReady(); err != nil {
-		return false, err
+func (rt *Runtime) Tick(deltaMS int64, nowMS int64) (bool, error) {
+	if rt.State == nil {
+		return false, errors.New("runtime not initialized")
 	}
 
-	rt.hydrateFromState()
-
-	changed := game.Tick(rt.state, rt.contentState, deltaMS, nowMS)
-	rt.lastTickAtMS = nowMS
+	rt.hydrate()
+	changed := game.Tick(rt.State, rt.ContentState, deltaMS, nowMS)
+	rt.hydrate()
 
 	return changed, nil
 }
 
-func (rt *wasmRuntime) dispatch(actionJSON string, nowMS int64) error {
-	if err := rt.ensureReady(); err != nil {
-		return err
+func (rt *Runtime) Dispatch(actionJSON string, nowMS int64) error {
+	if rt.State == nil {
+		return errors.New("runtime not initialized")
 	}
 
-	var action wasmAction
+	var action ActionPayload
 	if err := json.Unmarshal([]byte(actionJSON), &action); err != nil {
 		return err
 	}
 
-	if err := game.Dispatch(rt.state, game.Action{
+	if err := game.Dispatch(rt.State, game.Action{
 		Type: action.Type,
 		ID:   action.ID,
 	}, nowMS); err != nil {
 		return err
 	}
 
-	rt.hydrateFromState()
+	rt.hydrate()
 
-	if rt.contentState.ActiveMonster != nil && rt.state.Activity.Kind == "combat" {
-		rt.state.EnemyMaxHP = rt.contentState.ActiveMonster.HP
-		rt.state.EnemyHP = rt.contentState.ActiveMonster.HP
+	if rt.ContentState.ActiveMonster != nil && rt.State.Activity.Kind == "combat" {
+		rt.State.EnemyHP = rt.ContentState.ActiveMonster.HP
+		rt.State.EnemyMaxHP = rt.ContentState.ActiveMonster.HP
 	}
 
 	return nil
 }
 
-func (rt *wasmRuntime) exportSave() (string, error) {
-	if err := rt.ensureReady(); err != nil {
-		return "", err
+func (rt *Runtime) ExportSave() (string, error) {
+	if rt.State == nil {
+		return "", errors.New("runtime not initialized")
 	}
 
-	data, err := game.ExportSave(rt.state)
+	data, err := game.ExportSave(rt.State)
 	if err != nil {
 		return "", err
 	}
@@ -171,31 +159,15 @@ func (rt *wasmRuntime) exportSave() (string, error) {
 	return string(data), nil
 }
 
-func (rt *wasmRuntime) getStateJSON() (string, error) {
-	if err := rt.ensureReady(); err != nil {
-		return "", err
+func (rt *Runtime) StateJSON() (string, error) {
+	if rt.State == nil {
+		return "", errors.New("runtime not initialized")
 	}
 
-	out, err := json.Marshal(rt.state)
+	data, err := json.Marshal(rt.State)
 	if err != nil {
 		return "", err
 	}
 
-	return string(out), nil
-}
-
-func jsError(msg string) js.Value {
-	obj := js.Global().Get("Object").New()
-	obj.Set("ok", false)
-	obj.Set("error", msg)
-	return obj
-}
-
-func jsOK(data map[string]any) js.Value {
-	obj := js.Global().Get("Object").New()
-	obj.Set("ok", true)
-	for k, v := range data {
-		obj.Set(k, js.ValueOf(v))
-	}
-	return obj
+	return string(data), nil
 }
