@@ -51,23 +51,19 @@ jobs:
           LEGACY_DIR="${{ github.event.inputs.legacy_folder }}"
           mkdir -p "$LEGACY_DIR"
 
-          shopt -s dotglob nullglob extglob
-
-          for item in * .*; do
-            case "$item" in
-              .|..|.git)
+          git ls-files -z | while IFS= read -r -d '' file; do
+            case "$file" in
+              .github/*)
                 continue
                 ;;
-              .github)
+              "$LEGACY_DIR"/*)
                 continue
                 ;;
             esac
 
-            if [[ "$item" == "${LEGACY_DIR%%/*}" ]]; then
-              continue
-            fi
-
-            git mv "$item" "$LEGACY_DIR"/
+            dest="$LEGACY_DIR/$file"
+            mkdir -p "$(dirname "$dest")"
+            git mv "$file" "$dest"
           done
 
       - name: Commit changes
