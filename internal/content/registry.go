@@ -1,6 +1,19 @@
 package content
 
-import "path/filepath"
+import (
+	"os"
+	"path/filepath"
+	"sort"
+)
+
+type registryError string
+
+func (e registryError) Error() string { return string(e) }
+
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
 
 func LoadRegistry(basePath string) (*Registry, error) {
 	items, err := LoadJSONL[Item](filepath.Join(basePath, "items.jsonl"))
@@ -18,7 +31,15 @@ func LoadRegistry(basePath string) (*Registry, error) {
 		return nil, err
 	}
 
-	shopIndex, _ := LoadJSON[ShopIndex](filepath.Join(basePath, "shop_index.json"))
+	shopIndex := ShopIndex{Items: []string{}}
+	shopIndexPath := filepath.Join(basePath, "shop_index.json")
+	if fileExists(shopIndexPath) {
+		loadedShopIndex, err := LoadJSON[ShopIndex](shopIndexPath)
+		if err != nil {
+			return nil, err
+		}
+		shopIndex = loadedShopIndex
+	}
 
 	skills, err := loadByIDs[Skill](filepath.Join(basePath, "skills"), skillsIndex.Skills)
 	if err != nil {
@@ -50,6 +71,7 @@ func LoadRegistry(basePath string) (*Registry, error) {
 	for id := range monsterSet {
 		monsterIDs = append(monsterIDs, id)
 	}
+	sort.Strings(monsterIDs)
 
 	monsters, err := loadByIDs[Monster](filepath.Join(basePath, "monsters"), monsterIDs)
 	if err != nil {
