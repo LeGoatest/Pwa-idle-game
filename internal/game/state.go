@@ -1,5 +1,11 @@
 package game
 
+const (
+	TickMS         int64 = 100
+	MaxOfflineMS   int64 = 8 * 60 * 60 * 1000
+	SaveDebounceMS int64 = 5000
+)
+
 type EquipmentState struct {
 	Weapon  string `json:"weapon"`
 	Head    string `json:"head"`
@@ -18,12 +24,21 @@ type UIState struct {
 }
 
 type ActivityState struct {
-	Kind      string  `json:"kind"`
-	ZoneID    string  `json:"zoneId"`
-	MonsterID string  `json:"monsterId"`
-	SkillID   string  `json:"skillId"`
-	NodeID    string  `json:"nodeId"`
-	Progress  float64 `json:"progress"`
+	Kind            string  `json:"kind"`
+	ZoneID          string  `json:"zoneId,omitempty"`
+	MonsterID       string  `json:"monsterId,omitempty"`
+	SkillID         string  `json:"skillId,omitempty"`
+	NodeID          string  `json:"nodeId,omitempty"`
+	StartedAt       int64   `json:"startedAt,omitempty"`
+	LastProcessedAt int64   `json:"lastProcessedAt,omitempty"`
+	Progress        float64 `json:"progress"`
+}
+
+type MetaState struct {
+	InstallID      string `json:"installId"`
+	InstalledAt    int64  `json:"installedAt"`
+	LaunchCount    int    `json:"launchCount"`
+	LastLaunchedAt int64  `json:"lastLaunchedAt"`
 }
 
 type GameState struct {
@@ -35,18 +50,17 @@ type GameState struct {
 	Attack  int `json:"attack"`
 	Defense int `json:"defense"`
 	HP      int `json:"hp"`
-	MaxHP   int `json:"maxHp"`
+
+	WoodXP   float64 `json:"woodXp"`
+	MineXP   float64 `json:"mineXp"`
+	CombatXP float64 `json:"combatXp"`
+
+	WoodLevel   int `json:"woodLevel"`
+	MineLevel   int `json:"mineLevel"`
+	CombatLevel int `json:"combatLevel"`
 
 	EnemyHP    int `json:"enemyHp"`
 	EnemyMaxHP int `json:"enemyMaxHp"`
-
-	CombatXP int `json:"combatXp"`
-	WoodXP   int `json:"woodXp"`
-	MineXP   int `json:"mineXp"`
-
-	CombatLevel int `json:"combatLevel"`
-	WoodLevel   int `json:"woodLevel"`
-	MineLevel   int `json:"mineLevel"`
 
 	Inventory map[string]int `json:"inventory"`
 	Equipment EquipmentState `json:"equipment"`
@@ -56,32 +70,55 @@ type GameState struct {
 	UpdatedAt int64 `json:"updatedAt"`
 }
 
-func NewDefaultState() *GameState {
+func NewDefaultState(nowMS int64) *GameState {
 	return &GameState{
-		Version: 1,
+		Version: 8,
+
+		Gold:  0,
+		Kills: 0,
 
 		Attack:  2,
 		Defense: 1,
 		HP:      20,
-		MaxHP:   20,
+
+		WoodXP:   0,
+		MineXP:   0,
+		CombatXP: 0,
+
+		WoodLevel:   1,
+		MineLevel:   1,
+		CombatLevel: 1,
 
 		EnemyHP:    12,
 		EnemyMaxHP: 12,
 
-		CombatLevel: 1,
-		WoodLevel:   1,
-		MineLevel:   1,
-
 		Inventory: map[string]int{},
 
+		Equipment: EquipmentState{},
+
 		UI: UIState{
-			Tab:        "combat",
-			CombatMode: "zone",
-			SkillsMode: "list",
+			Tab:              "combat",
+			CurrentZoneID:    "",
+			CurrentMonsterID: "",
+			CurrentSkillID:   "",
+			CombatMode:       "zone",
+			SkillsMode:       "list",
 		},
 
 		Activity: ActivityState{
-			Kind: "none",
+			Kind:     "none",
+			Progress: 0,
 		},
+
+		UpdatedAt: nowMS,
+	}
+}
+
+func NewDefaultMeta(nowMS int64, installID string) *MetaState {
+	return &MetaState{
+		InstallID:      installID,
+		InstalledAt:    nowMS,
+		LaunchCount:    0,
+		LastLaunchedAt: 0,
 	}
 }
