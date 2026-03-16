@@ -1,0 +1,10 @@
+{
+  "id": "verdant_meadows",
+  "name": "Verdant Meadows",
+  "levelRequired": 1,
+  "monsters": [
+    "field_rat",
+    "young_boar",
+    "wild_slime"
+  ]
+}
