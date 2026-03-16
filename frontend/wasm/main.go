@@ -7,11 +7,33 @@ import (
 	"github.com/LeGoatest/Pwa-idle-game/internal/content"
 )
 
-var runtime = newRuntime()
+var runtime = NewRuntime()
 
-func loadRegistryFromJSON(contentJSON string) (*content.Registry, error) {
+func nowMS() int64 {
+	return int64(js.Global().Get("Date").New().Call("getTime").Int())
+}
+
+func ok(data map[string]any) js.Value {
+	obj := js.Global().Get("Object").New()
+	obj.Set("ok", true)
+
+	for k, v := range data {
+		obj.Set(k, js.ValueOf(v))
+	}
+
+	return obj
+}
+
+func fail(message string) js.Value {
+	obj := js.Global().Get("Object").New()
+	obj.Set("ok", false)
+	obj.Set("error", message)
+	return obj
+}
+
+func parseRegistry(input string) (*content.Registry, error) {
 	var reg content.Registry
-	if err := json.Unmarshal([]byte(contentJSON), &reg); err != nil {
+	if err := json.Unmarshal([]byte(input), &reg); err != nil {
 		return nil, err
 	}
 
@@ -34,91 +56,102 @@ func loadRegistryFromJSON(contentJSON string) (*content.Registry, error) {
 	return &reg, nil
 }
 
-func nowMS() int64 {
-	return js.Global().Get("Date").New().Call("getTime").Int64()
-}
-
-func initRuntime(this js.Value, args []js.Value) any {
+func gameInit(this js.Value, args []js.Value) any {
 	if len(args) < 1 {
-		return jsError("init requires content JSON")
+		return fail("missing registry json")
 	}
 
-	contentJSON := args[0].String()
+	reg, err := parseRegistry(args[0].String())
+	if err != nil {
+		return fail(err.Error())
+	}
+
 	saveJSON := ""
 	if len(args) > 1 && args[1].Type() != js.TypeUndefined && args[1].Type() != js.TypeNull {
 		saveJSON = args[1].String()
 	}
 
-	if err := runtime.init(contentJSON, saveJSON, nowMS()); err != nil {
-		return jsError(err.Error())
+	if err := runtime.Init(reg, saveJSON, nowMS()); err != nil {
+		return fail(err.Error())
 	}
 
-	return jsOK(map[string]any{
-		"state": mustStateJSON(),
+	stateJSON, err := runtime.StateJSON()
+	if err != nil {
+		return fail(err.Error())
+	}
+
+	return ok(map[string]any{
+		"state": stateJSON,
 	})
 }
 
-func tickRuntime(this js.Value, args []js.Value) any {
+func gameTick(this js.Value, args []js.Value) any {
 	if len(args) < 1 {
-		return jsError("tick requires deltaMS")
+		return fail("missing delta")
 	}
 
-	deltaMS := int64(args[0].Int())
-	changed, err := runtime.tick(deltaMS, nowMS())
+	changed, err := runtime.Tick(int64(args[0].Int()), nowMS())
 	if err != nil {
-		return jsError(err.Error())
+		return fail(err.Error())
 	}
 
-	return jsOK(map[string]any{
+	stateJSON, err := runtime.StateJSON()
+	if err != nil {
+		return fail(err.Error())
+	}
+
+	return ok(map[string]any{
 		"changed": changed,
-		"state":   mustStateJSON(),
+		"state":   stateJSON,
 	})
 }
 
-func dispatchRuntime(this js.Value, args []js.Value) any {
+func gameDispatch(this js.Value, args []js.Value) any {
 	if len(args) < 1 {
-		return jsError("dispatch requires action JSON")
+		return fail("missing action json")
 	}
 
-	if err := runtime.dispatch(args[0].String(), nowMS()); err != nil {
-		return jsError(err.Error())
+	if err := runtime.Dispatch(args[0].String(), nowMS()); err != nil {
+		return fail(err.Error())
 	}
 
-	return jsOK(map[string]any{
-		"state": mustStateJSON(),
+	stateJSON, err := runtime.StateJSON()
+	if err != nil {
+		return fail(err.Error())
+	}
+
+	return ok(map[string]any{
+		"state": stateJSON,
 	})
 }
 
-func exportSaveRuntime(this js.Value, args []js.Value) any {
-	saveJSON, err := runtime.exportSave()
+func gameExportSave(this js.Value, args []js.Value) any {
+	saveJSON, err := runtime.ExportSave()
 	if err != nil {
-		return jsError(err.Error())
+		return fail(err.Error())
 	}
 
-	return jsOK(map[string]any{
+	return ok(map[string]any{
 		"save": saveJSON,
 	})
 }
 
-func getStateRuntime(this js.Value, args []js.Value) any {
-	return jsOK(map[string]any{
-		"state": mustStateJSON(),
+func gameGetState(this js.Value, args []js.Value) any {
+	stateJSON, err := runtime.StateJSON()
+	if err != nil {
+		return fail(err.Error())
+	}
+
+	return ok(map[string]any{
+		"state": stateJSON,
 	})
 }
 
-func mustStateJSON() string {
-	s, err := runtime.getStateJSON()
-	if err != nil {
-		return "{}"
-	}
-	return s
-}
-
 func main() {
-	js.Global().Set("gameInit", js.FuncOf(initRuntime))
-	js.Global().Set("gameTick", js.FuncOf(tickRuntime))
-	js.Global().Set("gameDispatch", js.FuncOf(dispatchRuntime))
-	js.Global().Set("gameExportSave", js.FuncOf(exportSaveRuntime))
-	js.Global().Set("gameGetState", js.FuncOf(getStateRuntime))
+	js.Global().Set("gameInit", js.FuncOf(gameInit))
+	js.Global().Set("gameTick", js.FuncOf(gameTick))
+	js.Global().Set("gameDispatch", js.FuncOf(gameDispatch))
+	js.Global().Set("gameExportSave", js.FuncOf(gameExportSave))
+	js.Global().Set("gameGetState", js.FuncOf(gameGetState))
 	select {}
 }
