@@ -2,12 +2,12 @@ package main
 
 import "github.com/LeGoatest/Pwa-idle-game/internal/content"
 
-func resolveActiveMonster(reg *content.Registry, monsterID string) *content.Monster {
-	if reg == nil || monsterID == "" {
+func resolveMonster(reg *content.Registry, id string) *content.Monster {
+	if reg == nil || id == "" {
 		return nil
 	}
 
-	monster, ok := reg.Monsters[monsterID]
+	monster, ok := reg.Monsters[id]
 	if !ok {
 		return nil
 	}
@@ -16,12 +16,12 @@ func resolveActiveMonster(reg *content.Registry, monsterID string) *content.Mons
 	return &m
 }
 
-func resolveActiveSkill(reg *content.Registry, skillID string) *content.Skill {
-	if reg == nil || skillID == "" {
+func resolveSkill(reg *content.Registry, id string) *content.Skill {
+	if reg == nil || id == "" {
 		return nil
 	}
 
-	skill, ok := reg.Skills[skillID]
+	skill, ok := reg.Skills[id]
 	if !ok {
 		return nil
 	}
@@ -30,13 +30,13 @@ func resolveActiveSkill(reg *content.Registry, skillID string) *content.Skill {
 	return &s
 }
 
-func resolveActiveNode(skill *content.Skill, nodeID string) *content.SkillNode {
-	if skill == nil || nodeID == "" {
+func resolveNode(skill *content.Skill, id string) *content.SkillNode {
+	if skill == nil || id == "" {
 		return nil
 	}
 
 	for i := range skill.Nodes {
-		if skill.Nodes[i].ID == nodeID {
+		if skill.Nodes[i].ID == id {
 			return &skill.Nodes[i]
 		}
 	}
