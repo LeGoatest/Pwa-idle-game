@@ -1,34 +1,34 @@
-import { clearRegistryCache, loadRegistry } from './registry_loader.js';
+import { clearRegistryCache, loadRegistry } from './registry_loader.js'
 
-let registryPromise = null;
+let registryPromise = null
 
 async function getRegistry() {
   if (!registryPromise) {
-    registryPromise = loadRegistry();
+    registryPromise = loadRegistry()
   }
-  return registryPromise;
+  return registryPromise
 }
 
 export function clearContentCache() {
-  clearRegistryCache();
-  registryPromise = null;
+  clearRegistryCache()
+  registryPromise = null
 }
 
 export async function loadRegistryData() {
-  return getRegistry();
+  return getRegistry()
 }
 
 export async function loadItemRegistry() {
-  const registry = await getRegistry();
-  return registry.items;
+  const registry = await getRegistry()
+  return registry.items
 }
 
 export async function loadItemList() {
-  const registry = await getRegistry();
-  return registry.itemsList;
+  const registry = await getRegistry()
+  return registry.itemsList
 }
 
 export async function loadShopItems() {
-  const registry = await getRegistry();
-  return registry.shopItemsList;
+  const registry = await getRegistry()
+  return registry.shopItemsList
 }
