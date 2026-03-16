@@ -46,7 +46,7 @@
     <div id="modal-content" class="w-full max-w-sm pointer-events-auto"></div>
   </div>
 
-<footer class="fixed bottom-0 left-0 right-0 z-50">
+  <footer class="fixed bottom-0 left-0 right-0 z-50">
   <div class="mx-auto max-w-md px-3 pb-3">
     <div class="relative rounded-t-[2rem] bg-zinc-900/95 backdrop-blur-md border-t border-zinc-800 shadow-2xl overflow-visible">
       <nav class="grid grid-cols-5 items-end px-2 pt-3 pb-3">
@@ -61,10 +61,10 @@
 
         <button
           class="flex items-center justify-center py-2 text-zinc-400"
-          data-nav-tab="map"
-          data-tab="map"
-          aria-label="Map">
-          <span class="icon-[game-icons--world] w-7 h-7"></span>
+          data-nav-tab="equipment"
+          data-tab="equipment"
+          aria-label="Equipment">
+          <span class="icon-[game-icons--battle-gear] w-7 h-7"></span>
         </button>
 
         <div class="relative flex items-end justify-center">
@@ -88,16 +88,19 @@
 
         <button
           class="flex items-center justify-center py-2 text-zinc-400"
-          data-nav-tab="equipment"
-          data-tab="equipment"
-          aria-label="Equipment">
-          <span class="icon-[game-icons--battle-gear] w-7 h-7"></span>
+          hx-get="./views/settings.html"
+          hx-target="#modal-content"
+          hx-trigger="click"
+          data-action="open-modal"
+          aria-label="Settings">
+          <span class="icon-[game-icons--cog] w-7 h-7"></span>
         </button>
 
       </nav>
     </div>
   </div>
-</footer>  
+  </footer>
+  
   <script src="./assets/js/htmx.min.js"></script>
   <script type="module" src="./assets/js/game.js?v=15"></script>
   <script>
