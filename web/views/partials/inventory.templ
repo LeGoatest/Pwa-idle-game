@@ -1,0 +1,43 @@
+package partials
+
+import (
+	"sort"
+
+	"github.com/LeGoatest/Pwa-idle-game/internal/content"
+	"github.com/LeGoatest/Pwa-idle-game/internal/game"
+)
+
+templ Inventory(state *game.GameState, reg *content.Registry) {
+	<section id="inventory-panel" class="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+		<h2 class="mb-3 text-lg font-semibold">Inventory</h2>
+
+		<div id="inventory-list" class="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+			for _, pair := range sortedInventory(state.Inventory) {
+				<div class="rounded border border-zinc-800 bg-zinc-950 p-3">
+					<div class="font-medium">{ pair.Key }</div>
+					<div class="text-sm text-zinc-400">x{ templ.Sprintf("%d", pair.Value) }</div>
+				</div>
+			}
+
+			if len(state.Inventory) == 0 {
+				<div class="text-sm text-zinc-500">Inventory is empty.</div>
+			}
+		</div>
+	</section>
+}
+
+type InventoryPair struct {
+	Key   string
+	Value int
+}
+
+func sortedInventory(m map[string]int) []InventoryPair {
+	out := make([]InventoryPair, 0, len(m))
+	for k, v := range m {
+		out = append(out, InventoryPair{Key: k, Value: v})
+	}
+	sort.Slice(out, func(i, j int) bool {
+		return out[i].Key < out[j].Key
+	})
+	return out
+}
