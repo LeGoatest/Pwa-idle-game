@@ -3,7 +3,7 @@ export const MAX_OFFLINE_MS = 8 * 60 * 60 * 1000;
 export const SAVE_DEBOUNCE_MS = 5000;
 
 export const defaultState = {
-  version: 0.0.8,
+  version: 7,
 
   gold: 0,
   logs: 0,
