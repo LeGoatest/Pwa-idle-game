@@ -5,62 +5,82 @@
 
 <meta charset="UTF-8">
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-<title>Idle Pixel RPG</title>
+<meta name="theme-color" content="#09090b">
 
-<link rel="manifest" href="/manifest.json">
+<title>Pwa Idle Game</title>
 
-<link rel="stylesheet" href="./assets/css/style.css">
+<link rel="manifest" href="./manifest.webmanifest">
+
+<link rel="stylesheet" href="./assets/css/style.css?v=6">
 
 <script src="./assets/js/htmx.min.js"></script>
 
 </head>
 
+<body class="bg-zinc-950 text-zinc-100">
 
-<body class="bg-zinc-950 text-zinc-200 min-h-screen">
+<div class="max-w-md mx-auto min-h-screen flex flex-col pb-20">
 
-<div class="max-w-6xl mx-auto p-4 space-y-6">
+<!-- HEADER / HUD -->
 
+<header class="px-4 pt-4 space-y-4">
 
-<header class="pixel-card flex flex-wrap items-center justify-between gap-4">
+<div class="pixel-card flex justify-between">
 
-<div class="flex items-center gap-6">
-
-<div>
-<div class="text-xs uppercase text-zinc-500">Gold</div>
-<div data-bind="gold" class="font-black text-lg">0</div>
+<div class="text-center">
+<div class="text-xs text-zinc-400 uppercase">Gold</div>
+<div data-bind="gold" class="font-black">0</div>
 </div>
 
-<div>
-<div class="text-xs uppercase text-zinc-500">Kills</div>
-<div data-bind="kills" class="font-black text-lg">0</div>
+<div class="text-center">
+<div class="text-xs text-zinc-400 uppercase">Kills</div>
+<div data-bind="kills" class="font-black">0</div>
 </div>
 
-<div>
-<div class="text-xs uppercase text-zinc-500">HP</div>
-<div data-bind="hp" class="font-black text-lg">0</div>
+<div class="text-center">
+<div class="text-xs text-zinc-400 uppercase">HP</div>
+<div data-bind="hp" class="font-black">0</div>
 </div>
 
-</div>
-
-<div class="flex items-center gap-6">
-
-<div>
-<div class="text-xs uppercase text-zinc-500">Attack</div>
+<div class="text-center">
+<div class="text-xs text-zinc-400 uppercase">Attack</div>
 <div data-bind="attack" class="font-black">0</div>
 </div>
 
-<div>
-<div class="text-xs uppercase text-zinc-500">Defense</div>
+<div class="text-center">
+<div class="text-xs text-zinc-400 uppercase">Defense</div>
 <div data-bind="defense" class="font-black">0</div>
 </div>
 
-<div>
-<div class="text-xs uppercase text-zinc-500">Enemy</div>
+<div class="text-center">
+<div class="text-xs text-zinc-400 uppercase">Enemy</div>
 <div data-bind="enemyHp" class="font-black">0</div>
+</div>
+
+</div>
+
+<!-- ACTIVITY -->
+
+<div class="pixel-card space-y-2">
+
+<div class="text-xs text-zinc-500 uppercase">
+Current Activity
+</div>
+
+<div data-bind="activeTaskName"
+     class="font-black text-lg">
+Idle
+</div>
+
+<div class="h-2 bg-zinc-800 rounded overflow-hidden">
+
+<div data-task-bar
+     class="h-full bg-cyan-500 transition-all">
+</div>
+
 </div>
 
 </div>
@@ -68,73 +88,80 @@
 </header>
 
 
-<nav class="pixel-card flex flex-wrap gap-2">
-
-<button class="btn-secondary" data-nav-tab="combat">Combat</button>
-
-<button class="btn-secondary" data-nav-tab="map">Map</button>
-
-<button class="btn-secondary" data-nav-tab="skills">Skills</button>
-
-<button class="btn-secondary" data-nav-tab="items">Inventory</button>
-
-<button class="btn-secondary" data-nav-tab="equipment">Equipment</button>
-
-<button class="btn-secondary" data-nav-tab="shop">Shop</button>
-
-</nav>
-
-
-<div class="pixel-card space-y-3">
-
-<div class="text-xs uppercase text-zinc-500">
-Current Activity
-</div>
-
-<div
-  data-bind="activeTaskName"
-  class="font-black">
-Idle
-</div>
-
-<div class="h-2 bg-zinc-800 rounded overflow-hidden">
-
-<div
-  data-task-bar
-  class="h-full bg-cyan-500 transition-all">
-</div>
-
-</div>
-
-</div>
-
+<!-- VIEW AREA -->
 
 <main
   id="view-root"
-  class="space-y-6">
+  class="flex-1 p-4 space-y-4"
+  hx-get="./views/combat.html"
+  hx-trigger="load"
+  hx-swap="innerHTML">
 </main>
 
+
+<!-- BOTTOM NAV -->
+
+<footer class="fixed bottom-0 left-0 right-0 z-40 bg-zinc-950 border-t border-zinc-800">
+
+<div class="max-w-md mx-auto grid grid-cols-6 text-xs">
+
+<button class="nav-btn"
+        data-nav-tab="combat">
+Combat
+</button>
+
+<button class="nav-btn"
+        data-nav-tab="map">
+Map
+</button>
+
+<button class="nav-btn"
+        data-nav-tab="skills">
+Skills
+</button>
+
+<button class="nav-btn"
+        data-nav-tab="items">
+Inventory
+</button>
+
+<button class="nav-btn"
+        data-nav-tab="equipment">
+Equipment
+</button>
+
+<button class="nav-btn"
+        data-nav-tab="shop">
+Shop
+</button>
+
+</div>
+
+</footer>
 
 </div>
 
 
-<div
-  id="modal-root"
-  class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
+<!-- MODAL -->
+
+<div id="modal-root"
+     class="fixed inset-0 hidden items-center justify-center bg-black/70 z-50">
 
 <div id="modal-content"></div>
 
 </div>
 
 
-<div
-  id="active-pulse"
-  class="fixed bottom-6 right-6 hidden">
+<!-- ACTIVITY PULSE -->
+
+<div id="active-pulse"
+     class="fixed bottom-24 right-4 hidden">
 </div>
 
 
-<script type="module" src="./assets/js/game.js"></script>
-
+<script type="module"
+        src="./assets/js/game.js?v=6">
+</script>
 
 </body>
 </html>
