@@ -10,27 +10,27 @@ type ReplayLog struct {
 	Events []ReplayEvent `json:"events"`
 }
 
-func RecordAction(log *ReplayLog, now int64, action Action) {
+func RecordAction(log *ReplayLog, nowMS int64, action Action) {
 	log.Events = append(log.Events, ReplayEvent{
-		Time: now,
+		Time: nowMS,
 		Type: action.Type,
 		ID:   action.ID,
 	})
 }
 
-func RunReplay(state *GameState, replay ReplayLog) error {
+func RunReplay(state *GameState, contentState ContentState, replay ReplayLog) error {
 	var currentTime int64
 
 	for _, event := range replay.Events {
 		delta := event.Time - currentTime
 		if delta > 0 {
-			Tick(state, delta)
+			Tick(state, contentState, delta, event.Time)
 		}
 
 		if err := Dispatch(state, Action{
 			Type: event.Type,
 			ID:   event.ID,
-		}); err != nil {
+		}, event.Time); err != nil {
 			return err
 		}
 
