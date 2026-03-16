@@ -10,11 +10,15 @@ import {
 let lastTickAt = 0;
 let lastSaveAt = 0;
 let dirty = false;
-let state = null;
-let meta = null;
 
 const SAVE_DEBOUNCE_MS = 5000;
 const TICK_MS = 100;
+
+window.GameAppRuntime = {
+  state: null,
+  meta: null,
+  registry: null,
+};
 
 function nowMS() {
   return Date.now();
@@ -31,9 +35,7 @@ async function save(force = false) {
   }
 
   const result = window.GameWASM.exportSave();
-  if (!result || !result.ok) {
-    return;
-  }
+  if (!result || !result.ok) return;
 
   const parsed = JSON.parse(result.save);
   parsed.updatedAt = now;
@@ -44,27 +46,25 @@ async function save(force = false) {
 }
 
 async function saveMeta() {
-  if (!meta) return;
-  await idbSet(STORE_META, META_KEY, meta);
+  if (!window.GameAppRuntime.meta) return;
+  await idbSet(STORE_META, META_KEY, window.GameAppRuntime.meta);
 }
 
 function renderState(nextState) {
-  state = nextState;
-
-  const root = document.getElementById("app-state");
-  if (root) {
-    root.textContent = JSON.stringify(state, null, 2);
-  }
+  window.GameAppRuntime.state = nextState;
+  window.GameUIRender?.render(window.GameAppRuntime);
 }
 
 async function loadMeta() {
   const saved = await idbGet(STORE_META, META_KEY);
-  meta = saved || {
+  window.GameAppRuntime.meta = saved || {
     installId: "",
     installedAt: 0,
     launchCount: 0,
     lastLaunchedAt: 0,
   };
+
+  const meta = window.GameAppRuntime.meta;
 
   if (!meta.installId) {
     meta.installId = `install-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -84,6 +84,10 @@ async function start() {
   const init = await window.GameWASM.init(savedState ? JSON.stringify(savedState) : "");
   if (!init || !init.ok) {
     throw new Error(init?.error || "failed to initialize wasm");
+  }
+
+  if (window.__GAME_WASM_REGISTRY__) {
+    window.GameAppRuntime.registry = window.__GAME_WASM_REGISTRY__;
   }
 
   renderState(JSON.parse(init.state));
@@ -123,7 +127,7 @@ function startLoop() {
   }, TICK_MS);
 }
 
-export async function dispatch(type, id = "") {
+async function dispatch(type, id = "") {
   const result = window.GameWASM.dispatch({ type, id });
   if (result && result.ok) {
     renderState(JSON.parse(result.state));
@@ -132,6 +136,11 @@ export async function dispatch(type, id = "") {
   }
   return result;
 }
+
+window.GameApp = {
+  dispatch,
+  saveNow: () => save(true),
+};
 
 window.addEventListener("DOMContentLoaded", () => {
   void start();
