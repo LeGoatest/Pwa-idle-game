@@ -103,23 +103,51 @@ type Skill struct {
 
 func (x Skill) GetID() string { return x.ID }
 
+type ShopItemEffect struct {
+	Type    string `json:"type"`
+	Stat    string `json:"stat,omitempty"`
+	Value   int    `json:"value,omitempty"`
+	ItemKey string `json:"itemKey,omitempty"`
+	Amount  int    `json:"amount,omitempty"`
+}
+
 type ShopItem struct {
-	ID string `json:"id"`
+	ID          string          `json:"id"`
+	Name        string          `json:"name"`
+	Description string          `json:"description,omitempty"`
+	Price       int             `json:"price"`
+	Effect      *ShopItemEffect `json:"effect,omitempty"`
 }
 
 func (x ShopItem) GetID() string { return x.ID }
 
+type DropTableEntry struct {
+	Item   string  `json:"item"`
+	Chance float64 `json:"chance"`
+	Min    int     `json:"min"`
+	Max    int     `json:"max"`
+}
+
+type DropTable struct {
+	ID    string           `json:"id"`
+	Drops []DropTableEntry `json:"drops"`
+}
+
+func (x DropTable) GetID() string { return x.ID }
+
 type Registry struct {
-	Items         map[string]Item
-	ItemsList     []Item
-	Skills        map[string]Skill
-	SkillsList    []Skill
-	Zones         map[string]Zone
-	ZonesList     []Zone
-	Monsters      map[string]Monster
-	MonstersList  []Monster
-	ShopItems     map[string]ShopItem
-	ShopItemsList []ShopItem
+	Items          map[string]Item
+	ItemsList      []Item
+	Skills         map[string]Skill
+	SkillsList     []Skill
+	Zones          map[string]Zone
+	ZonesList      []Zone
+	Monsters       map[string]Monster
+	MonstersList   []Monster
+	ShopItems      map[string]ShopItem
+	ShopItemsList  []ShopItem
+	DropTables     map[string]DropTable
+	DropTablesList []DropTable
 
 	SkillsIndex SkillsIndex
 	ZonesIndex  ZonesIndex
