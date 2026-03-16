@@ -1,14 +1,21 @@
 package game
 
-func ProcessActivity(state *GameState, deltaMs int64) {
-	switch state.Activity.Kind {
-	case "combat":
-		ProcessCombat(state, deltaMs)
-	case "woodcutting":
-		state.Activity.Progress += float64(deltaMs)
-	case "mining":
-		state.Activity.Progress += float64(deltaMs)
-	default:
-		return
+func StartActivity(state *GameState, payload ActivityState, nowMS int64) {
+	state.Activity = ActivityState{
+		Kind:            payload.Kind,
+		ZoneID:          payload.ZoneID,
+		MonsterID:       payload.MonsterID,
+		SkillID:         payload.SkillID,
+		NodeID:          payload.NodeID,
+		StartedAt:       nowMS,
+		LastProcessedAt: nowMS,
+		Progress:        0,
+	}
+}
+
+func StopActivity(state *GameState) {
+	state.Activity = ActivityState{
+		Kind:     "none",
+		Progress: 0,
 	}
 }
