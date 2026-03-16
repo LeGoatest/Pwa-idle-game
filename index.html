@@ -1,134 +1,207 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#09090b">
-  <title>Idle Frontier PWA</title>
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./assets/icons/icon.svg">
-  <link rel="stylesheet" href="./assets/css/style.css?v=9">
-  <script src="./assets/js/htmx.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d0f14">
+
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./assets/icons/icon.svg">
+<link rel="stylesheet" href="./assets/css/style.css?v=2">
+
+<title>Idle Frontier PWA</title>
 </head>
-<body class="bg-zinc-950 text-zinc-100">
-  <div class="mx-auto max-w-md min-h-screen bg-zinc-950 flex flex-col">
 
-    <header class="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur">
-      <div class="px-4 pt-5 pb-4 space-y-4">
+<body class="mx-auto max-w-md bg-gamebg text-zinc-100 min-h-screen flex flex-col pb-24 shadow-2xl">
 
-        <div class="flex items-start justify-between gap-4">
-          <div class="min-w-0">
-            <h1 class="text-2xl font-black tracking-tight">Idle Frontier PWA</h1>
-            <div class="mt-1 flex items-center gap-2">
-              <div id="active-pulse" class="hidden h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.65)]"></div>
-              <span data-bind="activeTaskName" class="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Idle</span>
-            </div>
-          </div>
+<header class="sticky top-0 z-50 w-full bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800 p-4 flex items-center justify-between">
+<div>
+<h1 id="station-title" class="text-xl font-bold tracking-tight text-zinc-100">
+Idle Frontier
+</h1>
 
-          <div class="flex items-center gap-3 shrink-0">
-            <div class="flex items-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900/80 px-3 py-2">
-              <span class="icon-[game-icons--coins] w-4 h-4 text-yellow-500"></span>
-              <span data-bind="gold" class="font-black tabular-nums">0</span>
-            </div>
+<div class="flex items-center gap-1.5 mt-0.5">
+<div id="active-pulse" class="w-2 h-2 rounded-full bg-cyan-500 hidden"></div>
+<span data-bind="activeTaskName" class="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+Idle
+</span>
+</div>
+</div>
 
-            <button
-              class="icon-[game-icons--cog] w-7 h-7 text-zinc-300"
-              hx-get="./views/settings.html"
-              hx-target="#modal-content"
-              hx-trigger="click"
-              data-action="open-modal"
-              aria-label="Open settings"></button>
-          </div>
-        </div>
+<div class="flex items-center gap-3">
 
-        <div class="grid grid-cols-4 gap-3">
-          <div class="pixel-card !p-3 text-center">
-            <div class="text-[10px] uppercase tracking-[0.18em] text-zinc-500">Kills</div>
-            <div data-bind="kills" class="text-lg font-black tabular-nums">0</div>
-          </div>
+<div class="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1 rounded-full border border-zinc-700/50">
+<span class="icon-[game-icons--coins] icon-sm text-yellow-500"></span>
+<span data-bind="gold" class="text-sm font-medium tabular-nums">0</span>
+</div>
 
-          <div class="pixel-card !p-3 text-center">
-            <div class="text-[10px] uppercase tracking-[0.18em] text-zinc-500">HP</div>
-            <div data-bind="hp" class="text-lg font-black tabular-nums">0</div>
-          </div>
+<button
+class="icon-[game-icons--cog] w-6 h-6 text-zinc-400 hover:text-white transition-colors"
+hx-get="./views/settings.html"
+hx-target="#modal-content"
+hx-trigger="click"
+data-action="open-modal">
+</button>
 
-          <div class="pixel-card !p-3 text-center">
-            <div class="text-[10px] uppercase tracking-[0.18em] text-zinc-500">Attack</div>
-            <div data-bind="attack" class="text-lg font-black tabular-nums">0</div>
-          </div>
+</div>
+</header>
 
-          <div class="pixel-card !p-3 text-center">
-            <div class="text-[10px] uppercase tracking-[0.18em] text-zinc-500">Defense</div>
-            <div data-bind="defense" class="text-lg font-black tabular-nums">0</div>
-          </div>
-        </div>
+<main
+id="view-root"
+class="flex-1 overflow-y-auto p-4"
+hx-get="./views/combat.html"
+hx-trigger="load"
+hx-swap="innerHTML show:top">
+</main>
 
-        <div class="pixel-card space-y-3">
-          <div class="flex items-center justify-between">
-            <div class="text-sm font-black uppercase tracking-[0.18em] text-zinc-500">Current Activity</div>
-            <div data-task-status="combat" class="text-xs font-black uppercase tracking-[0.18em] text-zinc-500">Paused</div>
-          </div>
+<div id="modal-root" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-in fade-in duration-300">
+<div id="modal-content" class="w-full max-w-sm pointer-events-auto"></div>
+</div>
 
-          <div class="text-xl font-black" data-bind="activeTaskName">Idle</div>
+<div id="skills-launcher" class="fixed bottom-20 left-0 right-0 mx-auto max-w-md z-40 hidden animate-in slide-in-from-bottom-4 duration-300">
 
-          <div class="h-2 rounded-full bg-zinc-800 overflow-hidden">
-            <div data-task-bar class="h-full w-0 bg-cyan-500 transition-all duration-100"></div>
-          </div>
-        </div>
+<div class="mx-4 p-4 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 rounded-2xl shadow-2xl">
 
-      </div>
-    </header>
+<div class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 ml-1">
+Select Skill
+</div>
 
-    <main
-      id="view-root"
-      class="flex-1 px-4 py-4 pb-28"
-      hx-get="./views/combat.html"
-      hx-trigger="load"
-      hx-swap="innerHTML">
-    </main>
+<div class="grid grid-cols-4 gap-3">
 
-    <footer class="fixed bottom-0 left-0 right-0 z-40 border-t border-zinc-800 bg-zinc-950/95 backdrop-blur">
-      <div class="mx-auto max-w-md">
-        <nav class="grid grid-cols-6 gap-1 p-2">
-          <button class="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-3 text-[10px] font-black uppercase tracking-tight text-zinc-400" data-nav-tab="combat" data-tab="combat">
-            <span class="icon-[game-icons--crossed-swords] w-6 h-6"></span>
-            <span>Combat</span>
-          </button>
+<button
+class="flex flex-col items-center gap-2 p-3 bg-zinc-800/50 hover:bg-cyan-500/10 rounded-xl transition-all border border-transparent hover:border-cyan-500/30 group"
+data-action="woodcutting">
 
-          <button class="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-3 text-[10px] font-black uppercase tracking-tight text-zinc-400" data-nav-tab="map" data-tab="map">
-            <span class="icon-[game-icons--world] w-6 h-6"></span>
-            <span>Map</span>
-          </button>
+<span class="icon-[game-icons--birch-trees] w-6 h-6 text-zinc-400 group-hover:text-cyan-400"></span>
+<span class="text-[9px] font-bold uppercase tracking-tight">Wood</span>
 
-          <button class="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-3 text-[10px] font-black uppercase tracking-tight text-zinc-400" data-nav-tab="skills" data-tab="skills">
-            <span class="icon-[game-icons--skills] w-6 h-6"></span>
-            <span>Skills</span>
-          </button>
+</button>
 
-          <button class="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-3 text-[10px] font-black uppercase tracking-tight text-zinc-400" data-nav-tab="items" data-tab="items">
-            <span class="icon-[game-icons--locked-chest] w-6 h-6"></span>
-            <span>Vault</span>
-          </button>
+<button
+class="flex flex-col items-center gap-2 p-3 bg-zinc-800/50 hover:bg-cyan-500/10 rounded-xl transition-all border border-transparent hover:border-cyan-500/30 group"
+data-action="mining">
 
-          <button class="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-3 text-[10px] font-black uppercase tracking-tight text-zinc-400" data-nav-tab="equipment" data-tab="equipment">
-            <span class="icon-[game-icons--checked-shield] w-6 h-6"></span>
-            <span>Gear</span>
-          </button>
+<span class="icon-[game-icons--pickelhaube] w-6 h-6 text-zinc-400 group-hover:text-cyan-400"></span>
+<span class="text-[9px] font-bold uppercase tracking-tight">Mine</span>
 
-          <button class="flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-3 text-[10px] font-black uppercase tracking-tight text-zinc-400" data-nav-tab="shop" data-tab="shop">
-            <span class="icon-[game-icons--receive-money] w-6 h-6"></span>
-            <span>Shop</span>
-          </button>
-        </nav>
-      </div>
-    </footer>
+</button>
 
-  </div>
+<button class="flex flex-col items-center gap-2 p-3 bg-zinc-800/50 opacity-40 rounded-xl border border-transparent cursor-not-allowed">
+<span class="icon-[game-icons--fishing-net] w-6 h-6 text-zinc-400"></span>
+<span class="text-[9px] font-bold uppercase tracking-tight text-zinc-600">Fish</span>
+</button>
 
-  <div id="modal-root" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4">
-    <div id="modal-content"></div>
-  </div>
+<button class="flex flex-col items-center gap-2 p-3 bg-zinc-800/50 opacity-40 rounded-xl border border-transparent cursor-not-allowed">
+<span class="icon-[game-icons--cauldron] w-6 h-6 text-zinc-400"></span>
+<span class="text-[9px] font-bold uppercase tracking-tight text-zinc-600">Cook</span>
+</button>
 
-  <script type="module" src="./assets/js/game.js?v=9"></script>
+</div>
+</div>
+</div>
+
+<footer class="fixed bottom-0 left-0 right-0 mx-auto max-w-md bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-800/50 px-1 py-2 z-50">
+
+<nav class="grid grid-cols-5 items-center">
+
+<button
+class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
+hx-get="./views/combat.html"
+hx-target="#view-root"
+data-title="Combat">
+
+<div class="relative">
+<span class="icon-[game-icons--crossed-swords] w-6 h-6"></span>
+
+<div
+class="absolute -top-1 -right-1 w-2 h-2 bg-cyan-500 rounded-full border border-zinc-900 hidden"
+data-bind-class="activeTask.kind === 'combat' ? '' : 'hidden'">
+</div>
+
+</div>
+
+<span class="text-[9px] font-black uppercase tracking-tighter">
+Hunt
+</span>
+
+</button>
+
+<button
+class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
+hx-get="./views/equipment.html"
+hx-target="#view-root"
+data-title="Equipment">
+
+<span class="icon-[game-icons--battle-gear] w-6 h-6"></span>
+<span class="text-[9px] font-black uppercase tracking-tighter">
+Gear
+</span>
+
+</button>
+
+<button
+id="skills-btn"
+class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
+data-action="toggle-launcher">
+
+<div class="relative">
+
+<span class="icon-[game-icons--skills] w-6 h-6"></span>
+
+<div
+class="absolute -top-1 -right-1 w-2 h-2 bg-cyan-500 rounded-full border border-zinc-900 hidden"
+data-bind-class="activeTask.kind !== 'none' ? '' : 'hidden'">
+</div>
+
+</div>
+
+<span class="text-[9px] font-black uppercase tracking-tighter">
+Skills
+</span>
+
+</button>
+
+<button
+class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
+hx-get="./views/inventory.html"
+hx-target="#view-root"
+data-title="Inventory">
+
+<span class="icon-[game-icons--locked-chest] w-6 h-6"></span>
+<span class="text-[9px] font-black uppercase tracking-tighter">
+Vault
+</span>
+
+</button>
+
+<button
+class="flex flex-col items-center gap-1 text-zinc-400 hover:text-cyan-400 transition-all group"
+hx-get="./views/settings.html"
+hx-target="#modal-content"
+data-action="open-modal">
+
+<span class="icon-[game-icons--cog] w-6 h-6"></span>
+<span class="text-[9px] font-black uppercase tracking-tighter">
+Setup
+</span>
+
+</button>
+
+</nav>
+</footer>
+
+<script src="./assets/js/htmx.min.js"></script>
+
+<script type="module" src="./assets/js/game.js?v=2"></script>
+
+<script>
+if ('serviceWorker' in navigator) {
+navigator.serviceWorker
+.register('./sw.js')
+.then(reg => console.log('SW Registered', reg))
+.catch(err => console.log('SW Failed', err));
+}
+</script>
+
 </body>
 </html>
