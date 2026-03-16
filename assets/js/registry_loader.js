@@ -23,7 +23,7 @@ async function fetchJSONL(path) {
     .split("\n")
     .map(x => x.trim())
     .filter(Boolean)
-    .map(JSON.parse)
+    .map(line => JSON.parse(line))
 
   cache.set(path, rows)
   return rows
@@ -31,16 +31,16 @@ async function fetchJSONL(path) {
 
 function index(rows) {
   const out = {}
-  for (const r of rows) {
-    if (r?.id) out[r.id] = r
+  for (const row of rows) {
+    if (row?.id) out[row.id] = row
   }
   return out
 }
 
 async function loadSkills(skillsIndex) {
-  const ids = skillsIndex.skills.map(x =>
-    typeof x === "string" ? x : x.id
-  )
+  const ids = Array.isArray(skillsIndex?.skills)
+    ? skillsIndex.skills.map(x => typeof x === "string" ? x : x.id).filter(Boolean)
+    : []
 
   const rows = await Promise.all(
     ids.map(id =>
@@ -52,9 +52,9 @@ async function loadSkills(skillsIndex) {
 }
 
 async function loadZones(zonesIndex) {
-  const ids = zonesIndex.zones.map(x =>
-    typeof x === "string" ? x : x.id
-  )
+  const ids = Array.isArray(zonesIndex?.zones)
+    ? zonesIndex.zones.map(x => typeof x === "string" ? x : x.id).filter(Boolean)
+    : []
 
   const rows = await Promise.all(
     ids.map(id =>
@@ -68,9 +68,9 @@ async function loadZones(zonesIndex) {
 async function loadMonsters(zones) {
   const ids = new Set()
 
-  for (const z of zones) {
-    for (const m of z.monsters || []) {
-      ids.add(m)
+  for (const zone of zones) {
+    for (const monsterId of zone?.monsters || []) {
+      ids.add(monsterId)
     }
   }
 
@@ -86,8 +86,8 @@ async function loadMonsters(zones) {
 async function loadDropTables(monsters) {
   const ids = new Set()
 
-  for (const m of monsters) {
-    if (m.dropTable) ids.add(m.dropTable)
+  for (const monster of monsters) {
+    if (monster?.dropTable) ids.add(monster.dropTable)
   }
 
   const rows = await Promise.all(
@@ -100,9 +100,9 @@ async function loadDropTables(monsters) {
 }
 
 async function loadShopItems(shopIndex) {
-  const ids = shopIndex.items.map(x =>
-    typeof x === "string" ? x : x.id
-  )
+  const ids = Array.isArray(shopIndex?.items)
+    ? shopIndex.items.map(x => typeof x === "string" ? x : x.id).filter(Boolean)
+    : []
 
   const rows = await Promise.all(
     ids.map(id =>
@@ -114,27 +114,28 @@ async function loadShopItems(shopIndex) {
 }
 
 export async function loadRegistry() {
-
   const [
     items,
     skillsIndex,
     zonesIndex,
     shopIndex
   ] = await Promise.all([
-    fetchJSONL("./content/items.jsonl").catch(()=>[]),
-    fetchJSON("./content/skills_index.json").catch(()=>({skills:[]})),
-    fetchJSON("./content/zones_index.json").catch(()=>({zones:[]})),
-    fetchJSON("./content/shop_index.json").catch(()=>({items:[]}))
+    fetchJSONL("./content/items.jsonl").catch(() => []),
+    fetchJSON("./content/skills_index.json").catch(() => ({ skills: [] })),
+    fetchJSON("./content/zones_index.json").catch(() => ({ zones: [] })),
+    fetchJSON("./content/shop_index.json").catch(() => ({ items: [] }))
   ])
 
-  const skills = await loadSkills(skillsIndex)
-  const zones = await loadZones(zonesIndex)
+  const [skills, zones, shopItems] = await Promise.all([
+    loadSkills(skillsIndex),
+    loadZones(zonesIndex),
+    loadShopItems(shopIndex)
+  ])
+
   const monsters = await loadMonsters(zones)
   const dropTables = await loadDropTables(monsters)
-  const shopItems = await loadShopItems(shopIndex)
 
   return {
-
     items: index(items),
     itemsList: items,
 
@@ -159,6 +160,6 @@ export async function loadRegistry() {
   }
 }
 
-export function clearRegistryCache(){
+export function clearRegistryCache() {
   cache.clear()
 }
