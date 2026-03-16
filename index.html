@@ -46,9 +46,9 @@
     <div id="modal-content" class="w-full max-w-sm pointer-events-auto"></div>
   </div>
 
-  <footer class="fixed bottom-0 left-0 right-0 z-50">
+<footer class="fixed bottom-0 left-0 right-0 z-50">
   <div class="mx-auto max-w-md px-3 pb-3">
-    <div class="relative rounded-t-3xl bg-zinc-100 text-zinc-900 shadow-2xl">
+    <div class="relative rounded-t-[2rem] bg-zinc-100 text-zinc-900 shadow-2xl overflow-visible">
       <nav class="grid grid-cols-5 items-end px-2 pt-3 pb-2">
 
         <button
@@ -69,15 +69,15 @@
           <span>Map</span>
         </button>
 
-        <div class="relative flex items-end justify-center">
+        <div class="relative flex flex-col items-center justify-end">
           <button
-            class="absolute -top-10 flex h-20 w-20 flex-col items-center justify-center rounded-full bg-zinc-950 text-zinc-100 shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+            class="absolute -top-10 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-950 text-zinc-100 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
             data-nav-tab="skills"
             data-tab="skills"
             aria-label="Skills">
             <span class="icon-[game-icons--skills] w-8 h-8"></span>
           </button>
-          <div class="h-12 w-full"></div>
+          <div class="h-10"></div>
           <span class="pb-2 text-[10px] font-black uppercase tracking-tight">Skills</span>
         </div>
 
@@ -103,6 +103,7 @@
     </div>
   </div>
 </footer>
+  
   <script src="./assets/js/htmx.min.js"></script>
   <script type="module" src="./assets/js/game.js?v=15"></script>
   <script>
