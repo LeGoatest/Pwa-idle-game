@@ -9,7 +9,7 @@ export function startActivity(state, payload) {
 
 export function stopActivity(state) {
   state.activity = {
-    kind: "none",
+    kind: 'none',
     progress: 0
   }
 }
