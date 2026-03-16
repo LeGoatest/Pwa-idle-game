@@ -39,7 +39,6 @@ const contentState = {
   shopItems: [],
   activeZone: null,
   activeMonster: null,
-  activeDropTable: null,
   activeNode: null,
   activeSkill: null
 }
@@ -108,7 +107,6 @@ async function resetGame() {
   contentState.shopItems = []
   contentState.activeZone = null
   contentState.activeMonster = null
-  contentState.activeDropTable = null
   contentState.activeNode = null
   contentState.activeSkill = null
 
@@ -176,7 +174,6 @@ function hydrateActivityTargets() {
 
   contentState.activeNode = null
   contentState.activeMonster = null
-  contentState.activeDropTable = null
   contentState.activeSkill = null
 
   if (activity.kind === 'node' && activity.skillId) {
@@ -186,9 +183,6 @@ function hydrateActivityTargets() {
 
   if (activity.kind === 'combat' && activity.monsterId) {
     contentState.activeMonster = contentState.registry?.monsters?.[activity.monsterId] || null
-    contentState.activeDropTable = contentState.activeMonster
-      ? contentState.registry?.dropTables?.[contentState.activeMonster.dropTable] || null
-      : null
   }
 }
 
@@ -233,9 +227,23 @@ async function loadInitialContent() {
   await loadItemRegistry()
   hydrateActivityTargets()
 
-  if (state.ui?.currentZoneId) openZone(state.ui.currentZoneId, false)
-  if (state.ui?.currentMonsterId) openMonster(state.ui.currentMonsterId, false)
-  if (state.ui?.currentSkillId) openSkill(state.ui.currentSkillId, false)
+  if (!state.ui?.currentZoneId && contentState.zonesIndex?.zones?.length) {
+    const firstZone = contentState.zonesIndex.zones[0]
+    openZone(typeof firstZone === 'string' ? firstZone : firstZone.id, true)
+  } else if (state.ui?.currentZoneId) {
+    openZone(state.ui.currentZoneId, false)
+  }
+
+  if (!state.ui?.currentSkillId && contentState.skillsIndex?.skills?.length) {
+    const firstSkill = contentState.skillsIndex.skills[0]
+    openSkill(typeof firstSkill === 'string' ? firstSkill : firstSkill.id, true)
+  } else if (state.ui?.currentSkillId) {
+    openSkill(state.ui.currentSkillId, false)
+  }
+
+  if (state.ui?.currentMonsterId) {
+    openMonster(state.ui.currentMonsterId, false)
+  }
 }
 
 async function openTab(tab, persist = true) {
@@ -255,18 +263,19 @@ async function openTab(tab, persist = true) {
   if (typeof htmx !== 'undefined') {
     await htmx.ajax('GET', route, {
       target: '#view-root',
-      swap: 'innerHTML show:top'
+      swap: 'innerHTML'
     })
   } else {
     const root = document.getElementById('view-root')
-    if (root) root.innerHTML = `<div class="pixel-card text-center text-red-400">HTMX not loaded</div>`
+    if (root) {
+      root.innerHTML = `<div class="pixel-card text-center text-red-400">HTMX not loaded</div>`
+    }
   }
 }
 
 function openZone(zoneId, persist = true) {
   contentState.activeZone = contentState.registry?.zones?.[zoneId] || null
   contentState.activeMonster = null
-  contentState.activeDropTable = null
 
   if (persist) {
     setCurrentZone(zoneId)
@@ -280,9 +289,6 @@ function openZone(zoneId, persist = true) {
 
 function openMonster(monsterId, persist = true) {
   contentState.activeMonster = contentState.registry?.monsters?.[monsterId] || null
-  contentState.activeDropTable = contentState.activeMonster
-    ? contentState.registry?.dropTables?.[contentState.activeMonster.dropTable] || null
-    : null
 
   if (persist) setCurrentMonster(monsterId)
 
