@@ -26,10 +26,6 @@ export function processNode(state, contentState, deltaMs) {
 
     if (node.yield?.item) {
       addItem(state, node.yield.item, node.yield.amount || 1)
-
-      if (node.yield.item === 'logs') state.logs += node.yield.amount || 1
-      if (node.yield.item === 'ore') state.ore += node.yield.amount || 1
-      if (node.yield.item === 'gold') state.gold += node.yield.amount || 1
     }
 
     if (node.xp && contentState.activeSkill?.id) {
