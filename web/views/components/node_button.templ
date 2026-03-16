@@ -1,0 +1,16 @@
+package components
+
+import "github.com/LeGoatest/Pwa-idle-game/internal/content"
+
+templ NodeButton(skillID string, node content.SkillNode) {
+	<button
+		class="block w-full rounded border border-zinc-800 bg-zinc-950 px-3 py-2 text-left hover:bg-zinc-800"
+		data-node-id={ node.ID }
+		data-skill-id={ skillID }
+	>
+		<div class="font-medium">{ node.Name }</div>
+		<div class="text-xs text-zinc-400">
+			Lv { templ.Sprintf("%d", node.LevelRequired) } · XP { templ.Sprintf("%.1f", node.XP) } · { node.Yield.Item } x{ templ.Sprintf("%d", node.Yield.Amount) }
+		</div>
+	</button>
+}
