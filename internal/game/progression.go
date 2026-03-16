@@ -1,10 +1,37 @@
 package game
 
-func ProcessProgression(state *GameState) {
-	state.CombatLevel = 1 + (state.CombatXP / 100)
-	state.WoodLevel = 1 + (state.WoodXP / 100)
-	state.MineLevel = 1 + (state.MineXP / 100)
+import "math"
 
-	state.Attack = 2 + (state.CombatLevel - 1)
-	state.Defense = 1 + ((state.CombatLevel - 1) / 2)
+func XPForLevel(level int) float64 {
+	return math.Floor(20 * math.Pow(float64(level), 1.4))
+}
+
+func GainXP(state *GameState, skill string, amount float64) {
+	var xp *float64
+	var level *int
+
+	switch skill {
+	case "wood":
+		xp = &state.WoodXP
+		level = &state.WoodLevel
+	case "mine":
+		xp = &state.MineXP
+		level = &state.MineLevel
+	case "combat":
+		xp = &state.CombatXP
+		level = &state.CombatLevel
+	default:
+		return
+	}
+
+	*xp += amount
+
+	for *xp >= XPForLevel(*level) {
+		*xp -= XPForLevel(*level)
+		*level++
+
+		if skill == "combat" {
+			state.Attack += 1
+		}
+	}
 }
