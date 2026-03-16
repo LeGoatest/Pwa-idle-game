@@ -1,28 +1,11 @@
 package game
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
 
-func Dispatch(state *GameState, action Action) error {
-	switch strings.TrimSpace(action.Type) {
-	case "":
-		return fmt.Errorf("action type is required")
-
-	case "start_combat":
-		state.Activity = ActivityState{
-			Kind:      "combat",
-			MonsterID: action.ID,
-			Progress:  0,
-		}
-		state.UI.Tab = "combat"
-		return nil
-
+func Dispatch(state *GameState, action Action, nowMS int64) error {
+	switch action.Type {
 	case "stop_activity":
-		state.Activity = ActivityState{
-			Kind: "none",
-		}
+		StopActivity(state)
 		return nil
 
 	case "open_zone":
@@ -32,10 +15,30 @@ func Dispatch(state *GameState, action Action) error {
 
 	case "select_monster":
 		state.UI.CurrentMonsterID = action.ID
+		state.UI.Tab = "combat"
 		return nil
 
 	case "select_skill":
 		state.UI.CurrentSkillID = action.ID
+		state.UI.Tab = "skills"
+		return nil
+
+	case "start_combat":
+		StartActivity(state, ActivityState{
+			Kind:      "combat",
+			ZoneID:    state.UI.CurrentZoneID,
+			MonsterID: action.ID,
+		}, nowMS)
+		state.UI.CurrentMonsterID = action.ID
+		state.UI.Tab = "combat"
+		return nil
+
+	case "start_node":
+		StartActivity(state, ActivityState{
+			Kind:    "node",
+			SkillID: state.UI.CurrentSkillID,
+			NodeID:  action.ID,
+		}, nowMS)
 		state.UI.Tab = "skills"
 		return nil
 
