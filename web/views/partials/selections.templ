@@ -1,0 +1,66 @@
+package partials
+
+import (
+	"github.com/LeGoatest/Pwa-idle-game/internal/content"
+	"github.com/LeGoatest/Pwa-idle-game/internal/game"
+	"github.com/LeGoatest/Pwa-idle-game/web/views/components"
+)
+
+templ Selections(state *game.GameState, reg *content.Registry) {
+	<aside id="selections-panel" class="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
+		<h2 class="mb-3 text-lg font-semibold">Selections</h2>
+
+		<div class="mb-4">
+			<div class="mb-2 text-sm font-medium text-zinc-300">Zones</div>
+			<div id="zones-list" class="space-y-2">
+				for _, zone := range reg.ZonesIndex.Zones {
+					@components.ZoneButton(zone, state.UI.CurrentZoneID == zone.ID)
+				}
+			</div>
+		</div>
+
+		<div class="mb-4">
+			<div class="mb-2 text-sm font-medium text-zinc-300">Monsters</div>
+			<div id="monsters-list" class="space-y-2">
+				for _, monster := range monstersForCurrentZone(state, reg) {
+					@components.MonsterButton(monster, state.UI.CurrentMonsterID == monster.ID)
+				}
+				if len(monstersForCurrentZone(state, reg)) == 0 {
+					<div class="text-sm text-zinc-500">No monsters available.</div>
+				}
+			</div>
+		</div>
+
+		<div>
+			<div class="mb-2 text-sm font-medium text-zinc-300">Skills / Nodes</div>
+			<div id="skills-list" class="space-y-3">
+				for _, skillID := range reg.SkillsIndex.Skills {
+					if skill, ok := reg.Skills[skillID]; ok {
+						@components.SkillBlock(skill, state.UI.CurrentSkillID == skill.ID) {
+							for _, node := range skill.Nodes {
+								@components.NodeButton(skill.ID, node)
+							}
+						}
+					}
+				}
+			</div>
+		</div>
+	</aside>
+}
+
+func monstersForCurrentZone(state *game.GameState, reg *content.Registry) []content.Monster {
+	out := []content.Monster{}
+
+	zone, ok := reg.Zones[state.UI.CurrentZoneID]
+	if !ok {
+		return out
+	}
+
+	for _, id := range zone.Monsters {
+		if monster, ok := reg.Monsters[id]; ok {
+			out = append(out, monster)
+		}
+	}
+
+	return out
+}
