@@ -1,6 +1,10 @@
 package components
 
-import "github.com/LeGoatest/Pwa-idle-game/internal/content"
+import (
+	"fmt"
+
+	"github.com/LeGoatest/Pwa-idle-game/internal/content"
+)
 
 templ ZoneButton(zone content.ZoneIndexEntry, active bool) {
 	<button
@@ -8,7 +12,7 @@ templ ZoneButton(zone content.ZoneIndexEntry, active bool) {
 		data-zone-id={ zone.ID }
 	>
 		<div class="font-medium">{ zone.Name }</div>
-		<div class="text-xs text-zinc-400">Lv { templ.Sprintf("%d", zone.LevelRequired) }</div>
+		<div class="text-xs text-zinc-400">Lv { fmt.Sprintf("%d", zone.LevelRequired) }</div>
 	</button>
 }
 
