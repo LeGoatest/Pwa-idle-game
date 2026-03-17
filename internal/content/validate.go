@@ -53,9 +53,15 @@ func ValidateRegistry(r *Registry) error {
 		}
 	}
 
-	for _, shopItem := range r.ShopItemsList {
-		if shopItem.ID == "" {
-			return fmt.Errorf("shop item missing id")
+	for _, listing := range r.ShopIndex.Items {
+		if listing.ID == "" {
+			return fmt.Errorf("shop listing missing id")
+		}
+		if _, ok := r.Items[listing.ID]; !ok {
+			return fmt.Errorf("shop listing references missing item %s", listing.ID)
+		}
+		if listing.Price < 0 {
+			return fmt.Errorf("shop listing %s has negative price", listing.ID)
 		}
 	}
 
