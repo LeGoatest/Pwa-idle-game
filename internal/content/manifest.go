@@ -1,18 +1,17 @@
 package content
 
 type Manifest struct {
-	Counts   ManifestCounts   `json:"counts"`
-	Indexes  ManifestIndexes  `json:"indexes"`
-	Warnings []string         `json:"warnings,omitempty"`
+	Counts   ManifestCounts  `json:"counts"`
+	Indexes  ManifestIndexes `json:"indexes"`
+	Warnings []string        `json:"warnings,omitempty"`
 }
 
 type ManifestCounts struct {
-	Items      int `json:"items"`
-	Skills     int `json:"skills"`
-	Zones      int `json:"zones"`
-	Monsters   int `json:"monsters"`
-	ShopItems  int `json:"shopItems"`
-	DropTables int `json:"dropTables"`
+	Items     int `json:"items"`
+	Skills    int `json:"skills"`
+	Zones     int `json:"zones"`
+	Monsters  int `json:"monsters"`
+	ShopItems int `json:"shopItems"`
 }
 
 type ManifestIndexes struct {
@@ -37,16 +36,19 @@ func BuildManifest(reg *Registry) Manifest {
 	}
 
 	shopIDs := make([]string, 0, len(reg.ShopIndex.Items))
-	shopIDs = append(shopIDs, reg.ShopIndex.Items...)
+	for _, listing := range reg.ShopIndex.Items {
+		if listing.ID != "" {
+			shopIDs = append(shopIDs, listing.ID)
+		}
+	}
 
 	return Manifest{
 		Counts: ManifestCounts{
-			Items:      len(reg.ItemsList),
-			Skills:     len(reg.SkillsList),
-			Zones:      len(reg.ZonesList),
-			Monsters:   len(reg.MonstersList),
-			ShopItems:  len(reg.ShopItemsList),
-			DropTables: len(reg.DropTablesList),
+			Items:     len(reg.ItemsList),
+			Skills:    len(reg.SkillsList),
+			Zones:     len(reg.ZonesList),
+			Monsters:  len(reg.MonstersList),
+			ShopItems: len(reg.ShopIndex.Items),
 		},
 		Indexes: ManifestIndexes{
 			Skills: skillIDs,
