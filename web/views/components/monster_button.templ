@@ -1,6 +1,10 @@
 package components
 
-import "github.com/LeGoatest/Pwa-idle-game/internal/content"
+import (
+	"fmt"
+
+	"github.com/LeGoatest/Pwa-idle-game/internal/content"
+)
 
 templ MonsterButton(monster content.Monster, active bool) {
 	<button
@@ -9,7 +13,7 @@ templ MonsterButton(monster content.Monster, active bool) {
 	>
 		<div class="font-medium">{ monster.Name }</div>
 		<div class="text-xs text-zinc-400">
-			Lv { templ.Sprintf("%d", monster.Level) } · HP { templ.Sprintf("%d", monster.HP) } · ATK { templ.Sprintf("%d", monster.Attack) }
+			Lv { fmt.Sprintf("%d", monster.Level) } · HP { fmt.Sprintf("%d", monster.HP) } · ATK { fmt.Sprintf("%d", monster.Attack) }
 		</div>
 	</button>
 }
