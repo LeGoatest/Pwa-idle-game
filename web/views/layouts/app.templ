@@ -7,11 +7,11 @@ templ App(title string) {
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width,initial-scale=1"/>
 			<title>{ title }</title>
-			<link rel="stylesheet" href="/static/css/output.css"/>
+			<link rel="stylesheet" href="./static/css/app.css"/>
 			<script src="https://unpkg.com/htmx.org@1.9.12"></script>
-			<script src="/static/js/wasm_exec.js"></script>
-			<script src="/static/js/wasm-loader.js"></script>
-			<script type="module" src="/static/js/app.js"></script>
+			<script src="./static/js/wasm_exec.js"></script>
+			<script src="./static/js/wasm-loader.js"></script>
+			<script type="module" src="./static/js/app.js"></script>
 		</head>
 		<body class="min-h-screen bg-zinc-950 text-zinc-100">
 			{ children... }
