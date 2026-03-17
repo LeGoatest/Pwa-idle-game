@@ -1,13 +1,12 @@
 name: Build and Deploy Pages
 
 on:
-  push:
-    branches:
-      - migration/tinygo-wasm
   workflow_dispatch:
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    inputs:
+      target_branch:
+        description: "Branch to build and deploy"
+        required: true
+        default: "migration/tinygo-wasm"
 
 permissions:
   contents: read
@@ -23,19 +22,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout target branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target_branch }}
+          fetch-depth: 0
+
+      - name: Show repo state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git branch --show-current
+          pwd
+          ls -la
+          test -f go.mod
+          test -f Makefile
+          test -f package.json
 
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: "1.23.10"
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
 
       - name: Setup TinyGo
         uses: acifani/setup-tinygo@v2
@@ -43,13 +55,31 @@ jobs:
           tinygo-version: "0.35.0"
 
       - name: Setup templ
-        run: go install github.com/a-h/templ/cmd/templ@latest
+        run: go install github.com/a-h/templ/cmd/templ@v0.3.865
+
+      - name: Add Go bin to PATH
+        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build dist
+      - name: Generate templ files
+        shell: bash
         run: |
+          set -euo pipefail
+          templ generate
+
+      - name: Resolve Go module deps
+        shell: bash
+        run: |
+          set -euo pipefail
+          go mod tidy
+          test -f go.sum
+
+      - name: Build dist
+        shell: bash
+        run: |
+          set -euo pipefail
           export PATH="$(go env GOPATH)/bin:$PATH"
           make build
 
