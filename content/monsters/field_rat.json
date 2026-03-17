@@ -1,0 +1,24 @@
+{
+  "id": "field_rat",
+  "name": "Field Rat",
+  "level": 1,
+  "hp": 10,
+  "attack": 1,
+  "durationMs": 2000,
+  "xp": 5,
+  "loot": {
+    "gold": {
+      "min": 1,
+      "max": 3
+    },
+    "drops": [
+      {
+        "item": "rat_tail",
+        "chance": 0.65,
+        "min": 1,
+        "max": 1
+      }
+    ]
+  },
+  "dropTable": "field_rat"
+}
