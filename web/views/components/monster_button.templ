@@ -9,18 +9,31 @@ import (
 templ MonsterButton(monster content.Monster, active bool) {
 	<button
 		class={ monsterButtonClass(active) }
-		data-monster-id={ monster.ID }
+		data-action="start_combat"
+		data-id={ monster.ID }
 	>
-		<div class="font-medium">{ monster.Name }</div>
-		<div class="text-xs text-zinc-400">
-			Lv { fmt.Sprintf("%d", monster.Level) } · HP { fmt.Sprintf("%d", monster.HP) } · ATK { fmt.Sprintf("%d", monster.Attack) }
+		<div class="flex items-center justify-between gap-4">
+			<div>
+				<div class="font-semibold">{ monster.Name }</div>
+				<div class="mt-1 text-xs text-zinc-400">
+					Lv { fmt.Sprintf("%d", monster.Level) } · HP { fmt.Sprintf("%d", monster.HP) } · ATK { fmt.Sprintf("%d", monster.Attack) }
+				</div>
+			</div>
+			<span class="icon-[mdi--sword-cross] icon-md { monsterIconClass(active) }"></span>
 		</div>
 	</button>
 }
 
 func monsterButtonClass(active bool) string {
 	if active {
-		return "block w-full rounded border border-rose-600 bg-rose-950 px-3 py-2 text-left text-rose-200"
+		return "w-full rounded-2xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-left"
 	}
-	return "block w-full rounded border border-zinc-800 bg-zinc-950 px-3 py-2 text-left hover:bg-zinc-800"
+	return "w-full rounded-2xl border border-zinc-800 bg-zinc-900/60 px-4 py-3 text-left hover:border-zinc-700 hover:bg-zinc-900"
+}
+
+func monsterIconClass(active bool) string {
+	if active {
+		return "text-cyan-400"
+	}
+	return "text-zinc-500"
 }
