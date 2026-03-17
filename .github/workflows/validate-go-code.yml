@@ -1,13 +1,10 @@
 name: Validate Go Code
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - migration/tinygo-wasm
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -17,8 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout selected ref
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -39,20 +38,20 @@ jobs:
       - name: Generate templ files
         run: templ generate
 
-      - name: Validate content loader
+      - name: Validate content
         run: go run ./cmd/content-validate
 
       - name: Build buildsite
         run: go build ./cmd/buildsite
 
-      - name: Build game package
-        run: go build ./internal/game
-
       - name: Build content package
         run: go build ./internal/content
 
-      - name: Build wasm package
+      - name: Build game package
+        run: go build ./internal/game
+
+      - name: Build wasm
         run: tinygo build -target wasm -opt=z -no-debug -o /tmp/app.wasm ./frontend/wasm
 
-      - name: Run simulation
-        run: go run ./cmd/simulate.
+      - name: Run simulate
+        run: go run ./cmd/simulate
