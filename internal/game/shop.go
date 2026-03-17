@@ -7,21 +7,26 @@ func BuyShopItem(state *GameState, reg *content.Registry, itemID string) bool {
 		return false
 	}
 
-	item, ok := reg.ShopItems[itemID]
+	listing, ok := content.GetShopListing(reg, itemID)
 	if !ok {
 		return false
 	}
 
-	if state.Gold < item.Price {
+	item, ok := reg.Items[itemID]
+	if !ok {
 		return false
 	}
 
-	state.Gold -= item.Price
+	if state.Gold < listing.Price {
+		return false
+	}
+
+	state.Gold -= listing.Price
 
 	if item.Effect != nil {
 		switch item.Effect.Type {
 		case "stat":
-			switch item.Effect.Stat {
+			switch item.Stats["stat"] {
 			case "attack":
 				state.Attack += item.Effect.Value
 			case "defense":
@@ -34,16 +39,6 @@ func BuyShopItem(state *GameState, reg *content.Registry, itemID string) bool {
 		case "heal":
 			state.HP += item.Effect.Value
 			return true
-
-		case "item":
-			if item.Effect.ItemKey != "" {
-				amount := item.Effect.Amount
-				if amount <= 0 {
-					amount = 1
-				}
-				AddItem(state, item.Effect.ItemKey, amount)
-				return true
-			}
 		}
 	}
 
