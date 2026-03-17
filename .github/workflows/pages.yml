@@ -7,6 +7,11 @@ on:
         description: "Branch to deploy"
         required: true
         default: "migration/tinygo-wasm"
+  workflow_run:
+    workflows:
+      - Build Versioned Dist
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -19,14 +24,35 @@ concurrency:
 
 jobs:
   deploy:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout target branch
+      - name: Checkout target branch (manual)
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.target_branch }}
           fetch-depth: 0
+
+      - name: Checkout workflow branch (automatic)
+        if: github.event_name == 'workflow_run'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+
+      - name: Show repo state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git branch --show-current
+          pwd
+          ls -la
+          test -d dist/latest
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -39,7 +65,6 @@ jobs:
   publish:
     needs: deploy
     runs-on: ubuntu-latest
-
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -47,122 +72,4 @@ jobs:
     steps:
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v4          set -euo pipefail
-          git branch --show-current
-          pwd
-          ls -la
-          test -f go.mod
-          test -f Makefile
-          test -f package.json
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.23.10"
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Setup TinyGo
-        uses: acifani/setup-tinygo@v2
-        with:
-          tinygo-version: "0.35.0"
-
-      - name: Setup templ
-        run: go install github.com/a-h/templ/cmd/templ@v0.3.865
-
-      - name: Add Go bin to PATH
-        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Generate templ files
-        run: templ generate
-
-      - name: Resolve Go module deps
-        run: go mod tidy
-
-      - name: Build dist
-        run: |
-          export PATH="$(go env GOPATH)/bin:$PATH"
-          make clean
-          make build
-
-      - name: Stamp build metadata
-        id: meta
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          BUILD_TIMESTAMP="$(date -u +'%Y-%m-%dT%H-%M-%SZ')"
-          SHORT_SHA="$(git rev-parse --short HEAD)"
-          BUILD_ID="build-${BUILD_TIMESTAMP}-${SHORT_SHA}"
-
-          echo "build_timestamp=${BUILD_TIMESTAMP}" >> "$GITHUB_OUTPUT"
-          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
-          echo "build_id=${BUILD_ID}" >> "$GITHUB_OUTPUT"
-
-      - name: Copy dist into versioned folders
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          BUILD_ID="${{ steps.meta.outputs.build_id }}"
-          BUILD_TIMESTAMP="${{ steps.meta.outputs.build_timestamp }}"
-          SHORT_SHA="${{ steps.meta.outputs.short_sha }}"
-          TARGET_BRANCH="${{ github.event.inputs.target_branch }}"
-
-          mkdir -p dist/latest
-          mkdir -p dist/builds
-          mkdir -p "dist/builds/${BUILD_ID}"
-
-          find dist/latest -mindepth 1 -maxdepth 1 ! -name builds ! -name latest -exec rm -rf {} + || true
-          rm -rf dist/latest/*
-          cp -R dist/. dist/latest/
-
-          rm -rf "dist/builds/${BUILD_ID}"
-          mkdir -p "dist/builds/${BUILD_ID}"
-
-          find dist -mindepth 1 -maxdepth 1 ! -name latest ! -name builds -exec cp -R {} "dist/builds/${BUILD_ID}/" \;
-
-          cat > "dist/builds/${BUILD_ID}/build-info.json" <<EOF
-          {
-            "buildId": "${BUILD_ID}",
-            "timestampUtc": "${BUILD_TIMESTAMP}",
-            "commitShaShort": "${SHORT_SHA}",
-            "branch": "${TARGET_BRANCH}",
-            "workflow": "Build Versioned Dist",
-            "runNumber": "${{ github.run_number }}",
-            "runId": "${{ github.run_id }}"
-          }
-          EOF
-
-          cat > "dist/latest/build-info.json" <<EOF
-          {
-            "buildId": "${BUILD_ID}",
-            "timestampUtc": "${BUILD_TIMESTAMP}",
-            "commitShaShort": "${SHORT_SHA}",
-            "branch": "${TARGET_BRANCH}",
-            "workflow": "Build Versioned Dist",
-            "runNumber": "${{ github.run_number }}",
-            "runId": "${{ github.run_id }}"
-          }
-          EOF
-
-      - name: Commit versioned dist
-        shell: bash
-        run: |
-          set -euo pipefail
-          git add dist
-          if git diff --cached --quiet; then
-            echo "No dist changes to commit."
-            exit 0
-          fi
-          git commit -m "${{ github.event.inputs.commit_message }}"
-
-      - name: Push changes
-        run: |
-          git push origin HEAD:${{ github.event.inputs.target_branch }}
+        uses: actions/deploy-pages@v4
