@@ -1,5 +1,7 @@
 package game
 
+import "github.com/LeGoatest/Pwa-idle-game/internal/content"
+
 type ReplayEvent struct {
 	Time int64  `json:"t"`
 	Type string `json:"type"`
@@ -18,16 +20,17 @@ func RecordAction(log *ReplayLog, nowMS int64, action Action) {
 	})
 }
 
-func RunReplay(state *GameState, contentState ContentState, replay ReplayLog) error {
+func RunReplay(state *GameState, reg *content.Registry, replay ReplayLog) error {
 	var currentTime int64
 
 	for _, event := range replay.Events {
 		delta := event.Time - currentTime
 		if delta > 0 {
+			contentState := ResolveContentState(state, reg)
 			Tick(state, contentState, delta, event.Time)
 		}
 
-		if err := Dispatch(state, Action{
+		if err := Dispatch(state, reg, Action{
 			Type: event.Type,
 			ID:   event.ID,
 		}, event.Time); err != nil {
