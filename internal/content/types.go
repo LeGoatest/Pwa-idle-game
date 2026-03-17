@@ -35,8 +35,13 @@ type ZonesIndex struct {
 	Zones []ZoneIndexEntry `json:"zones"`
 }
 
+type ShopListing struct {
+	ID    string `json:"id"`
+	Price int    `json:"price"`
+}
+
 type ShopIndex struct {
-	Items []string `json:"items"`
+	Items []ShopListing `json:"items"`
 }
 
 type Zone struct {
@@ -74,7 +79,6 @@ type Monster struct {
 	DurationMS int          `json:"durationMs,omitempty"`
 	XP         int          `json:"xp,omitempty"`
 	Boss       bool         `json:"boss,omitempty"`
-	DropTable  string       `json:"dropTable,omitempty"`
 	Loot       *MonsterLoot `json:"loot,omitempty"`
 }
 
@@ -104,18 +108,14 @@ type Skill struct {
 func (x Skill) GetID() string { return x.ID }
 
 type Registry struct {
-	Items          map[string]Item
-	ItemsList      []Item
-	Skills         map[string]Skill
-	SkillsList     []Skill
-	Zones          map[string]Zone
-	ZonesList      []Zone
-	Monsters       map[string]Monster
-	MonstersList   []Monster
-	ShopItems      map[string]ShopItem
-	ShopItemsList  []ShopItem
-	DropTables     map[string]DropTable
-	DropTablesList []DropTable
+	Items        map[string]Item
+	ItemsList    []Item
+	Skills       map[string]Skill
+	SkillsList   []Skill
+	Zones        map[string]Zone
+	ZonesList    []Zone
+	Monsters     map[string]Monster
+	MonstersList []Monster
 
 	SkillsIndex SkillsIndex
 	ZonesIndex  ZonesIndex
