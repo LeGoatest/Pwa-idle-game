@@ -22,7 +22,16 @@ buildwasm:
 buildruntime:
 	mkdir -p dist/static/js
 	cp ./web/static/js/*.js ./dist/static/js/
-	cp "$$($(GO) env GOROOT)/lib/wasm/wasm_exec.js" ./dist/static/js/wasm_exec.js
+	if [ -f "$$($(TINYGO) env TINYGOROOT)/targets/wasm_exec.js" ]; then \
+		cp "$$($(TINYGO) env TINYGOROOT)/targets/wasm_exec.js" ./dist/static/js/wasm_exec.js; \
+	elif [ -f "$$($(GO) env GOROOT)/lib/wasm/wasm_exec.js" ]; then \
+		cp "$$($(GO) env GOROOT)/lib/wasm/wasm_exec.js" ./dist/static/js/wasm_exec.js; \
+	elif [ -f "$$($(GO) env GOROOT)/misc/wasm/wasm_exec.js" ]; then \
+		cp "$$($(GO) env GOROOT)/misc/wasm/wasm_exec.js" ./dist/static/js/wasm_exec.js; \
+	else \
+		echo "wasm_exec.js not found in TinyGo or Go toolchain"; \
+		exit 1; \
+	fi
 
 buildcontent:
 	$(GO) run ./cmd/buildcontent
