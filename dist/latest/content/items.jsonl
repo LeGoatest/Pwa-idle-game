@@ -1,0 +1,4 @@
+{"id":"oak_log","name":"Oak Log","type":"material","stackable":true,"maxStack":999,"value":2,"icon":"oak_log","tags":["wood","material"]}
+{"id":"rat_tail","name":"Rat Tail","type":"material","stackable":true,"maxStack":999,"value":1,"icon":"rat_tail","tags":["beast","loot","material"]}
+{"id":"health_potion","name":"Health Potion","type":"consumable","stackable":true,"maxStack":99,"value":15,"icon":"health_potion","tags":["potion","consumable"],"effect":{"type":"heal","value":10}}
+{"id":"bronze_sword","name":"Bronze Sword","type":"equipment","stackable":false,"value":25,"equipSlot":"weapon","icon":"bronze_sword","tags":["weapon","melee","equipment"],"stats":{"attack":2}}
