@@ -79,7 +79,7 @@ func (rt *Runtime) Dispatch(actionJSON string, nowMS int64) error {
 		return err
 	}
 
-	if err := game.DispatchExtended(rt.State, rt.Registry, game.Action{
+	if err := game.Dispatch(rt.State, rt.Registry, game.Action{
 		Type: action.Type,
 		ID:   action.ID,
 	}, nowMS); err != nil {
