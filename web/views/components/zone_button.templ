@@ -9,16 +9,29 @@ import (
 templ ZoneButton(zone content.ZoneIndexEntry, active bool) {
 	<button
 		class={ zoneButtonClass(active) }
-		data-zone-id={ zone.ID }
+		data-action="open_zone"
+		data-id={ zone.ID }
 	>
-		<div class="font-medium">{ zone.Name }</div>
-		<div class="text-xs text-zinc-400">Lv { fmt.Sprintf("%d", zone.LevelRequired) }</div>
+		<div class="flex items-center justify-between">
+			<div>
+				<div class="font-semibold">{ zone.Name }</div>
+				<div class="mt-1 text-xs text-zinc-400">Required Lv { fmt.Sprintf("%d", zone.LevelRequired) }</div>
+			</div>
+			<span class="icon-[mdi--map-marker] icon-md { zoneIconClass(active) }"></span>
+		</div>
 	</button>
 }
 
 func zoneButtonClass(active bool) string {
 	if active {
-		return "block w-full rounded border border-emerald-600 bg-emerald-950 px-3 py-2 text-left text-emerald-200"
+		return "w-full rounded-2xl border border-cyan-500/40 bg-cyan-500/10 px-4 py-3 text-left shadow-glow"
 	}
-	return "block w-full rounded border border-zinc-800 bg-zinc-950 px-3 py-2 text-left hover:bg-zinc-800"
+	return "w-full rounded-2xl border border-zinc-800 bg-zinc-900/60 px-4 py-3 text-left hover:border-zinc-700 hover:bg-zinc-900"
+}
+
+func zoneIconClass(active bool) string {
+	if active {
+		return "text-cyan-400"
+	}
+	return "text-zinc-500"
 }
