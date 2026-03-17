@@ -7,64 +7,67 @@ import (
 )
 
 templ Activity(state *game.GameState) {
-	<section id="activity-panel" class="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
-		<h2 class="mb-3 text-lg font-semibold">Activity</h2>
+	<section id="activity-panel" class="card hidden md:block">
+		<div class="mb-4 flex items-center justify-between">
+			<h2>Activity</h2>
+			if state.Activity.Kind != "" && state.Activity.Kind != "none" {
+				<span class="stat-pill">
+					<span class="activity-pulse h-2 w-2 rounded-full bg-cyan-400"></span>
+					<span class="capitalize">{ state.Activity.Kind }</span>
+				</span>
+			}
+		</div>
 
-		<div class="grid gap-3 md:grid-cols-2">
-			<div class="rounded border border-zinc-800 p-3">
-				<div class="flex justify-between gap-4">
-					<span class="text-zinc-400">Kind</span>
-					<span id="activity-kind">{ valueOrDash(state.Activity.Kind) }</span>
+		<div class="space-y-3">
+			<div class="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
+				<div class="mb-2 flex justify-between text-sm">
+					<span class="text-zinc-400">Enemy HP</span>
+					<span>{ fmt.Sprintf("%d / %d", state.EnemyHP, state.EnemyMaxHP) }</span>
 				</div>
-
-				<div class="mt-1 flex justify-between gap-4">
-					<span class="text-zinc-400">Zone</span>
-					<span id="activity-zone">{ valueOrDash(state.Activity.ZoneID) }</span>
-				</div>
-
-				<div class="mt-1 flex justify-between gap-4">
-					<span class="text-zinc-400">Monster</span>
-					<span id="activity-monster">{ valueOrDash(state.Activity.MonsterID) }</span>
-				</div>
-
-				<div class="mt-1 flex justify-between gap-4">
-					<span class="text-zinc-400">Skill</span>
-					<span id="activity-skill">{ valueOrDash(state.Activity.SkillID) }</span>
-				</div>
-
-				<div class="mt-1 flex justify-between gap-4">
-					<span class="text-zinc-400">Node</span>
-					<span id="activity-node">{ valueOrDash(state.Activity.NodeID) }</span>
-				</div>
-
-				<div class="mt-1 flex justify-between gap-4">
-					<span class="text-zinc-400">Progress</span>
-					<span id="activity-progress">{ fmt.Sprintf("%.0f", state.Activity.Progress) }</span>
+				<div class="progress-bar-container">
+					<div class="progress-bar-fill" style={ enemyHPWidth(state) }></div>
 				</div>
 			</div>
 
-			<div class="rounded border border-zinc-800 p-3">
-				<div class="flex justify-between gap-4">
-					<span class="text-zinc-400">Enemy HP</span>
-					<span id="enemy-hp">{ fmt.Sprintf("%d / %d", state.EnemyHP, state.EnemyMaxHP) }</span>
+			<div class="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
+				<div class="mb-2 flex justify-between text-sm">
+					<span class="text-zinc-400">Progress</span>
+					<span>{ fmt.Sprintf("%.0f", state.Activity.Progress) }</span>
 				</div>
+				<div class="progress-bar-container">
+					<div class="progress-bar-fill" style={ progressWidth(state) }></div>
+				</div>
+			</div>
 
-				if state.UI.CurrentMonsterID != "" {
-					<button
-						class="mt-4 rounded border border-emerald-700 bg-emerald-800 px-3 py-2 hover:bg-emerald-700"
-						data-action="start_current_combat"
-					>
-						Start Combat
-					</button>
-				}
+			<div class="flex gap-2">
+				<button class="btn-primary flex-1" data-action="start_current_combat">Start</button>
+				<button class="btn flex-1" data-action="stop_activity">Stop</button>
 			</div>
 		</div>
 	</section>
 }
 
-func valueOrDash(v string) string {
-	if v == "" {
-		return "-"
+func enemyHPWidth(state *game.GameState) string {
+	if state == nil || state.EnemyMaxHP <= 0 {
+		return "width: 0%;"
 	}
-	return v
+	pct := (float64(state.EnemyHP) / float64(state.EnemyMaxHP)) * 100
+	if pct < 0 {
+		pct = 0
+	}
+	if pct > 100 {
+		pct = 100
+	}
+	return fmt.Sprintf("width: %.2f%%;", pct)
+}
+
+func progressWidth(state *game.GameState) string {
+	if state == nil || state.Activity.Progress <= 0 {
+		return "width: 0%;"
+	}
+	pct := state.Activity.Progress
+	if pct > 100 {
+		pct = 100
+	}
+	return fmt.Sprintf("width: %.2f%%;", pct)
 }
