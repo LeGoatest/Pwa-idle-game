@@ -13,7 +13,7 @@ buildsite: generate
 
 buildcss:
 	mkdir -p dist/static/css
-	$(TAILWIND) -i ./input.css -o ./dist/static/css/output.css --minify
+	$(TAILWIND) -i ./input.css -o ./dist/static/css/app.css --minify
 
 buildwasm:
 	mkdir -p dist/static/wasm
