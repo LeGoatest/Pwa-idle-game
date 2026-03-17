@@ -74,17 +74,13 @@
     const skills = await loadByIds("/content/skills", skillIDs);
     const zones = await loadByIds("/content/zones", zoneIDs);
 
-    const monsterIDs = [...new Set(
-      zones.flatMap((zone) => Array.isArray(zone.monsters) ? zone.monsters : [])
-    )];
+    const monsterIDs = [
+      ...new Set(
+        zones.flatMap((zone) => (Array.isArray(zone.monsters) ? zone.monsters : []))
+      ),
+    ];
 
     const monsters = await loadByIds("/content/monsters", monsterIDs);
-
-    let shopItems = [];
-    if (Array.isArray(shopIndex.items) && shopIndex.items.length > 0) {
-      const shopIDs = shopIndex.items.map((x) => (typeof x === "string" ? x : x.id)).filter(Boolean);
-      shopItems = await loadByIds("/content/shop", shopIDs);
-    }
 
     return {
       items: indexById(items),
@@ -95,8 +91,6 @@
       zonesList: zones,
       monsters: indexById(monsters),
       monstersList: monsters,
-      shopItems: indexById(shopItems),
-      shopItemsList: shopItems,
       skillsIndex,
       zonesIndex,
       shopIndex,
