@@ -5,3 +5,9 @@ node_modules/
 .DS_Store
 web/static/wasm/app.wasm
 web/static/css/output.css
+dist/*
+!dist/.keep
+!dist/latest/
+!dist/latest/**
+!dist/builds/
+!dist/builds/**
