@@ -29,10 +29,18 @@ func main() {
 	}
 
 	if state.UI.CurrentMonsterID == "" {
-		log.Fatal("no monster available to simulate")
+		fmt.Println("simulation complete")
+		fmt.Println("duration_ms: 0")
+		fmt.Println("monster: ")
+		fmt.Printf("gold: %d\n", state.Gold)
+		fmt.Printf("kills: %d\n", state.Kills)
+		fmt.Printf("combat_level: %d\n", state.CombatLevel)
+		fmt.Printf("combat_xp: %.2f\n", state.CombatXP)
+		fmt.Printf("inventory:\n")
+		return
 	}
 
-	if err := game.Dispatch(state, game.Action{
+	if err := game.Dispatch(state, reg, game.Action{
 		Type: "start_combat",
 		ID:   state.UI.CurrentMonsterID,
 	}, nowMS); err != nil {
@@ -55,11 +63,4 @@ func main() {
 	fmt.Printf("duration_ms: %d\n", simulateFor)
 	fmt.Printf("monster: %s\n", state.UI.CurrentMonsterID)
 	fmt.Printf("gold: %d\n", state.Gold)
-	fmt.Printf("kills: %d\n", state.Kills)
-	fmt.Printf("combat_level: %d\n", state.CombatLevel)
-	fmt.Printf("combat_xp: %.2f\n", state.CombatXP)
-	fmt.Printf("inventory:\n")
-	for itemID, amount := range state.Inventory {
-		fmt.Printf("  %s: %d\n", itemID, amount)
-	}
-}
+	fmt.Printf("kills
