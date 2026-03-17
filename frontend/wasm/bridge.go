@@ -30,15 +30,11 @@ func (rt *Runtime) Init(reg *content.Registry, saveJSON string, nowMS int64) err
 
 	rt.Registry = reg
 
-	if saveJSON != "" && saveJSON != "null" {
-		state, err := game.ImportSave([]byte(saveJSON))
-		if err != nil {
-			return err
-		}
-		rt.State = state
-	} else {
-		rt.State = game.NewDefaultState(nowMS)
+	state, err := loadState(saveJSON, nowMS)
+	if err != nil {
+		return err
 	}
+	rt.State = state
 
 	if rt.State.UI.CurrentZoneID == "" && len(reg.ZonesIndex.Zones) > 0 {
 		rt.State.UI.CurrentZoneID = reg.ZonesIndex.Zones[0].ID
@@ -54,57 +50,11 @@ func (rt *Runtime) Init(reg *content.Registry, saveJSON string, nowMS int64) err
 		}
 	}
 
-	rt.hydrate()
+	rt.ContentState = game.ResolveContentState(rt.State, rt.Registry)
+	applyOffline(rt.State, rt.ContentState, nowMS)
+	rt.ContentState = game.ResolveContentState(rt.State, rt.Registry)
 
-	if rt.State.UpdatedAt > 0 && nowMS > rt.State.UpdatedAt {
-		elapsed := nowMS - rt.State.UpdatedAt
-		game.ApplyOfflineProgress(rt.State, rt.ContentState, elapsed, nowMS)
-	}
-
-	rt.hydrate()
 	return nil
-}
-
-func (rt *Runtime) hydrate() {
-	rt.ContentState = game.ContentState{}
-
-	if rt.Registry == nil || rt.State == nil {
-		return
-	}
-
-	if rt.State.Activity.Kind == "combat" && rt.State.Activity.MonsterID != "" {
-		if monster, ok := rt.Registry.Monsters[rt.State.Activity.MonsterID]; ok {
-			m := monster
-			rt.ContentState.ActiveMonster = &m
-		}
-	} else if rt.State.UI.CurrentMonsterID != "" {
-		if monster, ok := rt.Registry.Monsters[rt.State.UI.CurrentMonsterID]; ok {
-			m := monster
-			rt.ContentState.ActiveMonster = &m
-		}
-	}
-
-	skillID := rt.State.UI.CurrentSkillID
-	if rt.State.Activity.SkillID != "" {
-		skillID = rt.State.Activity.SkillID
-	}
-
-	if skillID != "" {
-		if skill, ok := rt.Registry.Skills[skillID]; ok {
-			s := skill
-			rt.ContentState.ActiveSkill = &s
-
-			nodeID := rt.State.Activity.NodeID
-			if nodeID != "" {
-				for i := range s.Nodes {
-					if s.Nodes[i].ID == nodeID {
-						rt.ContentState.ActiveNode = &s.Nodes[i]
-						break
-					}
-				}
-			}
-		}
-	}
 }
 
 func (rt *Runtime) Tick(deltaMS int64, nowMS int64) (bool, error) {
@@ -112,9 +62,9 @@ func (rt *Runtime) Tick(deltaMS int64, nowMS int64) (bool, error) {
 		return false, errors.New("runtime not initialized")
 	}
 
-	rt.hydrate()
+	rt.ContentState = game.ResolveContentState(rt.State, rt.Registry)
 	changed := game.Tick(rt.State, rt.ContentState, deltaMS, nowMS)
-	rt.hydrate()
+	rt.ContentState = game.ResolveContentState(rt.State, rt.Registry)
 
 	return changed, nil
 }
@@ -129,14 +79,14 @@ func (rt *Runtime) Dispatch(actionJSON string, nowMS int64) error {
 		return err
 	}
 
-	if err := game.Dispatch(rt.State, game.Action{
+	if err := game.DispatchExtended(rt.State, rt.Registry, game.Action{
 		Type: action.Type,
 		ID:   action.ID,
 	}, nowMS); err != nil {
 		return err
 	}
 
-	rt.hydrate()
+	rt.ContentState = game.ResolveContentState(rt.State, rt.Registry)
 
 	if rt.ContentState.ActiveMonster != nil && rt.State.Activity.Kind == "combat" {
 		rt.State.EnemyHP = rt.ContentState.ActiveMonster.HP
