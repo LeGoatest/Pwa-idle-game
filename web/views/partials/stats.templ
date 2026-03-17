@@ -1,6 +1,10 @@
 package partials
 
-import "github.com/LeGoatest/Pwa-idle-game/internal/game"
+import (
+	"fmt"
+
+	"github.com/LeGoatest/Pwa-idle-game/internal/game"
+)
 
 templ Stats(state *game.GameState) {
 	<section id="stats-panel" class="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
@@ -9,22 +13,22 @@ templ Stats(state *game.GameState) {
 		<div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
 			<div class="rounded border border-zinc-800 p-3">
 				<span class="text-zinc-400">Gold:</span>
-				<span class="font-semibold" id="stat-gold">{ templ.Sprintf("%d", state.Gold) }</span>
+				<span class="font-semibold" id="stat-gold">{ fmt.Sprintf("%d", state.Gold) }</span>
 			</div>
 
 			<div class="rounded border border-zinc-800 p-3">
 				<span class="text-zinc-400">Kills:</span>
-				<span class="font-semibold" id="stat-kills">{ templ.Sprintf("%d", state.Kills) }</span>
+				<span class="font-semibold" id="stat-kills">{ fmt.Sprintf("%d", state.Kills) }</span>
 			</div>
 
 			<div class="rounded border border-zinc-800 p-3">
 				<span class="text-zinc-400">Attack:</span>
-				<span class="font-semibold" id="stat-attack">{ templ.Sprintf("%d", state.Attack) }</span>
+				<span class="font-semibold" id="stat-attack">{ fmt.Sprintf("%d", state.Attack) }</span>
 			</div>
 
 			<div class="rounded border border-zinc-800 p-3">
 				<span class="text-zinc-400">Combat Lv:</span>
-				<span class="font-semibold" id="stat-combat-level">{ templ.Sprintf("%d", state.CombatLevel) }</span>
+				<span class="font-semibold" id="stat-combat-level">{ fmt.Sprintf("%d", state.CombatLevel) }</span>
 			</div>
 		</div>
 	</section>
