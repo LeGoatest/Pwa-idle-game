@@ -1,22 +1,24 @@
-name: Build Versioned Dist
+name: Build and Deploy Pages
 
 on:
   workflow_dispatch:
     inputs:
       target_branch:
-        description: "Branch to build and update"
+        description: "Branch to deploy"
         required: true
         default: "migration/tinygo-wasm"
-      commit_message:
-        description: "Commit message"
-        required: true
-        default: "chore: update versioned dist build"
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  build-and-commit:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,15 +28,26 @@ jobs:
           ref: ${{ github.event.inputs.target_branch }}
           fetch-depth: 0
 
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
 
-      - name: Show repo state
-        shell: bash
-        run: |
-          set -euo pipefail
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./dist/latest
+
+  publish:
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4          set -euo pipefail
           git branch --show-current
           pwd
           ls -la
