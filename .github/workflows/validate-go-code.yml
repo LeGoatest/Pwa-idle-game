@@ -47,7 +47,7 @@ jobs:
           tinygo-version: "0.35.0"
 
       - name: Setup templ
-        run: go install github.com/a-h/templ/cmd/templ@latest
+        run: go install github.com/a-h/templ/cmd/templ@v0.3.865
 
       - name: Add Go bin to PATH
         run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
