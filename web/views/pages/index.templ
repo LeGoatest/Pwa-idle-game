@@ -12,18 +12,27 @@ templ Index(state *game.GameState, reg *content.Registry) {
 		<div class="min-h-screen bg-gamebg text-zinc-100">
 			@partials.Topbar(state)
 
-			<main class="mx-auto flex min-h-[calc(100vh-9rem)] w-full max-w-md flex-col px-4 pb-28 pt-4 md:max-w-6xl md:px-6 md:pb-8">
-				<div class="grid gap-4 md:grid-cols-[320px_minmax(0,1fr)]">
-					<div class="space-y-4">
-						@partials.Stats(state)
-						@partials.Activity(state)
-					</div>
+			<main class="mx-auto w-full max-w-md px-4 pb-28 pt-4">
+				<section data-tab-panel="combat" class="space-y-4">
+					@partials.ActivityMobile(state)
+					@partials.MonstersOnly(state, reg)
+				</section>
 
-					<div class="space-y-4">
-						@partials.Selections(state, reg)
-						@partials.Inventory(state, reg)
-					</div>
-				</div>
+				<section data-tab-panel="gather" class="hidden space-y-4">
+					@partials.SkillsOnly(state, reg)
+				</section>
+
+				<section data-tab-panel="inventory" class="hidden space-y-4">
+					@partials.Inventory(state, reg)
+				</section>
+
+				<section data-tab-panel="character" class="hidden space-y-4">
+					@partials.StatsMobile(state)
+				</section>
+
+				<section data-tab-panel="settings" class="hidden space-y-4">
+					@partials.SettingsStub()
+				</section>
 			</main>
 
 			@partials.BottomNav()
