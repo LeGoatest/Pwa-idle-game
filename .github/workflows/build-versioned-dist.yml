@@ -67,13 +67,22 @@ jobs:
         run: npm install
 
       - name: Generate templ files
-        run: templ generate
+        shell: bash
+        run: |
+          set -euo pipefail
+          templ generate
 
       - name: Resolve Go module deps
-        run: go mod tidy
+        shell: bash
+        run: |
+          set -euo pipefail
+          go mod tidy
+          test -f go.sum
 
       - name: Build dist
+        shell: bash
         run: |
+          set -euo pipefail
           export PATH="$(go env GOPATH)/bin:$PATH"
           make clean
           make build
@@ -106,14 +115,17 @@ jobs:
           mkdir -p dist/builds
           mkdir -p "dist/builds/${BUILD_ID}"
 
-          find dist/latest -mindepth 1 -maxdepth 1 ! -name builds ! -name latest -exec rm -rf {} + || true
-          rm -rf dist/latest/*
-          cp -R dist/. dist/latest/
+          find dist/latest -mindepth 1 -maxdepth 1 -exec rm -rf {} + || true
+          find "dist/builds/${BUILD_ID}" -mindepth 1 -maxdepth 1 -exec rm -rf {} + || true
 
-          rm -rf "dist/builds/${BUILD_ID}"
-          mkdir -p "dist/builds/${BUILD_ID}"
-
-          find dist -mindepth 1 -maxdepth 1 ! -name latest ! -name builds -exec cp -R {} "dist/builds/${BUILD_ID}/" \;
+          for entry in dist/*; do
+            name="$(basename "$entry")"
+            if [ "$name" = "latest" ] || [ "$name" = "builds" ]; then
+              continue
+            fi
+            cp -R "$entry" dist/latest/
+            cp -R "$entry" "dist/builds/${BUILD_ID}/"
+          done
 
           cat > "dist/builds/${BUILD_ID}/build-info.json" <<EOF
           {
