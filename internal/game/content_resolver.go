@@ -4,6 +4,7 @@ import "github.com/LeGoatest/Pwa-idle-game/internal/content"
 
 func ResolveContentState(state *GameState, reg *content.Registry) ContentState {
 	var out ContentState
+	out.Registry = reg
 
 	if state == nil || reg == nil {
 		return out
