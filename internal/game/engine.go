@@ -1,7 +1,7 @@
 package game
 
 func Tick(state *GameState, contentState ContentState, deltaMS int64, nowMS int64) bool {
-	if state == nil {
+	if state == nil || deltaMS <= 0 {
 		return false
 	}
 
@@ -17,4 +17,18 @@ func Tick(state *GameState, contentState ContentState, deltaMS int64, nowMS int6
 	default:
 		return false
 	}
+}
+
+func ApplyOfflineProgress(state *GameState, contentState ContentState, elapsedMS int64, nowMS int64) bool {
+	if state == nil {
+		return false
+	}
+
+	elapsedMS = ClampOffline(elapsedMS)
+	if elapsedMS <= 0 {
+		state.UpdatedAt = nowMS
+		return false
+	}
+
+	return Tick(state, contentState, elapsedMS, nowMS)
 }
