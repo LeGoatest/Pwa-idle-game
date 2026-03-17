@@ -27,7 +27,7 @@ func LoadRegistry(basePath string) (*Registry, error) {
 		return nil, err
 	}
 
-	shopIndex := ShopIndex{Items: []string{}}
+	shopIndex := ShopIndex{Items: []ShopListing{}}
 	shopIndexPath := filepath.Join(basePath, "shop_index.json")
 	if fileExists(shopIndexPath) {
 		loadedShopIndex, err := LoadJSON[ShopIndex](shopIndexPath)
@@ -74,35 +74,18 @@ func LoadRegistry(basePath string) (*Registry, error) {
 		return nil, err
 	}
 
-	var shopItems []ShopItem
-	if len(shopIndex.Items) > 0 {
-		shopItems, err = loadByIDs[ShopItem](filepath.Join(basePath, "shop"), shopIndex.Items)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	dropTables, err := LoadDropTables(basePath)
-	if err != nil {
-		return nil, err
-	}
-
 	reg := &Registry{
-		Items:          IndexByID(items),
-		ItemsList:      items,
-		Skills:         IndexByID(skills),
-		SkillsList:     skills,
-		Zones:          IndexByID(zones),
-		ZonesList:      zones,
-		Monsters:       IndexByID(monsters),
-		MonstersList:   monsters,
-		ShopItems:      IndexByID(shopItems),
-		ShopItemsList:  shopItems,
-		DropTables:     IndexByID(dropTables),
-		DropTablesList: dropTables,
-		SkillsIndex:    skillsIndex,
-		ZonesIndex:     zonesIndex,
-		ShopIndex:      shopIndex,
+		Items:        IndexByID(items),
+		ItemsList:    items,
+		Skills:       IndexByID(skills),
+		SkillsList:   skills,
+		Zones:        IndexByID(zones),
+		ZonesList:    zones,
+		Monsters:     IndexByID(monsters),
+		MonstersList: monsters,
+		SkillsIndex:  skillsIndex,
+		ZonesIndex:   zonesIndex,
+		ShopIndex:    shopIndex,
 	}
 
 	if err := ValidateRegistry(reg); err != nil {
