@@ -49,9 +49,6 @@ func parseRegistry(input string) (*content.Registry, error) {
 	if reg.Monsters == nil {
 		reg.Monsters = map[string]content.Monster{}
 	}
-	if reg.ShopItems == nil {
-		reg.ShopItems = map[string]content.ShopItem{}
-	}
 
 	return &reg, nil
 }
