@@ -1,3 +1,9 @@
 node_modules/
 assets/css/style.css
 build.log
+dist/*
+!dist/.keep
+!dist/latest/
+!dist/latest/**
+!dist/builds/
+!dist/builds/**
