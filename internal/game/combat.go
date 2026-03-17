@@ -56,12 +56,6 @@ func ApplyCombatRewards(state *GameState, reg *content.Registry, monster *conten
 		}
 	}
 
-	if monster.DropTable != "" && reg != nil {
-		if RollDropTable(state, reg, monster.DropTable) {
-			changed = true
-		}
-	}
-
 	xp := monster.XP
 	if xp <= 0 {
 		xp = 5
