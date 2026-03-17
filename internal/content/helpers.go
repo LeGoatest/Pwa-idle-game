@@ -20,14 +20,13 @@ func GetSkill(reg *Registry, id string) (Skill, bool) {
 	return skill, ok
 }
 
-func GetShopItem(reg *Registry, id string) (ShopItem, bool) {
-	item, ok := reg.ShopItems[id]
-	return item, ok
-}
-
-func GetDropTable(reg *Registry, id string) (DropTable, bool) {
-	table, ok := reg.DropTables[id]
-	return table, ok
+func GetShopListing(reg *Registry, id string) (ShopListing, bool) {
+	for _, listing := range reg.ShopIndex.Items {
+		if listing.ID == id {
+			return listing, true
+		}
+	}
+	return ShopListing{}, false
 }
 
 func GetItemsByTag(reg *Registry, tag string) []Item {
