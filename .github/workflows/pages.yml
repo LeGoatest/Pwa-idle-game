@@ -2,9 +2,11 @@ name: Build and Deploy Pages
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - migration/tinygo-wasm
+    inputs:
+      target_branch:
+        description: "Branch to build and deploy"
+        required: true
+        default: "migration/tinygo-wasm"
 
 permissions:
   contents: read
@@ -20,8 +22,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout target branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target_branch }}
+          fetch-depth: 0
 
       - name: Setup Go
         uses: actions/setup-go@v5
