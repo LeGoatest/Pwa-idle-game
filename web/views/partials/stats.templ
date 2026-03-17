@@ -32,7 +32,7 @@ templ Stats(state *game.GameState) {
 			<div class="stat-ribbon">
 				<span class="icon-[mdi--heart] icon-sm text-rose-400"></span>
 				<span class="text-zinc-400">HP</span>
-				<span class="ml-auto font-semibold">{ fmt.Sprintf("%d / %d", state.HP, state.MaxHP) }</span>
+				<span class="ml-auto font-semibold">{ fmt.Sprintf("%d", state.HP) }</span>
 			</div>
 
 			<div class="stat-ribbon">
