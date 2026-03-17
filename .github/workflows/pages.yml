@@ -28,6 +28,17 @@ jobs:
           ref: ${{ github.event.inputs.target_branch }}
           fetch-depth: 0
 
+      - name: Show repo state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git branch --show-current
+          pwd
+          ls -la
+          test -f go.mod
+          test -f Makefile
+          test -f package.json
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -53,13 +64,22 @@ jobs:
         run: npm install
 
       - name: Generate templ files
-        run: templ generate
+        shell: bash
+        run: |
+          set -euo pipefail
+          templ generate
 
       - name: Resolve Go module deps
-        run: go mod tidy
+        shell: bash
+        run: |
+          set -euo pipefail
+          go mod tidy
+          test -f go.sum
 
       - name: Build dist
+        shell: bash
         run: |
+          set -euo pipefail
           export PATH="$(go env GOPATH)/bin:$PATH"
           make build
 
