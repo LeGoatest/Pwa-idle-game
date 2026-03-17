@@ -31,6 +31,7 @@ jobs:
           ls -la
           test -f go.mod
           test -f Makefile
+          test -f package.json
           test -d internal/game
           test -d internal/content
           test -d frontend/wasm
@@ -55,7 +56,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: "npm"
 
       - name: Install npm deps
         run: npm install
