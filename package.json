@@ -7,6 +7,8 @@
     "watch:css": "npx @tailwindcss/cli -i ./input.css -o ./dist/static/css/app.css --watch"
   },
   "devDependencies": {
+    "@iconify-json/game-icons": "^1.2.6",
+    "@iconify-json/mdi": "^1.2.3",
     "@iconify/tailwind4": "^1.0.5",
     "@tailwindcss/cli": "^4.2.1",
     "tailwindcss": "^4.2.1"
