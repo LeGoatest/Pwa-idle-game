@@ -7,33 +7,37 @@ import (
 )
 
 templ Selections(state *game.GameState, reg *content.Registry) {
-	<aside id="selections-panel" class="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
-		<h2 class="mb-3 text-lg font-semibold">Selections</h2>
-
-		<div class="mb-4">
-			<div class="mb-2 text-sm font-medium text-zinc-300">Zones</div>
-			<div id="zones-list" class="space-y-2">
+	<section id="selections-panel" class="space-y-4">
+		<div class="card">
+			<div class="mb-3 flex items-center justify-between">
+				<h2>Zones</h2>
+				<span class="text-xs uppercase tracking-[0.25em] text-zinc-500">Travel</span>
+			</div>
+			<div class="space-y-2">
 				for _, zone := range reg.ZonesIndex.Zones {
 					@components.ZoneButton(zone, state.UI.CurrentZoneID == zone.ID)
 				}
 			</div>
 		</div>
 
-		<div class="mb-4">
-			<div class="mb-2 text-sm font-medium text-zinc-300">Monsters</div>
-			<div id="monsters-list" class="space-y-2">
+		<div class="card">
+			<div class="mb-3 flex items-center justify-between">
+				<h2>Monsters</h2>
+				<span class="text-xs uppercase tracking-[0.25em] text-zinc-500">Combat</span>
+			</div>
+			<div class="space-y-2">
 				for _, monster := range monstersForCurrentZone(state, reg) {
 					@components.MonsterButton(monster, state.UI.CurrentMonsterID == monster.ID)
-				}
-				if len(monstersForCurrentZone(state, reg)) == 0 {
-					<div class="text-sm text-zinc-500">No monsters available.</div>
 				}
 			</div>
 		</div>
 
-		<div>
-			<div class="mb-2 text-sm font-medium text-zinc-300">Skills / Nodes</div>
-			<div id="skills-list" class="space-y-3">
+		<div class="card">
+			<div class="mb-3 flex items-center justify-between">
+				<h2>Skills</h2>
+				<span class="text-xs uppercase tracking-[0.25em] text-zinc-500">Gather</span>
+			</div>
+			<div class="space-y-3">
 				for _, skillID := range reg.SkillsIndex.Skills {
 					if skill, ok := reg.Skills[skillID]; ok {
 						@components.SkillBlock(skill, state.UI.CurrentSkillID == skill.ID) {
@@ -45,7 +49,7 @@ templ Selections(state *game.GameState, reg *content.Registry) {
 				}
 			</div>
 		</div>
-	</aside>
+	</section>
 }
 
 func monstersForCurrentZone(state *game.GameState, reg *content.Registry) []content.Monster {
