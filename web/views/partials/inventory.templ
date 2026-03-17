@@ -1,6 +1,7 @@
 package partials
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/LeGoatest/Pwa-idle-game/internal/content"
@@ -15,7 +16,7 @@ templ Inventory(state *game.GameState, reg *content.Registry) {
 			for _, pair := range sortedInventory(state.Inventory) {
 				<div class="rounded border border-zinc-800 bg-zinc-950 p-3">
 					<div class="font-medium">{ pair.Key }</div>
-					<div class="text-sm text-zinc-400">x{ templ.Sprintf("%d", pair.Value) }</div>
+					<div class="text-sm text-zinc-400">x{ fmt.Sprintf("%d", pair.Value) }</div>
 				</div>
 			}
 
