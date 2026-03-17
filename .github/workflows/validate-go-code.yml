@@ -1,10 +1,12 @@
-name: Validate Go Code
+name: Validate Go migration branch
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - migration/tinygo-wasm
+    inputs:
+      target_branch:
+        description: "Branch to validate"
+        required: true
+        default: "migration/tinygo-wasm"
 
 permissions:
   contents: read
@@ -14,10 +16,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout selected ref
+      - name: Checkout target branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref_name }}
+          ref: ${{ github.event.inputs.target_branch }}
+          fetch-depth: 0
+
+      - name: Show repo state
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "branch=$(git branch --show-current)"
+          pwd
+          ls -la
+          test -f go.mod
+          test -f Makefile
+          test -d internal/game
+          test -d internal/content
+          test -d frontend/wasm
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -35,23 +51,59 @@ jobs:
       - name: Add Go bin to PATH
         run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install npm deps
+        run: npm install
+
       - name: Generate templ files
-        run: templ generate
+        shell: bash
+        run: |
+          set -euo pipefail
+          templ generate
 
       - name: Validate content
-        run: go run ./cmd/content-validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./cmd/content-validate
+
+      - name: Build internal/content
+        shell: bash
+        run: |
+          set -euo pipefail
+          go build ./internal/content
+
+      - name: Build internal/game
+        shell: bash
+        run: |
+          set -euo pipefail
+          go build ./internal/game
 
       - name: Build buildsite
-        run: go build ./cmd/buildsite
+        shell: bash
+        run: |
+          set -euo pipefail
+          go build ./cmd/buildsite
 
-      - name: Build content package
-        run: go build ./internal/content
-
-      - name: Build game package
-        run: go build ./internal/game
+      - name: Build content builder
+        shell: bash
+        run: |
+          set -euo pipefail
+          go build ./cmd/buildcontent
 
       - name: Build wasm
-        run: tinygo build -target wasm -opt=z -no-debug -o /tmp/app.wasm ./frontend/wasm
+        shell: bash
+        run: |
+          set -euo pipefail
+          tinygo build -target wasm -opt=z -no-debug -o /tmp/app.wasm ./frontend/wasm
 
       - name: Run simulate
-        run: go run ./cmd/simulate
+        shell: bash
+        run: |
+          set -euo pipefail
+          go run ./cmd/simulate
