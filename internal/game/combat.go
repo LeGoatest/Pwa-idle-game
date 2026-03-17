@@ -8,6 +8,7 @@ import (
 )
 
 type ContentState struct {
+	Registry      *content.Registry
 	ActiveMonster *content.Monster
 	ActiveNode    *content.SkillNode
 	ActiveSkill   *content.Skill
@@ -18,6 +19,16 @@ func rollInt(min, max int) int {
 		return min
 	}
 	return rand.Intn(max-min+1) + min
+}
+
+func rollChance(chance float64) bool {
+	if chance <= 0 {
+		return false
+	}
+	if chance >= 1 {
+		return true
+	}
+	return rand.Float64() < chance
 }
 
 func ProcessCombat(state *GameState, contentState ContentState, deltaMS int64, nowMS int64) bool {
@@ -45,32 +56,11 @@ func ProcessCombat(state *GameState, contentState ContentState, deltaMS int64, n
 		if state.EnemyHP <= 0 {
 			state.Kills++
 
-			if monster.Loot != nil && monster.Loot.Gold != nil {
-				state.Gold += rollInt(monster.Loot.Gold.Min, monster.Loot.Gold.Max)
+			if ApplyCombatRewards(state, contentState.Registry, monster) {
+				changed = true
 			}
 
-			if monster.Loot != nil {
-				for _, drop := range monster.Loot.Drops {
-					if rand.Float64() < drop.Chance {
-						amount := rollInt(maxInt(drop.Min, 1), maxInt(drop.Max, 1))
-						AddItem(state, drop.Item, amount)
-					}
-				}
-			}
-
-			xp := monster.XP
-			if xp <= 0 {
-				xp = 5
-			}
-			GainXP(state, "combat", float64(xp))
-
-			if monster.HP > 0 {
-				state.EnemyHP = monster.HP
-				state.EnemyMaxHP = monster.HP
-			} else {
-				state.EnemyHP = 12
-				state.EnemyMaxHP = 12
-			}
+			ResetEnemyFromMonster(state, monster)
 		}
 
 		changed = true
