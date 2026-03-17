@@ -7,28 +7,44 @@ import (
 )
 
 templ Stats(state *game.GameState) {
-	<section id="stats-panel" class="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
-		<h2 class="mb-3 text-lg font-semibold">Stats</h2>
+	<section id="stats-panel" class="card hidden md:block">
+		<div class="mb-4 flex items-center justify-between">
+			<h2>Stats</h2>
+			<div class="resource-pill">
+				<span class="icon-[mdi--gold] icon-sm text-amber-400"></span>
+				<span>{ fmt.Sprintf("%d", state.Gold) }</span>
+			</div>
+		</div>
 
-		<div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-			<div class="rounded border border-zinc-800 p-3">
-				<span class="text-zinc-400">Gold:</span>
-				<span class="font-semibold" id="stat-gold">{ fmt.Sprintf("%d", state.Gold) }</span>
+		<div class="space-y-3">
+			<div class="stat-ribbon">
+				<span class="icon-[mdi--sword] icon-sm text-cyan-400"></span>
+				<span class="text-zinc-400">Attack</span>
+				<span class="ml-auto font-semibold">{ fmt.Sprintf("%d", state.Attack) }</span>
 			</div>
 
-			<div class="rounded border border-zinc-800 p-3">
-				<span class="text-zinc-400">Kills:</span>
-				<span class="font-semibold" id="stat-kills">{ fmt.Sprintf("%d", state.Kills) }</span>
+			<div class="stat-ribbon">
+				<span class="icon-[mdi--shield] icon-sm text-cyan-400"></span>
+				<span class="text-zinc-400">Defense</span>
+				<span class="ml-auto font-semibold">{ fmt.Sprintf("%d", state.Defense) }</span>
 			</div>
 
-			<div class="rounded border border-zinc-800 p-3">
-				<span class="text-zinc-400">Attack:</span>
-				<span class="font-semibold" id="stat-attack">{ fmt.Sprintf("%d", state.Attack) }</span>
+			<div class="stat-ribbon">
+				<span class="icon-[mdi--heart] icon-sm text-rose-400"></span>
+				<span class="text-zinc-400">HP</span>
+				<span class="ml-auto font-semibold">{ fmt.Sprintf("%d / %d", state.HP, state.MaxHP) }</span>
 			</div>
 
-			<div class="rounded border border-zinc-800 p-3">
-				<span class="text-zinc-400">Combat Lv:</span>
-				<span class="font-semibold" id="stat-combat-level">{ fmt.Sprintf("%d", state.CombatLevel) }</span>
+			<div class="stat-ribbon">
+				<span class="icon-[mdi--sword-cross] icon-sm text-cyan-400"></span>
+				<span class="text-zinc-400">Combat Lv</span>
+				<span class="ml-auto font-semibold">{ fmt.Sprintf("%d", state.CombatLevel) }</span>
+			</div>
+
+			<div class="stat-ribbon">
+				<span class="icon-[mdi--axe] icon-sm text-cyan-400"></span>
+				<span class="text-zinc-400">Woodcutting Lv</span>
+				<span class="ml-auto font-semibold">{ fmt.Sprintf("%d", state.WoodLevel) }</span>
 			</div>
 		</div>
 	</section>
