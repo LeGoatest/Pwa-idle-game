@@ -4,25 +4,30 @@ import "github.com/LeGoatest/Pwa-idle-game/internal/content"
 
 templ SkillBlock(skill content.Skill, active bool) {
 	<div class={ skillBlockClass(active) }>
-		<button
-			class="w-full text-left"
-			data-skill-id={ skill.ID }
-		>
-			<div class="font-medium">{ skill.Name }</div>
-			<div class="text-xs text-zinc-400">{ skill.ID }</div>
-		</button>
-
-		if active {
-			<div class="mt-2 space-y-2">
-				{ children... }
+		<div class="mb-3 flex items-center justify-between">
+			<div>
+				<div class="font-semibold">{ skill.Name }</div>
+				<div class="mt-1 text-xs text-zinc-400">Gathering skill</div>
 			</div>
-		}
+			<button
+				type="button"
+				class="btn"
+				data-action="select_skill"
+				data-id={ skill.ID }
+			>
+				Select
+			</button>
+		</div>
+
+		<div class="space-y-2">
+			{ children... }
+		</div>
 	</div>
 }
 
 func skillBlockClass(active bool) string {
 	if active {
-		return "rounded border border-sky-600 bg-sky-950 p-3"
+		return "rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-3"
 	}
-	return "rounded border border-zinc-800 bg-zinc-950 p-3"
+	return "rounded-2xl border border-zinc-800 bg-zinc-900/40 p-3"
 }
