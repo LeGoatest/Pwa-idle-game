@@ -18,16 +18,23 @@ templ Index(state *game.GameState, reg *content.Registry) {
 					@partials.Selections(state, reg)
 				</section>
 
-				<section data-tab-panel="inventory" class="hidden space-y-4">
-					@partials.Inventory(state, reg)
+				<section data-tab-panel="gather" class="hidden space-y-4">
+					@partials.Selections(state, reg)
 				</section>
 
 				<section data-tab-panel="character" class="hidden space-y-4">
 					@partials.Stats(state)
 				</section>
 
+				<section data-tab-panel="inventory" class="hidden space-y-4">
+					@partials.Inventory(state, reg)
+				</section>
+
 				<section data-tab-panel="settings" class="hidden space-y-4">
-					@partials.Stats(state)
+					<div class="card">
+						<h2 class="mb-3">Settings</h2>
+						<div class="text-sm text-zinc-400">Settings panel placeholder.</div>
+					</div>
 				</section>
 			</main>
 
