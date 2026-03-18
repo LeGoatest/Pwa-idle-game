@@ -1,3 +1,5 @@
+import "./ui-actions.js";
+import "./ui-render.js";
 import {
   GAME_STATE_KEY,
   META_KEY,

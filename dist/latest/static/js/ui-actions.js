@@ -35,45 +35,11 @@ document.addEventListener("click", async (event) => {
     return;
   }
 
-  const zoneButton = event.target.closest("[data-zone-id]");
-  if (zoneButton) {
-    await dispatchAction("open_zone", zoneButton.dataset.zoneId || "");
-    return;
-  }
-
-  const monsterButton = event.target.closest("[data-monster-id]");
-  if (monsterButton) {
-    const id = monsterButton.dataset.monsterId || "";
-    await dispatchAction("select_monster", id);
-    await dispatchAction("start_combat", id);
-    setMobileTab("combat");
-    return;
-  }
-
-  const skillButton = event.target.closest("[data-skill-id]:not([data-node-id])");
-  if (skillButton) {
-    await dispatchAction("select_skill", skillButton.dataset.skillId || "");
-    return;
-  }
-
-  const nodeButton = event.target.closest("[data-node-id]");
-  if (nodeButton) {
-    const skillId = nodeButton.dataset.skillId || "";
-    const nodeId = nodeButton.dataset.nodeId || "";
-
-    if (skillId) {
-      await dispatchAction("select_skill", skillId);
-    }
-
-    await dispatchAction("start_node", nodeId);
-    setMobileTab("gather");
-    return;
-  }
-
   const actionButton = event.target.closest("[data-action]");
   if (!actionButton) return;
 
-  const action = actionButton.dataset.action;
+  const action = actionButton.dataset.action || "";
+  const id = actionButton.dataset.id || "";
 
   if (action === "start_current_combat") {
     const monsterId = window.GameAppRuntime?.state?.ui?.currentMonsterId || "";
@@ -83,13 +49,21 @@ document.addEventListener("click", async (event) => {
     return;
   }
 
-  if (action === "stop_activity") {
-    await dispatchAction("stop_activity");
+  if (action === "save_now") {
+    await window.GameApp?.saveNow?.();
     return;
   }
 
-  if (action === "save_now") {
-    await window.GameApp?.saveNow?.();
+  if (action) {
+    await dispatchAction(action, id);
+
+    if (action === "start_combat" || action === "select_monster") {
+      setMobileTab("combat");
+    } else if (action === "start_node" || action === "select_skill" || action === "open_zone") {
+      setMobileTab("combat");
+    } else if (action === "buy_item" || action === "equip_item" || action === "use_item") {
+      setMobileTab("inventory");
+    }
   }
 });
 
