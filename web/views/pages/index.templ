@@ -14,12 +14,8 @@ templ Index(state *game.GameState, reg *content.Registry) {
 
 			<main class="mx-auto w-full max-w-md px-4 pb-28 pt-4">
 				<section data-tab-panel="combat" class="space-y-4">
-					@partials.ActivityMobile(state)
-					@partials.MonstersOnly(state, reg)
-				</section>
-
-				<section data-tab-panel="gather" class="hidden space-y-4">
-					@partials.SkillsOnly(state, reg)
+					@partials.Activity(state)
+					@partials.Selections(state, reg)
 				</section>
 
 				<section data-tab-panel="inventory" class="hidden space-y-4">
@@ -27,11 +23,11 @@ templ Index(state *game.GameState, reg *content.Registry) {
 				</section>
 
 				<section data-tab-panel="character" class="hidden space-y-4">
-					@partials.StatsMobile(state)
+					@partials.Stats(state)
 				</section>
 
 				<section data-tab-panel="settings" class="hidden space-y-4">
-					@partials.SettingsStub()
+					@partials.Stats(state)
 				</section>
 			</main>
 
