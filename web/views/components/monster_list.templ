@@ -1,0 +1,37 @@
+package components
+
+import (
+	"github.com/LeGoatest/Pwa-idle-game/internal/content"
+	"github.com/LeGoatest/Pwa-idle-game/internal/game"
+)
+
+templ MonsterList(state *game.GameState, reg *content.Registry) {
+	<div class="card">
+		<div class="mb-3 flex items-center justify-between">
+			<h2>Monsters</h2>
+			<span class="text-xs uppercase tracking-[0.25em] text-zinc-500">Combat</span>
+		</div>
+		<div class="space-y-2">
+			for _, monster := range monstersForCurrentZone(state, reg) {
+				@MonsterButton(monster, state.UI.CurrentMonsterID == monster.ID)
+			}
+		</div>
+	</div>
+}
+
+func monstersForCurrentZone(state *game.GameState, reg *content.Registry) []content.Monster {
+	out := []content.Monster{}
+
+	zone, ok := reg.Zones[state.UI.CurrentZoneID]
+	if !ok {
+		return out
+	}
+
+	for _, id := range zone.Monsters {
+		if monster, ok := reg.Monsters[id]; ok {
+			out = append(out, monster)
+		}
+	}
+
+	return out
+}
