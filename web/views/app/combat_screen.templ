@@ -5,14 +5,13 @@ import (
 
 	"github.com/LeGoatest/Pwa-idle-game/internal/content"
 	"github.com/LeGoatest/Pwa-idle-game/internal/game"
-	"github.com/LeGoatest/Pwa-idle-game/web/views/components"
 )
 
 templ CombatScreen(state *game.GameState, reg *content.Registry) {
 	<div class="space-y-4 px-4 pt-4 pb-6">
-		<section class="grid grid-cols-[1fr_auto] items-end gap-3">
-			<div class="rounded-[20px] bg-[#4a4a4a] px-4 pt-4 pb-3">
-				<div class="flex min-h-[220px] items-center justify-center rounded-[16px] bg-black/10">
+		<section class="w-full">
+			<div class="rounded-[24px] bg-[#4a4a4a] px-4 pt-4 pb-3">
+				<div class="flex min-h-[220px] items-center justify-center rounded-[18px] bg-black/10">
 					if currentEnemyImage(state, reg) != "" {
 						<img
 							src={ currentEnemyImage(state, reg) }
@@ -30,13 +29,6 @@ templ CombatScreen(state *game.GameState, reg *content.Registry) {
 					{ currentEnemyName(state, reg) }
 				</div>
 			</div>
-
-			<div class="mb-2 rounded-[18px] bg-[#4a4a4a] px-4 py-3">
-				<div class="flex items-center gap-2">
-					<span class="icon-[mdi--gold] icon-md text-amber-400"></span>
-					<span class="text-[26px] leading-none font-light">{ fmt.Sprintf("%d", state.Gold) }</span>
-				</div>
-			</div>
 		</section>
 
 		<section class="rounded-[18px] bg-[#4a4a4a] px-4 py-4">
@@ -48,7 +40,7 @@ templ CombatScreen(state *game.GameState, reg *content.Registry) {
 
 				<div class="flex items-center justify-center gap-2">
 					<span class="icon-[mdi--arm-flex] icon-md text-zinc-200"></span>
-					<span class="text-[24px] font-light leading-none">{ fmt.Sprintf("%d", safeCombatLevel(state)) }</span>
+					<span class="text-[24px] font-light leading-none">{ fmt.Sprintf("%d", safeAttack(state)) }</span>
 				</div>
 
 				<div class="flex items-center justify-center gap-2">
@@ -72,8 +64,8 @@ templ CombatScreen(state *game.GameState, reg *content.Registry) {
 						style={ progressWidth(state) }
 					></div>
 				</div>
-				<div id="activity-progress" class="text-[20px] font-light leading-none">
-					{ fmt.Sprintf("%.0f%%", cappedProgress(state)) }
+				<div class="text-[20px] font-light leading-none">
+					{ actionSpeedLabel(state, reg) }
 				</div>
 			</div>
 
@@ -91,11 +83,12 @@ templ CombatScreen(state *game.GameState, reg *content.Registry) {
 			</div>
 		</section>
 
-		<section class="grid grid-cols-[120px_68px_1fr] gap-3 items-start">
+		<section class="grid grid-cols-[120px_108px_1fr] gap-4 items-start">
 			<div class="space-y-2">
 				<button class="flex h-[102px] w-full items-center justify-center rounded-[20px] border-[3px] border-[#ff9f1a] bg-[#4a4a4a] shadow-[0_0_16px_rgba(255,159,26,0.35)]">
 					<span class="icon-[mdi--sword] text-white w-[72px] h-[72px]"></span>
 				</button>
+
 				<div class="text-center text-[18px] leading-tight font-light">
 					Weapon
 				</div>
@@ -114,34 +107,47 @@ templ CombatScreen(state *game.GameState, reg *content.Registry) {
 						data-action="stop_activity"
 						aria-label="Stop activity"
 					>
-						<span class="icon-[mdi--arrow-left-right] icon-lg text-white"></span>
+						<span class="icon-[mdi--pause] icon-lg text-white"></span>
 					</button>
 				</div>
 			</div>
 
 			<div class="space-y-3 pt-4">
-				<div class="flex h-[68px] w-[68px] items-center justify-center rounded-[16px] bg-[#4a4a4a]">
-					<span class="icon-[mdi--shield] icon-md text-zinc-200"></span>
-				</div>
+				<button
+					class="flex h-[68px] w-[108px] items-center justify-center rounded-[16px] bg-[#4a4a4a]"
+					data-action="cycle_combat_style"
+					aria-label="Cycle combat training style"
+				>
+					<div class="flex items-center gap-2">
+						<span class={ trainingIconClass(state) }></span>
+						<span class="text-[14px] font-medium leading-none">{ trainingModeLabel(state) }</span>
+					</div>
+				</button>
 
-				<div class="flex h-[68px] w-[68px] items-center justify-center rounded-[16px] bg-[#4a4a4a]">
-					<span class="icon-[mdi--cached] icon-md text-zinc-200"></span>
+				<div class="flex h-[68px] w-[108px] items-center justify-center rounded-[16px] bg-[#4a4a4a]">
+					<span class="icon-[mdi--shield] icon-md text-zinc-200"></span>
 				</div>
 			</div>
 
 			<div class="space-y-3 pt-1">
 				<div>
-					<div class="text-[18px] font-light leading-none">
-						Combat Lv. { fmt.Sprintf("%d", safeCombatLevel(state)) }
-					</div>
+					<button
+						class="block w-full text-left"
+						data-action="cycle_combat_style"
+						aria-label="Cycle combat training style"
+					>
+						<div class="text-[18px] font-light leading-none">
+							{ trainingModeLabel(state) } Lv. { fmt.Sprintf("%d", displayedTrainingLevel(state)) }
+						</div>
 
-					<div class="mt-3 h-6 overflow-hidden rounded-full bg-[#242424]">
-						<div class="h-full rounded-full bg-[#44afe0]" style={ xpWidth(state) }></div>
-					</div>
+						<div class="mt-3 h-6 overflow-hidden rounded-full bg-[#242424]">
+							<div class="h-full rounded-full bg-[#44afe0]" style={ displayedTrainingXPWidth(state) }></div>
+						</div>
 
-					<div class="mt-2 text-center text-[18px] font-light leading-none">
-						{ combatStatusLabel(state) }
-					</div>
+						<div class="mt-2 text-center text-[18px] font-light leading-none">
+							{ displayedTrainingXPLabel(state) }
+						</div>
+					</button>
 				</div>
 
 				<div class="grid grid-cols-2 gap-3">
@@ -170,9 +176,6 @@ templ CombatScreen(state *game.GameState, reg *content.Registry) {
 				</div>
 			</div>
 		</section>
-
-		@components.ZoneList(state, reg)
-		@components.MonsterList(state, reg)
 	</div>
 }
 
@@ -224,6 +227,16 @@ func currentEnemyImage(state *game.GameState, reg *content.Registry) string {
 	return ""
 }
 
+func actionSpeedLabel(state *game.GameState, reg *content.Registry) string {
+	if state == nil || reg == nil {
+		return "--"
+	}
+	if monster, ok := reg.Monsters[state.UI.CurrentMonsterID]; ok && monster.DurationMS > 0 {
+		return fmt.Sprintf("%.2fs", float64(monster.DurationMS)/1000.0)
+	}
+	return "--"
+}
+
 func activityKindLabel(state *game.GameState) string {
 	if state == nil || state.Activity.Kind == "" || state.Activity.Kind == "none" {
 		return "+0"
@@ -231,17 +244,50 @@ func activityKindLabel(state *game.GameState) string {
 	return state.Activity.Kind
 }
 
-func combatStatusLabel(state *game.GameState) string {
-	if state == nil || state.Activity.Kind == "" || state.Activity.Kind == "none" {
-		return "Idle"
+func trainingModeLabel(state *game.GameState) string {
+	if state == nil {
+		return "ATK"
 	}
-	return "In Combat"
+	switch state.UI.CombatMode {
+	case "strength":
+		return "STR"
+	case "defense":
+		return "DEF"
+	case "attack":
+		return "ATK"
+	default:
+		return "ATK"
+	}
 }
 
-func xpWidth(state *game.GameState) string {
+func trainingIconClass(state *game.GameState) string {
+	if state == nil {
+		return "icon-[mdi--sword] icon-md text-cyan-400"
+	}
+	switch state.UI.CombatMode {
+	case "strength":
+		return "icon-[mdi--arm-flex] icon-md text-zinc-100"
+	case "defense":
+		return "icon-[mdi--shield] icon-md text-emerald-400"
+	case "attack":
+		return "icon-[mdi--sword] icon-md text-cyan-400"
+	default:
+		return "icon-[mdi--sword] icon-md text-cyan-400"
+	}
+}
+
+func displayedTrainingLevel(state *game.GameState) int {
+	if state == nil || state.CombatLevel <= 0 {
+		return 1
+	}
+	return state.CombatLevel
+}
+
+func displayedTrainingXPWidth(state *game.GameState) string {
 	if state == nil {
 		return "width: 0%;"
 	}
+	// View-safe placeholder until separate STR/ATK/DEF XP tracks exist.
 	pct := float64((state.CombatLevel % 10) * 10)
 	if pct < 10 {
 		pct = 18
@@ -250,6 +296,19 @@ func xpWidth(state *game.GameState) string {
 		pct = 100
 	}
 	return fmt.Sprintf("width: %.2f%%;", pct)
+}
+
+func displayedTrainingXPLabel(state *game.GameState) string {
+	if state == nil {
+		return "0 / 0"
+	}
+	// View-safe placeholder until separate STR/ATK/DEF XP tracks exist.
+	cur := int(state.CombatXP)
+	next := displayedTrainingLevel(state) * 100
+	if next <= 0 {
+		next = 100
+	}
+	return fmt.Sprintf("%d / %d", cur, next)
 }
 
 func safeAttack(state *game.GameState) int {
@@ -285,14 +344,4 @@ func safeEnemyMaxHP(state *game.GameState) int {
 		return 0
 	}
 	return state.EnemyMaxHP
-}
-
-func safeCombatLevel(state *game.GameState) int {
-	if state == nil {
-		return 1
-	}
-	if state.CombatLevel <= 0 {
-		return 1
-	}
-	return state.CombatLevel
 }
