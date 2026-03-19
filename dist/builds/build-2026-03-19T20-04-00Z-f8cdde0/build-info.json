@@ -1,9 +1,0 @@
-{
-  "buildId": "build-2026-03-19T20-04-00Z-f8cdde0",
-  "timestampUtc": "2026-03-19T20-04-00Z",
-  "commitShaShort": "f8cdde0",
-  "branch": "migration/tinygo-wasm",
-  "workflow": "Build Versioned Dist",
-  "runNumber": "13",
-  "runId": "23314430468"
-}
