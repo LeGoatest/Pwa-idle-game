@@ -1,0 +1,11 @@
+package app
+
+import (
+	"github.com/LeGoatest/Pwa-idle-game/internal/content"
+	"github.com/LeGoatest/Pwa-idle-game/internal/game"
+	"github.com/LeGoatest/Pwa-idle-game/web/views/components"
+)
+
+templ GatherScreen(state *game.GameState, reg *content.Registry) {
+	@components.SkillList(state, reg)
+}
