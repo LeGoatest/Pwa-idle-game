@@ -17,7 +17,7 @@ templ ZoneButton(zone content.ZoneIndexEntry, active bool) {
 				<div class="font-semibold">{ zone.Name }</div>
 				<div class="mt-1 text-xs text-zinc-400">Required Lv { fmt.Sprintf("%d", zone.LevelRequired) }</div>
 			</div>
-			<span class="icon-[mdi--map-marker] icon-md { zoneIconClass(active) }"></span>
+			<span class={ "icon-[mdi--map-marker] icon-md " + zoneIconClass(active) }></span>
 		</div>
 	</button>
 }
