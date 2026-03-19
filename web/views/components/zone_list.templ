@@ -1,0 +1,20 @@
+package components
+
+import (
+	"github.com/LeGoatest/Pwa-idle-game/internal/content"
+	"github.com/LeGoatest/Pwa-idle-game/internal/game"
+)
+
+templ ZoneList(state *game.GameState, reg *content.Registry) {
+	<div class="card">
+		<div class="mb-3 flex items-center justify-between">
+			<h2>Zones</h2>
+			<span class="text-xs uppercase tracking-[0.25em] text-zinc-500">Travel</span>
+		</div>
+		<div class="space-y-2">
+			for _, zone := range reg.ZonesIndex.Zones {
+				@ZoneButton(zone, state.UI.CurrentZoneID == zone.ID)
+			}
+		</div>
+	</div>
+}
