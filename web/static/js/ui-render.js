@@ -17,6 +17,69 @@ function pct(value, max) {
   return `${n.toFixed(2)}%`;
 }
 
+function xpForLevel(level) {
+  return Math.floor(20 * Math.pow(level, 1.4));
+}
+
+function currentCombatMode(state) {
+  const mode = state?.ui?.combatMode || "attack";
+  if (mode === "strength" || mode === "defense" || mode === "attack") return mode;
+  return "attack";
+}
+
+function combatModeLabel(state) {
+  switch (currentCombatMode(state)) {
+    case "strength":
+      return "STR";
+    case "defense":
+      return "DEF";
+    default:
+      return "ATK";
+  }
+}
+
+function combatModeIconClass(state) {
+  switch (currentCombatMode(state)) {
+    case "strength":
+      return "icon-[mdi--arm-flex] icon-sm text-zinc-100";
+    case "defense":
+      return "icon-[mdi--shield] icon-sm text-emerald-400";
+    default:
+      return "icon-[mdi--sword] icon-sm text-cyan-400";
+  }
+}
+
+function combatModeLevel(state) {
+  switch (currentCombatMode(state)) {
+    case "strength":
+      return state.strengthLevel ?? 1;
+    case "defense":
+      return state.defenseLevel ?? 1;
+    default:
+      return state.attackLevel ?? 1;
+  }
+}
+
+function combatModeXP(state) {
+  switch (currentCombatMode(state)) {
+    case "strength":
+      return state.strengthXp ?? 0;
+    case "defense":
+      return state.defenseXp ?? 0;
+    default:
+      return state.attackXp ?? 0;
+  }
+}
+
+function actionSpeedLabel(state, runtime) {
+  const monsterId = state?.ui?.currentMonsterId || "";
+  const reg = runtime?.registry;
+  const monster = reg?.monsters?.[monsterId] || reg?.Monsters?.[monsterId];
+  const duration = monster?.durationMs ?? monster?.DurationMS ?? 0;
+  if (!duration || duration <= 0) return "--";
+  return `${(duration / 1000).toFixed(2)}s`;
+}
+
 function renderInventory(state) {
   const root = byId("inventory-list");
   if (!root) return;
@@ -45,7 +108,37 @@ function renderInventory(state) {
   `).join("");
 }
 
-function renderStateBits(state) {
+function renderCombatTraining(state, runtime) {
+  const smallName = byId("combat-style-name-small");
+  if (smallName) smallName.textContent = combatModeLabel(state);
+
+  const level = byId("combat-style-level");
+  if (level) level.textContent = `${combatModeLabel(state)} Lv. ${combatModeLevel(state)}`;
+
+  const xp = byId("combat-style-xp");
+  if (xp) {
+    const cur = Math.floor(combatModeXP(state));
+    const need = xpForLevel(combatModeLevel(state));
+    xp.textContent = `${cur} / ${need}`;
+  }
+
+  const fill = byId("combat-style-xp-fill");
+  if (fill) {
+    fill.style.width = pct(combatModeXP(state), xpForLevel(combatModeLevel(state)));
+  }
+
+  const icon = byId("combat-style-icon");
+  if (icon) {
+    icon.className = combatModeIconClass(state);
+  }
+
+  const speed = byId("action-speed-label");
+  if (speed) {
+    speed.textContent = actionSpeedLabel(state, runtime);
+  }
+}
+
+function renderStateBits(state, runtime) {
   if (byId("topbar-gold")) byId("topbar-gold").textContent = String(state.gold ?? 0);
   if (byId("stats-gold")) byId("stats-gold").textContent = String(state.gold ?? 0);
   if (byId("stats-attack")) byId("stats-attack").textContent = String(state.attack ?? 0);
@@ -55,7 +148,6 @@ function renderStateBits(state) {
   if (byId("stats-wood-level")) byId("stats-wood-level").textContent = String(state.woodLevel ?? 1);
 
   if (byId("enemy-hp")) byId("enemy-hp").textContent = `${state.enemyHp ?? 0} / ${state.enemyMaxHp ?? 0}`;
-  if (byId("activity-progress")) byId("activity-progress").textContent = String(Math.floor(state.activity?.progress || 0));
 
   const enemyFill = byId("enemy-hp-fill");
   if (enemyFill) enemyFill.style.width = pct(state.enemyHp ?? 0, state.enemyMaxHp ?? 0);
@@ -65,11 +157,13 @@ function renderStateBits(state) {
     const raw = Math.max(0, Math.min(100, state.activity?.progress ?? 0));
     progressFill.style.width = `${raw.toFixed(2)}%`;
   }
+
+  renderCombatTraining(state, runtime);
 }
 
 function render(runtime) {
   if (!runtime?.state) return;
-  renderStateBits(runtime.state);
+  renderStateBits(runtime.state, runtime);
   renderInventory(runtime.state);
 }
 
