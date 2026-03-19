@@ -33,6 +33,14 @@
 }
 
 @layer components {
+  .modal-backdrop {
+    @apply fixed inset-0 z-50 flex items-end justify-center bg-black/60 px-4 pb-4 pt-16 backdrop-blur-sm;
+  }
+  .modal-sheet {
+    @apply w-full max-w-md rounded-[2rem] border border-zinc-800 bg-zinc-950 p-4 shadow-2xl;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+    animation: slideInFromBottom 0.2s ease-out;
+  }
   .pixel-card {
     @apply bg-surface-low rounded-2xl p-4 shadow-lg border border-zinc-800/50 relative overflow-hidden;
     background-image: linear-gradient(to bottom right, rgba(255,255,255,0.02), transparent);
