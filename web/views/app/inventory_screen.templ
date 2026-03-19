@@ -1,0 +1,50 @@
+package app
+
+import (
+	"fmt"
+	"sort"
+
+	"github.com/LeGoatest/Pwa-idle-game/internal/game"
+)
+
+templ InventoryScreen(state *game.GameState) {
+	<section id="inventory-panel" class="card">
+		<div class="mb-4 flex items-center justify-between">
+			<h2>Inventory</h2>
+			<span class="text-xs uppercase tracking-[0.25em] text-zinc-500">Bag</span>
+		</div>
+
+		<div id="inventory-list" class="ui-grid-inventory">
+			for _, pair := range sortedInventory(state.Inventory) {
+				<div class="ui-grid-item-slot active">
+					<div class="text-center">
+						<div class="text-xs font-medium leading-tight">{ pair.Key }</div>
+						<div class="mt-1 text-[11px] text-zinc-400">x{ fmt.Sprintf("%d", pair.Value) }</div>
+					</div>
+				</div>
+			}
+
+			if len(state.Inventory) == 0 {
+				for range []int{0, 1, 2, 3, 4} {
+					<div class="ui-grid-item-slot"></div>
+				}
+			}
+		</div>
+	</section>
+}
+
+type InventoryPair struct {
+	Key   string
+	Value int
+}
+
+func sortedInventory(m map[string]int) []InventoryPair {
+	out := make([]InventoryPair, 0, len(m))
+	for k, v := range m {
+		out = append(out, InventoryPair{Key: k, Value: v})
+	}
+	sort.Slice(out, func(i, j int) bool {
+		return out[i].Key < out[j].Key
+	})
+	return out
+}
