@@ -59,6 +59,14 @@ type GameState struct {
 	MineLevel   int `json:"mineLevel"`
 	CombatLevel int `json:"combatLevel"`
 
+	AttackXP   float64 `json:"attackXp"`
+	StrengthXP float64 `json:"strengthXp"`
+	DefenseXP  float64 `json:"defenseXp"`
+
+	AttackLevel   int `json:"attackLevel"`
+	StrengthLevel int `json:"strengthLevel"`
+	DefenseLevel  int `json:"defenseLevel"`
+
 	EnemyHP    int `json:"enemyHp"`
 	EnemyMaxHP int `json:"enemyMaxHp"`
 
@@ -72,7 +80,7 @@ type GameState struct {
 
 func NewDefaultState(nowMS int64) *GameState {
 	return &GameState{
-		Version: 8,
+		Version: 9,
 
 		Gold:  0,
 		Kills: 0,
@@ -89,6 +97,14 @@ func NewDefaultState(nowMS int64) *GameState {
 		MineLevel:   1,
 		CombatLevel: 1,
 
+		AttackXP:   0,
+		StrengthXP: 0,
+		DefenseXP:  0,
+
+		AttackLevel:   1,
+		StrengthLevel: 1,
+		DefenseLevel:  1,
+
 		EnemyHP:    12,
 		EnemyMaxHP: 12,
 
@@ -101,7 +117,7 @@ func NewDefaultState(nowMS int64) *GameState {
 			CurrentZoneID:    "",
 			CurrentMonsterID: "",
 			CurrentSkillID:   "",
-			CombatMode:       "zone",
+			CombatMode:       "attack",
 			SkillsMode:       "list",
 		},
 
