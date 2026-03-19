@@ -3,8 +3,8 @@ package app
 import (
 	"github.com/LeGoatest/Pwa-idle-game/internal/content"
 	"github.com/LeGoatest/Pwa-idle-game/internal/game"
-	"github.com/LeGoatest/Pwa-idle-game/web/views/layouts"
 	"github.com/LeGoatest/Pwa-idle-game/web/views/components"
+	"github.com/LeGoatest/Pwa-idle-game/web/views/layouts"
 )
 
 templ Root(state *game.GameState, reg *content.Registry) {
@@ -26,7 +26,7 @@ templ Root(state *game.GameState, reg *content.Registry) {
 				</section>
 
 				<section data-tab-panel="inventory" class="hidden space-y-4">
-					@InventoryScreen(state, reg)
+					@InventoryScreen(state)
 				</section>
 			</main>
 
