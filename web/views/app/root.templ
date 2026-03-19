@@ -1,0 +1,37 @@
+package app
+
+import (
+	"github.com/LeGoatest/Pwa-idle-game/internal/content"
+	"github.com/LeGoatest/Pwa-idle-game/internal/game"
+	"github.com/LeGoatest/Pwa-idle-game/web/views/layouts"
+	"github.com/LeGoatest/Pwa-idle-game/web/views/components"
+)
+
+templ Root(state *game.GameState, reg *content.Registry) {
+	@layouts.App("Idle Frontier") {
+		<div class="min-h-screen bg-gamebg text-zinc-100">
+			@components.Topbar(state)
+
+			<main class="mx-auto w-full max-w-md px-4 pb-28 pt-4">
+				<section data-tab-panel="combat" class="space-y-4">
+					@CombatScreen(state, reg)
+				</section>
+
+				<section data-tab-panel="gather" class="hidden space-y-4">
+					@GatherScreen(state, reg)
+				</section>
+
+				<section data-tab-panel="character" class="hidden space-y-4">
+					@CharacterScreen(state)
+				</section>
+
+				<section data-tab-panel="inventory" class="hidden space-y-4">
+					@InventoryScreen(state, reg)
+				</section>
+			</main>
+
+			@SettingsModal()
+			@components.BottomNav()
+		</div>
+	}
+}
