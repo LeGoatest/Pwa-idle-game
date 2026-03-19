@@ -16,6 +16,11 @@ func Dispatch(state *GameState, reg *content.Registry, action Action, nowMS int6
 		StopActivity(state)
 		return nil
 
+	case "cycle_combat_style":
+		state.UI.CombatMode = nextCombatMode(state.UI.CombatMode)
+		syncCombatSummary(state)
+		return nil
+
 	case "open_zone":
 		state.UI.CurrentZoneID = action.ID
 		state.UI.CurrentMonsterID = ""
@@ -110,5 +115,18 @@ func Dispatch(state *GameState, reg *content.Registry, action Action, nowMS int6
 
 	default:
 		return fmt.Errorf("unsupported action type: %s", action.Type)
+	}
+}
+
+func nextCombatMode(mode string) string {
+	switch mode {
+	case "attack":
+		return "strength"
+	case "strength":
+		return "defense"
+	case "defense":
+		return "attack"
+	default:
+		return "attack"
 	}
 }
