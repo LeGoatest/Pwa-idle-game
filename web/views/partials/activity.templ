@@ -7,7 +7,7 @@ import (
 )
 
 templ Activity(state *game.GameState) {
-	<section id="activity-panel" class="card hidden md:block">
+	<section id="activity-panel" class="card">
 		<div class="mb-4 flex items-center justify-between">
 			<h2>Activity</h2>
 			if state.Activity.Kind != "" && state.Activity.Kind != "none" {
@@ -22,20 +22,20 @@ templ Activity(state *game.GameState) {
 			<div class="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
 				<div class="mb-2 flex justify-between text-sm">
 					<span class="text-zinc-400">Enemy HP</span>
-					<span>{ fmt.Sprintf("%d / %d", state.EnemyHP, state.EnemyMaxHP) }</span>
+					<span id="enemy-hp">{ fmt.Sprintf("%d / %d", state.EnemyHP, state.EnemyMaxHP) }</span>
 				</div>
 				<div class="progress-bar-container">
-					<div class="progress-bar-fill" style={ enemyHPWidth(state) }></div>
+					<div id="enemy-hp-fill" class="progress-bar-fill" style={ enemyHPWidth(state) }></div>
 				</div>
 			</div>
 
 			<div class="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
 				<div class="mb-2 flex justify-between text-sm">
 					<span class="text-zinc-400">Progress</span>
-					<span>{ fmt.Sprintf("%.0f", state.Activity.Progress) }</span>
+					<span id="activity-progress">{ fmt.Sprintf("%.0f", state.Activity.Progress) }</span>
 				</div>
 				<div class="progress-bar-container">
-					<div class="progress-bar-fill" style={ progressWidth(state) }></div>
+					<div id="activity-progress-fill" class="progress-bar-fill" style={ progressWidth(state) }></div>
 				</div>
 			</div>
 
