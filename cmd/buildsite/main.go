@@ -9,8 +9,8 @@ import (
 
 	"github.com/LeGoatest/Pwa-idle-game/internal/content"
 	"github.com/LeGoatest/Pwa-idle-game/internal/game"
-	"github.com/LeGoatest/Pwa-idle-game/web/views/pages"
-	"github.com/LeGoatest/Pwa-idle-game/web/views/partials"
+	"github.com/LeGoatest/Pwa-idle-game/web/views/app"
+	"github.com/LeGoatest/Pwa-idle-game/web/views/components"
 )
 
 func main() {
@@ -38,23 +38,29 @@ func main() {
 	ctx := context.Background()
 
 	mustRender("dist/index.html", func(f *os.File) error {
-		return pages.Index(state, reg).Render(ctx, f)
+		return app.Root(state, reg).Render(ctx, f)
 	})
 
 	mustRender("dist/views/stats.html", func(f *os.File) error {
-		return partials.Stats(state).Render(ctx, f)
+		return app.CharacterScreen(state).Render(ctx, f)
 	})
 
 	mustRender("dist/views/activity.html", func(f *os.File) error {
-		return partials.Activity(state).Render(ctx, f)
+		return app.CombatScreen(state, reg).Render(ctx, f)
 	})
 
 	mustRender("dist/views/inventory.html", func(f *os.File) error {
-		return partials.Inventory(state, reg).Render(ctx, f)
+		return app.InventoryScreen(state).Render(ctx, f)
 	})
 
 	mustRender("dist/views/selections.html", func(f *os.File) error {
-		return partials.Selections(state, reg).Render(ctx, f)
+		if err := components.ZoneList(state, reg).Render(ctx, f); err != nil {
+			return err
+		}
+		if err := components.MonsterList(state, reg).Render(ctx, f); err != nil {
+			return err
+		}
+		return components.SkillList(state, reg).Render(ctx, f)
 	})
 }
 
