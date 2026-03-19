@@ -15,7 +15,8 @@ function setMobileTab(tab) {
 
   const buttons = document.querySelectorAll(".tab-nav-btn");
   buttons.forEach((button) => {
-    if (button.dataset.tabOpen === tab) {
+    const target = button.dataset.tabOpen || "";
+    if (target === tab) {
       button.classList.remove("text-zinc-400");
       button.classList.add("text-cyan-400");
     } else {
@@ -28,10 +29,40 @@ function setMobileTab(tab) {
   window.GameAppRuntime.mobileTab = tab;
 }
 
+function openModal(name) {
+  if (name === "settings") {
+    document.getElementById("settings-modal")?.classList.remove("hidden");
+  }
+}
+
+function closeModal(name) {
+  if (name === "settings") {
+    document.getElementById("settings-modal")?.classList.add("hidden");
+  }
+}
+
 document.addEventListener("click", async (event) => {
   const tabButton = event.target.closest("[data-tab-open]");
   if (tabButton) {
     setMobileTab(tabButton.dataset.tabOpen || "combat");
+    return;
+  }
+
+  const openModalButton = event.target.closest("[data-open-modal]");
+  if (openModalButton) {
+    openModal(openModalButton.dataset.openModal || "");
+    return;
+  }
+
+  const closeButton = event.target.closest("[data-close-modal]");
+  if (closeButton) {
+    closeModal(closeButton.dataset.closeModal || "");
+    return;
+  }
+
+  const backdrop = event.target.closest(".modal-backdrop");
+  if (backdrop && event.target === backdrop) {
+    backdrop.classList.add("hidden");
     return;
   }
 
@@ -60,7 +91,7 @@ document.addEventListener("click", async (event) => {
     if (action === "start_combat" || action === "select_monster") {
       setMobileTab("combat");
     } else if (action === "start_node" || action === "select_skill" || action === "open_zone") {
-      setMobileTab("combat");
+      setMobileTab("gather");
     } else if (action === "buy_item" || action === "equip_item" || action === "use_item") {
       setMobileTab("inventory");
     }
