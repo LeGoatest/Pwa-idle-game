@@ -8,169 +8,163 @@ import (
 )
 
 templ CombatScreen(state *game.GameState, reg *content.Registry) {
-	<div class="space-y-4 px-4 pt-4 pb-6">
+	<div class="space-y-3 px-4 pt-4 pb-5">
 		<section class="w-full">
-			<div class="rounded-[24px] bg-[#4a4a4a] px-4 pt-4 pb-3">
-				<div class="flex min-h-[220px] items-center justify-center rounded-[18px] bg-black/10">
+			<div class="rounded-[22px] bg-[#4a4a4a] px-3 pt-3 pb-2">
+				<div class="flex min-h-[180px] items-center justify-center rounded-[16px] bg-black/10">
 					if currentEnemyImage(state, reg) != "" {
 						<img
 							src={ currentEnemyImage(state, reg) }
 							alt={ currentEnemyName(state, reg) }
-							class="h-[160px] w-[160px] object-contain pixelated"
+							class="h-[132px] w-[132px] object-contain pixelated"
 						/>
 					} else {
-						<div class="flex h-[160px] w-[160px] items-center justify-center rounded-[16px] bg-black/10">
-							<span class="icon-[mdi--cube-outline] icon-lg text-white/60"></span>
+						<div class="flex h-[132px] w-[132px] items-center justify-center rounded-[14px] bg-black/10">
+							<span class="icon-[mdi--cube-outline] icon-md text-white/60"></span>
 						</div>
 					}
 				</div>
 
-				<div class="mt-3 text-center text-[28px] leading-none font-light">
+				<div class="mt-2 text-center text-[23px] leading-none font-light">
 					{ currentEnemyName(state, reg) }
 				</div>
 			</div>
 		</section>
 
-		<section class="rounded-[18px] bg-[#4a4a4a] px-4 py-4">
+		<section class="rounded-[16px] bg-[#4a4a4a] px-3 py-3">
 			<div class="grid grid-cols-4 gap-2 text-center">
 				<div class="flex items-center justify-center gap-2">
-					<span class="icon-[mdi--sword] icon-md text-cyan-400"></span>
-					<span class="text-[24px] font-light leading-none">{ fmt.Sprintf("%d", safeAttack(state)) }</span>
+					<span class="icon-[mdi--sword] icon-sm text-cyan-400"></span>
+					<span class="text-[18px] font-light leading-none">{ fmt.Sprintf("%d", safeAttack(state)) }</span>
 				</div>
 
 				<div class="flex items-center justify-center gap-2">
-					<span class="icon-[mdi--arm-flex] icon-md text-zinc-200"></span>
-					<span class="text-[24px] font-light leading-none">{ fmt.Sprintf("%d", safeAttack(state)) }</span>
+					<span class="icon-[mdi--arm-flex] icon-sm text-zinc-200"></span>
+					<span class="text-[18px] font-light leading-none">{ fmt.Sprintf("%d", safeStrength(state)) }</span>
 				</div>
 
 				<div class="flex items-center justify-center gap-2">
-					<span class="icon-[mdi--shield] icon-md text-emerald-400"></span>
-					<span class="text-[24px] font-light leading-none">{ fmt.Sprintf("%d", safeDefense(state)) }</span>
+					<span class="icon-[mdi--shield] icon-sm text-emerald-400"></span>
+					<span class="text-[18px] font-light leading-none">{ fmt.Sprintf("%d", safeDefense(state)) }</span>
 				</div>
 
 				<div class="flex items-center justify-center gap-2">
-					<span class="icon-[mdi--heart] icon-md text-rose-400"></span>
-					<span class="text-[24px] font-light leading-none">{ fmt.Sprintf("%d", safeEnemyHP(state)) }</span>
+					<span class="icon-[mdi--heart] icon-sm text-rose-400"></span>
+					<span class="text-[18px] font-light leading-none">{ fmt.Sprintf("%d", safeEnemyHP(state)) }</span>
 				</div>
 			</div>
 		</section>
 
-		<section class="grid grid-cols-2 gap-4">
-			<div class="space-y-2 text-center">
-				<div class="h-10 overflow-hidden rounded-[12px] bg-[#242424]">
+		<section class="grid grid-cols-2 gap-3">
+			<div class="space-y-1.5 text-center">
+				<div class="h-8 overflow-hidden rounded-[10px] bg-[#242424]">
 					<div
 						id="activity-progress-fill"
-						class="h-full rounded-[12px] bg-[#3cb7e8]"
+						class="h-full rounded-[10px] bg-[#3cb7e8]"
 						style={ progressWidth(state) }
 					></div>
 				</div>
-				<div class="text-[20px] font-light leading-none">
+				<div id="action-speed-label" class="text-[16px] font-light leading-none">
 					{ actionSpeedLabel(state, reg) }
 				</div>
 			</div>
 
-			<div class="space-y-2 text-center">
-				<div class="h-10 overflow-hidden rounded-[12px] bg-[#242424]">
+			<div class="space-y-1.5 text-center">
+				<div class="h-8 overflow-hidden rounded-[10px] bg-[#242424]">
 					<div
 						id="enemy-hp-fill"
-						class="h-full rounded-[12px] bg-[#53c95c]"
+						class="h-full rounded-[10px] bg-[#53c95c]"
 						style={ enemyHPWidth(state) }
 					></div>
 				</div>
-				<div id="enemy-hp" class="text-[20px] font-light leading-none">
+				<div id="enemy-hp" class="text-[16px] font-light leading-none">
 					{ fmt.Sprintf("%d / %d", safeEnemyHP(state), safeEnemyMaxHP(state)) }
 				</div>
 			</div>
 		</section>
 
-		<section class="grid grid-cols-[120px_108px_1fr] gap-4 items-start">
+		<section class="grid grid-cols-[108px_84px_1fr] gap-3 items-start">
 			<div class="space-y-2">
-				<button class="flex h-[102px] w-full items-center justify-center rounded-[20px] border-[3px] border-[#ff9f1a] bg-[#4a4a4a] shadow-[0_0_16px_rgba(255,159,26,0.35)]">
-					<span class="icon-[mdi--sword] text-white w-[72px] h-[72px]"></span>
+				<button class="flex h-[92px] w-full items-center justify-center rounded-[18px] border-[3px] border-[#ff9f1a] bg-[#4a4a4a] shadow-[0_0_12px_rgba(255,159,26,0.28)]">
+					<span class="icon-[mdi--sword] text-white w-[54px] h-[54px]"></span>
 				</button>
 
-				<div class="text-center text-[18px] leading-tight font-light">
+				<div class="text-center text-[16px] leading-tight font-light">
 					Weapon
 				</div>
 
-				<div class="grid grid-cols-2 gap-3 pt-1">
+				<div class="grid grid-cols-2 gap-2 pt-1">
 					<button
-						class="flex h-[72px] items-center justify-center rounded-[16px] bg-[#4a4a4a]"
+						class="flex h-[64px] items-center justify-center rounded-[14px] bg-[#4a4a4a]"
 						data-action="start_current_combat"
 						aria-label="Start combat"
 					>
-						<span class="icon-[mdi--play] icon-lg text-white"></span>
+						<span class="icon-[mdi--play] icon-md text-white"></span>
 					</button>
 
 					<button
-						class="flex h-[72px] items-center justify-center rounded-[16px] bg-[#4a4a4a]"
+						class="flex h-[64px] items-center justify-center rounded-[14px] bg-[#4a4a4a]"
 						data-action="stop_activity"
 						aria-label="Stop activity"
 					>
-						<span class="icon-[mdi--pause] icon-lg text-white"></span>
+						<span class="icon-[mdi--pause] icon-md text-white"></span>
 					</button>
 				</div>
 			</div>
 
-			<div class="space-y-3 pt-4">
+			<div class="space-y-2 pt-2">
 				<button
-					class="flex h-[68px] w-[108px] items-center justify-center rounded-[16px] bg-[#4a4a4a]"
+					class="flex h-[64px] w-[84px] items-center justify-center rounded-[14px] bg-[#4a4a4a]"
 					data-action="cycle_combat_style"
 					aria-label="Cycle combat training style"
 				>
 					<div class="flex items-center gap-2">
-						<span class={ trainingIconClass(state) }></span>
-						<span class="text-[14px] font-medium leading-none">{ trainingModeLabel(state) }</span>
+						<span id="combat-style-icon" class={ trainingIconClass(state) }></span>
+						<span id="combat-style-name-small" class="text-[13px] font-medium leading-none">{ trainingModeLabel(state) }</span>
+					</div>
+				</button>
+			</div>
+
+			<div class="space-y-2 pt-1">
+				<button
+					class="block w-full text-left"
+					data-action="cycle_combat_style"
+					aria-label="Cycle combat training style"
+				>
+					<div id="combat-style-level" class="text-[16px] font-light leading-none">
+						{ trainingModeLabel(state) } Lv. { fmt.Sprintf("%d", displayedTrainingLevel(state)) }
+					</div>
+
+					<div class="mt-2 h-5 overflow-hidden rounded-full bg-[#242424]">
+						<div id="combat-style-xp-fill" class="h-full rounded-full bg-[#44afe0]" style={ displayedTrainingXPWidth(state) }></div>
+					</div>
+
+					<div id="combat-style-xp" class="mt-1.5 text-center text-[15px] font-light leading-none">
+						{ displayedTrainingXPLabel(state) }
 					</div>
 				</button>
 
-				<div class="flex h-[68px] w-[108px] items-center justify-center rounded-[16px] bg-[#4a4a4a]">
-					<span class="icon-[mdi--shield] icon-md text-zinc-200"></span>
-				</div>
-			</div>
-
-			<div class="space-y-3 pt-1">
-				<div>
-					<button
-						class="block w-full text-left"
-						data-action="cycle_combat_style"
-						aria-label="Cycle combat training style"
-					>
-						<div class="text-[18px] font-light leading-none">
-							{ trainingModeLabel(state) } Lv. { fmt.Sprintf("%d", displayedTrainingLevel(state)) }
-						</div>
-
-						<div class="mt-3 h-6 overflow-hidden rounded-full bg-[#242424]">
-							<div class="h-full rounded-full bg-[#44afe0]" style={ displayedTrainingXPWidth(state) }></div>
-						</div>
-
-						<div class="mt-2 text-center text-[18px] font-light leading-none">
-							{ displayedTrainingXPLabel(state) }
-						</div>
-					</button>
-				</div>
-
-				<div class="grid grid-cols-2 gap-3">
-					<div class="flex h-[80px] items-center justify-center rounded-[18px] bg-[#4a4a4a]">
-						<span class="icon-[mdi--book-open-page-variant] icon-lg text-amber-300"></span>
+				<div class="grid grid-cols-2 gap-2">
+					<div class="flex h-[68px] items-center justify-center rounded-[16px] bg-[#4a4a4a]">
+						<span class="icon-[mdi--book-open-page-variant] icon-md text-amber-300"></span>
 					</div>
 
-					<div class="flex h-[80px] items-center justify-center rounded-[18px] bg-[#4a4a4a] opacity-55">
-						<span class="icon-[mdi--file-document-outline] icon-lg text-zinc-300"></span>
+					<div class="flex h-[68px] items-center justify-center rounded-[16px] bg-[#4a4a4a] opacity-55">
+						<span class="icon-[mdi--file-document-outline] icon-md text-zinc-300"></span>
 					</div>
 				</div>
 
-				<div class="rounded-[18px] bg-[#4a4a4a] px-4 py-3">
-					<div class="flex items-center justify-between gap-3">
-						<div class="flex items-center gap-2">
-							<span class="icon-[mdi--heart] icon-md text-rose-400"></span>
-							<span class="text-[24px] font-light leading-none">{ fmt.Sprintf("%d", safeHP(state)) }</span>
-							<span class="text-[20px] leading-none text-[#55d36a]">{ activityKindLabel(state) }</span>
+				<div class="rounded-[16px] bg-[#4a4a4a] px-3 py-2.5">
+					<div class="flex items-center justify-between gap-2">
+						<div class="flex items-center gap-1.5">
+							<span class="icon-[mdi--heart] icon-sm text-rose-400"></span>
+							<span class="text-[16px] font-light leading-none">{ fmt.Sprintf("%d", safeHP(state)) }</span>
+							<span class="text-[14px] leading-none text-[#55d36a]">{ activityKindLabel(state) }</span>
 						</div>
 
-						<div class="flex items-center gap-2">
-							<span class="icon-[mdi--gold] icon-md text-amber-400"></span>
-							<span class="text-[24px] font-light leading-none">{ fmt.Sprintf("%d", state.Gold) }</span>
+						<div class="flex items-center gap-1.5">
+							<span class="icon-[mdi--gold] icon-sm text-amber-400"></span>
+							<span class="text-[16px] font-light leading-none">{ fmt.Sprintf("%d", state.Gold) }</span>
 						</div>
 					</div>
 				</div>
@@ -262,39 +256,65 @@ func trainingModeLabel(state *game.GameState) string {
 
 func trainingIconClass(state *game.GameState) string {
 	if state == nil {
-		return "icon-[mdi--sword] icon-md text-cyan-400"
+		return "icon-[mdi--sword] icon-sm text-cyan-400"
 	}
 	switch state.UI.CombatMode {
 	case "strength":
-		return "icon-[mdi--arm-flex] icon-md text-zinc-100"
+		return "icon-[mdi--arm-flex] icon-sm text-zinc-100"
 	case "defense":
-		return "icon-[mdi--shield] icon-md text-emerald-400"
+		return "icon-[mdi--shield] icon-sm text-emerald-400"
 	case "attack":
-		return "icon-[mdi--sword] icon-md text-cyan-400"
+		return "icon-[mdi--sword] icon-sm text-cyan-400"
 	default:
-		return "icon-[mdi--sword] icon-md text-cyan-400"
+		return "icon-[mdi--sword] icon-sm text-cyan-400"
 	}
 }
 
 func displayedTrainingLevel(state *game.GameState) int {
-	if state == nil || state.CombatLevel <= 0 {
+	if state == nil {
 		return 1
 	}
-	return state.CombatLevel
+	switch state.UI.CombatMode {
+	case "strength":
+		if state.StrengthLevel > 0 {
+			return state.StrengthLevel
+		}
+	case "defense":
+		if state.DefenseLevel > 0 {
+			return state.DefenseLevel
+		}
+	default:
+		if state.AttackLevel > 0 {
+			return state.AttackLevel
+		}
+	}
+	return 1
 }
 
 func displayedTrainingXPWidth(state *game.GameState) string {
 	if state == nil {
 		return "width: 0%;"
 	}
-	// View-safe placeholder until separate STR/ATK/DEF XP tracks exist.
-	pct := float64((state.CombatLevel % 10) * 10)
-	if pct < 10 {
-		pct = 18
+
+	level := displayedTrainingLevel(state)
+	if level <= 0 {
+		level = 1
+	}
+
+	cur := displayedTrainingXPValue(state)
+	need := game.XPForLevel(level)
+	if need <= 0 {
+		return "width: 0%;"
+	}
+
+	pct := (cur / need) * 100
+	if pct < 0 {
+		pct = 0
 	}
 	if pct > 100 {
 		pct = 100
 	}
+
 	return fmt.Sprintf("width: %.2f%%;", pct)
 }
 
@@ -302,13 +322,30 @@ func displayedTrainingXPLabel(state *game.GameState) string {
 	if state == nil {
 		return "0 / 0"
 	}
-	// View-safe placeholder until separate STR/ATK/DEF XP tracks exist.
-	cur := int(state.CombatXP)
-	next := displayedTrainingLevel(state) * 100
-	if next <= 0 {
-		next = 100
+
+	level := displayedTrainingLevel(state)
+	if level <= 0 {
+		level = 1
 	}
-	return fmt.Sprintf("%d / %d", cur, next)
+
+	cur := int(displayedTrainingXPValue(state))
+	need := int(game.XPForLevel(level))
+
+	return fmt.Sprintf("%d / %d", cur, need)
+}
+
+func displayedTrainingXPValue(state *game.GameState) float64 {
+	if state == nil {
+		return 0
+	}
+	switch state.UI.CombatMode {
+	case "strength":
+		return state.StrengthXP
+	case "defense":
+		return state.DefenseXP
+	default:
+		return state.AttackXP
+	}
 }
 
 func safeAttack(state *game.GameState) int {
@@ -316,6 +353,16 @@ func safeAttack(state *game.GameState) int {
 		return 0
 	}
 	return state.Attack
+}
+
+func safeStrength(state *game.GameState) int {
+	if state == nil {
+		return 0
+	}
+	if state.StrengthLevel > 0 {
+		return state.StrengthLevel
+	}
+	return 0
 }
 
 func safeDefense(state *game.GameState) int {
