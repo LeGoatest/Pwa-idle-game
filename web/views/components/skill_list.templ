@@ -1,0 +1,26 @@
+package components
+
+import (
+	"github.com/LeGoatest/Pwa-idle-game/internal/content"
+	"github.com/LeGoatest/Pwa-idle-game/internal/game"
+)
+
+templ SkillList(state *game.GameState, reg *content.Registry) {
+	<div class="card">
+		<div class="mb-3 flex items-center justify-between">
+			<h2>Skills</h2>
+			<span class="text-xs uppercase tracking-[0.25em] text-zinc-500">Gather</span>
+		</div>
+		<div class="space-y-3">
+			for _, skillID := range reg.SkillsIndex.Skills {
+				if skill, ok := reg.Skills[skillID]; ok {
+					@SkillBlock(skill, state.UI.CurrentSkillID == skill.ID) {
+						for _, node := range skill.Nodes {
+							@NodeButton(skill.ID, node)
+						}
+					}
+				}
+			}
+		</div>
+	</div>
+}
