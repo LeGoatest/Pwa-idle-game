@@ -1,0 +1,276 @@
+package app
+
+import (
+	"fmt"
+
+	"github.com/LeGoatest/Pwa-idle-game/internal/content"
+	"github.com/LeGoatest/Pwa-idle-game/internal/game"
+	"github.com/LeGoatest/Pwa-idle-game/web/views/components"
+)
+
+templ CombatScreen(state *game.GameState, reg *content.Registry) {
+	<div class="flex flex-col items-center gap-7 px-7 pt-8 pb-6">
+		<section class="w-full flex items-end justify-center gap-4">
+			<div class="w-[294px] rounded-[20px] bg-[#4a4a4a] px-5 pt-5 pb-4 flex flex-col items-center">
+				<img
+					src={ currentEnemyImage(state, reg) }
+					alt={ currentEnemyName(state, reg) }
+					class="w-[190px] h-[190px] object-contain pixelated"
+				/>
+
+				<div class="w-full mt-2 text-left text-[34px] leading-none font-light">
+					{ currentEnemyName(state, reg) }
+				</div>
+			</div>
+
+			<div class="rounded-[18px] bg-[#4a4a4a] px-4 py-3 flex items-center gap-3 self-end mb-3">
+				<img
+					src="/assets/ui/blue-token.png"
+					alt=""
+					class="w-10 h-10 object-contain pixelated"
+				/>
+				<span class="text-[28px] leading-none font-light">{ fmt.Sprintf("%d", state.Gold) }</span>
+			</div>
+		</section>
+
+		<section class="w-full max-w-[580px] rounded-[18px] bg-[#4a4a4a] px-6 py-4 flex items-center justify-between">
+			<div class="flex items-center gap-3">
+				<img src="/assets/ui/stat-attack.png" alt="" class="w-10 h-10 pixelated" />
+				<span class="text-[30px] font-light leading-none">{ fmt.Sprintf("%d", state.Attack) }</span>
+			</div>
+
+			<div class="flex items-center gap-3">
+				<img src="/assets/ui/stat-power.png" alt="" class="w-10 h-10 pixelated" />
+				<span class="text-[30px] font-light leading-none">{ fmt.Sprintf("%d", state.CombatLevel) }</span>
+			</div>
+
+			<div class="flex items-center gap-3">
+				<img src="/assets/ui/stat-defense.png" alt="" class="w-10 h-10 pixelated" />
+				<span class="text-[30px] font-light leading-none">{ fmt.Sprintf("%d", state.Defense) }</span>
+			</div>
+
+			<div class="flex items-center gap-3">
+				<img src="/assets/ui/stat-heart.png" alt="" class="w-10 h-10 pixelated" />
+				<span class="text-[30px] font-light leading-none">{ fmt.Sprintf("%d", state.EnemyHP) }</span>
+			</div>
+		</section>
+
+		<section class="w-full max-w-[640px] grid grid-cols-2 gap-16 items-start">
+			<div class="flex flex-col items-center gap-3">
+				<div class="w-full h-10 rounded-md bg-[#242424] overflow-hidden">
+					<div
+						id="activity-progress-fill"
+						class="h-full bg-[#44afe0]"
+						style={ progressWidth(state) }
+					></div>
+				</div>
+				<div id="activity-progress" class="text-[38px] font-light leading-none">
+					{ fmt.Sprintf("%.0f%%", cappedProgress(state)) }
+				</div>
+			</div>
+
+			<div class="flex flex-col items-center gap-3">
+				<div class="w-full h-10 rounded-md bg-[#242424] overflow-hidden">
+					<div
+						id="enemy-hp-fill"
+						class="h-full bg-[#4cc75a]"
+						style={ enemyHPWidth(state) }
+					></div>
+				</div>
+				<div id="enemy-hp" class="text-[38px] font-light leading-none">
+					{ fmt.Sprintf("%d / %d", state.EnemyHP, state.EnemyMaxHP) }
+				</div>
+			</div>
+		</section>
+
+		<section class="w-full max-w-[640px] grid grid-cols-[130px_90px_1fr] gap-x-7 gap-y-5 items-center">
+			<div class="flex flex-col items-center">
+				<button class="w-[102px] h-[102px] rounded-[20px] bg-[#4a4a4a] border-[3px] border-[#ff9f1a] flex items-center justify-center shadow-[0_0_16px_rgba(255,159,26,0.45)]">
+					<img
+						src="/assets/items/royal-goblet.png"
+						alt="Active Item"
+						class="w-[72px] h-[72px] object-contain pixelated"
+					/>
+				</button>
+				<div class="mt-3 text-center text-[26px] leading-tight font-light">
+					Active Item
+				</div>
+			</div>
+
+			<div class="flex items-center justify-center">
+				<div class="w-[70px] h-[70px] rounded-[16px] bg-[#4a4a4a] flex items-center justify-center">
+					<img
+						src="/assets/ui/stat-power.png"
+						alt=""
+						class="w-12 h-12 object-contain pixelated"
+					/>
+				</div>
+			</div>
+
+			<div class="flex flex-col gap-3">
+				<div class="text-[30px] font-light leading-none">Combat Lv. { fmt.Sprintf("%d", state.CombatLevel) }</div>
+
+				<div class="w-full h-7 rounded-full bg-[#2b2b2b] overflow-hidden">
+					<div class="h-full w-[80%] rounded-full bg-[#44afe0]"></div>
+				</div>
+
+				<div class="text-center text-[24px] font-light leading-none">
+					In Combat
+				</div>
+			</div>
+
+			<div class="flex flex-col gap-4">
+				<div class="grid grid-cols-2 gap-4">
+					<button
+						class="w-[78px] h-[78px] rounded-[16px] bg-[#4a4a4a] flex items-center justify-center"
+						data-action="start_current_combat"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
+							<path d="M8 5v14l11-7z"></path>
+						</svg>
+					</button>
+
+					<button
+						class="w-[78px] h-[78px] rounded-[16px] bg-[#4a4a4a] flex items-center justify-center"
+						data-action="stop_activity"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
+							<path d="M20 11H7.83l3.58-3.59L10 6l-6 6 6 6 1.41-1.41L7.83 13H20v-2z"></path>
+						</svg>
+					</button>
+				</div>
+
+				<div class="flex items-end gap-4">
+					<div class="flex flex-col items-center gap-2">
+						<button class="w-[88px] h-[88px] rounded-[18px] bg-[#4a4a4a] border-[3px] border-[#ff9f1a] flex items-center justify-center">
+							<img
+								src="/assets/items/pink-tool.png"
+								alt=""
+								class="w-[60px] h-[60px] object-contain pixelated"
+							/>
+						</button>
+						<div class="w-[70px] h-4 rounded-full bg-[#2b2b2b] overflow-hidden">
+							<div class="h-full w-full rounded-full bg-[#4cc75a]"></div>
+						</div>
+					</div>
+
+					<div class="flex flex-col items-center gap-1">
+						<button class="w-[62px] h-[62px] rounded-[16px] bg-[#4a4a4a] flex items-center justify-center">
+							<img
+								src="/assets/items/arrow.png"
+								alt=""
+								class="w-10 h-10 object-contain pixelated"
+							/>
+						</button>
+						<div class="text-[22px] leading-none font-light">{ fmt.Sprintf("%d", state.HP) }</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="relative h-[110px]">
+				<div class="absolute left-2 top-7 text-[28px] font-light">+1</div>
+
+				<div class="absolute left-0 bottom-4 w-[64px] h-[64px] rounded-[12px] bg-[#4a4a4a] flex items-center justify-center">
+					<img
+						src="/assets/items/book.png"
+						alt=""
+						class="w-12 h-12 object-contain pixelated"
+					/>
+				</div>
+
+				<div class="absolute left-10 top-14 text-[22px] font-light">{ fmt.Sprintf("%d", state.CombatLevel) }</div>
+			</div>
+
+			<div class="flex flex-col gap-4">
+				<div class="flex items-center gap-4">
+					<div class="w-[88px] h-[88px] rounded-[18px] bg-[#4a4a4a] flex items-center justify-center">
+						<img
+							src="/assets/items/gold-book.png"
+							alt=""
+							class="w-[62px] h-[62px] object-contain pixelated"
+						/>
+					</div>
+
+					<div class="w-[88px] h-[88px] rounded-[18px] bg-[#4a4a4a] opacity-55 flex items-center justify-center">
+						<img
+							src="/assets/items/empty-scroll.png"
+							alt=""
+							class="w-[62px] h-[62px] object-contain pixelated grayscale"
+						/>
+					</div>
+				</div>
+
+				<div class="rounded-[18px] bg-[#4a4a4a] px-5 py-3 flex items-center justify-between">
+					<div class="flex items-center gap-2">
+						<img src="/assets/ui/stat-heart.png" alt="" class="w-9 h-9 pixelated" />
+						<span class="text-[28px] font-light leading-none">{ fmt.Sprintf("%d", state.HP) }</span>
+						<span class="text-[24px] leading-none text-[#55d36a]">{ activityKindLabel(state) }</span>
+					</div>
+
+					<div class="flex items-center gap-2">
+						<img src="/assets/items/feather.png" alt="" class="w-9 h-9 pixelated" />
+						<span class="text-[28px] font-light leading-none">{ fmt.Sprintf("%d", state.Gold) }</span>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		@components.ZoneList(state, reg)
+		@components.MonsterList(state, reg)
+	</div>
+}
+
+func enemyHPWidth(state *game.GameState) string {
+	if state == nil || state.EnemyMaxHP <= 0 {
+		return "width: 0%;"
+	}
+	pct := (float64(state.EnemyHP) / float64(state.EnemyMaxHP)) * 100
+	if pct < 0 {
+		pct = 0
+	}
+	if pct > 100 {
+		pct = 100
+	}
+	return fmt.Sprintf("width: %.2f%%;", pct)
+}
+
+func progressWidth(state *game.GameState) string {
+	return fmt.Sprintf("width: %.2f%%;", cappedProgress(state))
+}
+
+func cappedProgress(state *game.GameState) float64 {
+	if state == nil {
+		return 0
+	}
+	pct := state.Activity.Progress
+	if pct < 0 {
+		pct = 0
+	}
+	if pct > 100 {
+		pct = 100
+	}
+	return pct
+}
+
+func currentEnemyName(state *game.GameState, reg *content.Registry) string {
+	if state == nil || reg == nil {
+		return "Enemy"
+	}
+	if monster, ok := reg.Monsters[state.UI.CurrentMonsterID]; ok && monster.Name != "" {
+		return monster.Name
+	}
+	return "Enemy"
+}
+
+func currentEnemyImage(state *game.GameState, reg *content.Registry) string {
+	_ = state
+	_ = reg
+	return "/assets/enemies/azurite-golem.png"
+}
+
+func activityKindLabel(state *game.GameState) string {
+	if state == nil || state.Activity.Kind == "" || state.Activity.Kind == "none" {
+		return "+0"
+	}
+	return state.Activity.Kind
+  }
