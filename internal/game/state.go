@@ -50,6 +50,7 @@ type GameState struct {
 	Attack  int `json:"attack"`
 	Defense int `json:"defense"`
 	HP      int `json:"hp"`
+	MaxHP   int `json:"maxHp"`
 
 	WoodXP   float64 `json:"woodXp"`
 	MineXP   float64 `json:"mineXp"`
@@ -67,8 +68,9 @@ type GameState struct {
 	StrengthLevel int `json:"strengthLevel"`
 	DefenseLevel  int `json:"defenseLevel"`
 
-	EnemyHP    int `json:"enemyHp"`
-	EnemyMaxHP int `json:"enemyMaxHp"`
+	EnemyHP       int     `json:"enemyHp"`
+	EnemyMaxHP    int     `json:"enemyMaxHp"`
+	EnemyProgress float64 `json:"enemyProgress"`
 
 	Inventory map[string]int `json:"inventory"`
 	Equipment EquipmentState `json:"equipment"`
@@ -80,7 +82,7 @@ type GameState struct {
 
 func NewDefaultState(nowMS int64) *GameState {
 	return &GameState{
-		Version: 9,
+		Version: 10,
 
 		Gold:  0,
 		Kills: 0,
@@ -88,6 +90,7 @@ func NewDefaultState(nowMS int64) *GameState {
 		Attack:  2,
 		Defense: 1,
 		HP:      20,
+		MaxHP:   20,
 
 		WoodXP:   0,
 		MineXP:   0,
@@ -105,8 +108,9 @@ func NewDefaultState(nowMS int64) *GameState {
 		StrengthLevel: 1,
 		DefenseLevel:  1,
 
-		EnemyHP:    12,
-		EnemyMaxHP: 12,
+		EnemyHP:       12,
+		EnemyMaxHP:    12,
+		EnemyProgress: 0,
 
 		Inventory: map[string]int{},
 
