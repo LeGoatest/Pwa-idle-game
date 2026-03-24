@@ -1,11 +1,85 @@
 package app
 
 import (
-	"github.com/LeGoatest/Pwa-idle-game/internal/content"
-	"github.com/LeGoatest/Pwa-idle-game/internal/game"
-	"github.com/LeGoatest/Pwa-idle-game/web/views/components"
+  "fmt"
+
+  "github.com/LeGoatest/Pwa-idle-game/internal/content"
+  "github.com/LeGoatest/Pwa-idle-game/internal/game"
+  "github.com/LeGoatest/Pwa-idle-game/web/views/components"
 )
 
 templ GatherScreen(state *game.GameState, reg *content.Registry) {
-	@components.SkillList(state, reg)
+  <div class="space-y-3 px-4 pt-4 pb-5">
+
+    <section class="rounded-[16px] bg-[#4a4a4a] px-3 py-3 text-center">
+      <div class="text-[20px] font-light">
+        { currentSkillName(state, reg) }
+      </div>
+    </section>
+
+    <section class="space-y-2">
+      @components.NodeList(state, reg)
+    </section>
+
+    <section class="space-y-1.5 text-center">
+      <div class="h-8 overflow-hidden rounded-[10px] bg-[#242424]">
+        <div
+          id="gather-progress-fill"
+          class="h-full rounded-[10px] bg-[#3cb7e8]"
+          style={ progressWidth(state) }
+        ></div>
+      </div>
+      <div class="text-[16px] font-light">
+        { activityKindLabel(state) }
+      </div>
+    </section>
+
+    <section class="grid grid-cols-2 gap-2">
+      <button
+        class="h-[64px] rounded-[14px] bg-[#4a4a4a]"
+        data-action="start_node"
+      >
+        Start
+      </button>
+
+      <button
+        class="h-[64px] rounded-[14px] bg-[#4a4a4a]"
+        data-action="stop_activity"
+      >
+        Stop
+      </button>
+    </section>
+
+  </div>
+}
+
+func currentSkillName(state *game.GameState, reg *content.Registry) string {
+  if state == nil || reg == nil {
+    return "Skill"
+  }
+  if skill, ok := reg.Skills[state.UI.CurrentSkillID]; ok {
+    return skill.Name
+  }
+  return "Skill"
+}
+
+func progressWidth(state *game.GameState) string {
+  if state == nil {
+    return "width: 0%;"
+  }
+  pct := state.Activity.Progress
+  if pct < 0 {
+    pct = 0
+  }
+  if pct > 100 {
+    pct = 100
+  }
+  return fmt.Sprintf("width: %.2f%%;", pct)
+}
+
+func activityKindLabel(state *game.GameState) string {
+  if state == nil || state.Activity.Kind == "" {
+    return "--"
+  }
+  return state.Activity.Kind
 }
