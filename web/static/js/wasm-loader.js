@@ -1,3 +1,5 @@
+import { BASE_PATH } from "./base-path.js";
+
 (function () {
   let bootPromise = null;
 
@@ -11,7 +13,7 @@
 
     const go = new Go();
     const result = await WebAssembly.instantiateStreaming(
-      fetch("/static/wasm/app.wasm"),
+      fetch(`${BASE_PATH}/static/wasm/app.wasm`),
       go.importObject
     );
 
@@ -19,7 +21,7 @@
   }
 
   async function loadJSON(url, fallback = null) {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(`${BASE_PATH}${url}`, { cache: "no-store" });
     if (!res.ok) {
       if (fallback !== null) return fallback;
       throw new Error(`Failed to load ${url}`);
@@ -28,7 +30,7 @@
   }
 
   async function loadJSONL(url) {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(`${BASE_PATH}${url}`, { cache: "no-store" });
     if (!res.ok) throw new Error(`Failed to load ${url}`);
 
     const text = await res.text();
@@ -50,7 +52,9 @@
   async function loadByIds(base, ids) {
     return Promise.all(
       (ids || []).map(async (id) => {
-        const res = await fetch(`${base}/${id}.json`, { cache: "no-store" });
+        const res = await fetch(`${BASE_PATH}${base}/${id}.json`, {
+          cache: "no-store",
+        });
         if (!res.ok) throw new Error(`Failed to load ${base}/${id}.json`);
         return res.json();
       })
@@ -63,20 +67,20 @@
     const zonesIndex = await loadJSON("/content/zones_index.json", { zones: [] });
     const shopIndex = await loadJSON("/content/shop_index.json", { items: [] });
 
-    const skillIDs = Array.isArray(skillsIndex.skills)
-      ? skillsIndex.skills.map((x) => (typeof x === "string" ? x : x.id)).filter(Boolean)
-      : [];
+    const skillIDs = (skillsIndex.skills || []).map((x) =>
+      typeof x === "string" ? x : x.id
+    );
 
-    const zoneIDs = Array.isArray(zonesIndex.zones)
-      ? zonesIndex.zones.map((x) => (typeof x === "string" ? x : x.id)).filter(Boolean)
-      : [];
+    const zoneIDs = (zonesIndex.zones || []).map((x) =>
+      typeof x === "string" ? x : x.id
+    );
 
     const skills = await loadByIds("/content/skills", skillIDs);
     const zones = await loadByIds("/content/zones", zoneIDs);
 
     const monsterIDs = [
       ...new Set(
-        zones.flatMap((zone) => (Array.isArray(zone.monsters) ? zone.monsters : []))
+        zones.flatMap((z) => (Array.isArray(z.monsters) ? z.monsters : []))
       ),
     ];
 
