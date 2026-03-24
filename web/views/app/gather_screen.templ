@@ -1,85 +1,148 @@
 package app
 
 import (
-  "fmt"
+	"fmt"
 
-  "github.com/LeGoatest/Pwa-idle-game/internal/content"
-  "github.com/LeGoatest/Pwa-idle-game/internal/game"
-  "github.com/LeGoatest/Pwa-idle-game/web/views/components"
+	"github.com/LeGoatest/Pwa-idle-game/internal/content"
+	"github.com/LeGoatest/Pwa-idle-game/internal/game"
 )
 
 templ GatherScreen(state *game.GameState, reg *content.Registry) {
-  <div class="space-y-3 px-4 pt-4 pb-5">
+	<div class="space-y-3 px-4 pt-4 pb-5">
+		<section class="rounded-[16px] bg-[#4a4a4a] px-3 py-3 text-center">
+			<div class="text-[20px] font-light">
+				{ currentSkillName(state, reg) }
+			</div>
+		</section>
 
-    <section class="rounded-[16px] bg-[#4a4a4a] px-3 py-3 text-center">
-      <div class="text-[20px] font-light">
-        { currentSkillName(state, reg) }
-      </div>
-    </section>
+		<section class="space-y-2">
+			for _, node := range currentSkillNodes(state, reg) {
+				<button
+					class={ gatherNodeButtonClass(state, node.ID) }
+					data-action="start_node"
+					data-id={ node.ID }
+				>
+					<div class="flex items-center justify-between gap-3">
+						<div class="text-left">
+							<div class="text-[16px] leading-none font-light">{ node.Name }</div>
+							<div class="mt-1 text-[13px] leading-none text-zinc-300">
+								Lv. { fmt.Sprintf("%d", node.LevelRequired) } · { fmt.Sprintf("%.0f", node.XP) } XP · { fmt.Sprintf("%.2fs", float64(node.DurationMS)/1000.0) }
+							</div>
+						</div>
 
-    <section class="space-y-2">
-      @components.NodeList(state, reg)
-    </section>
+						<div class="text-right text-[13px] leading-none text-zinc-300">
+							{ gatherNodeYieldLabel(node) }
+						</div>
+					</div>
+				</button>
+			}
 
-    <section class="space-y-1.5 text-center">
-      <div class="h-8 overflow-hidden rounded-[10px] bg-[#242424]">
-        <div
-          id="gather-progress-fill"
-          class="h-full rounded-[10px] bg-[#3cb7e8]"
-          style={ progressWidth(state) }
-        ></div>
-      </div>
-      <div class="text-[16px] font-light">
-        { activityKindLabel(state) }
-      </div>
-    </section>
+			if len(currentSkillNodes(state, reg)) == 0 {
+				<div class="rounded-[16px] bg-[#4a4a4a] px-3 py-4 text-center text-[14px] text-zinc-300">
+					No nodes available
+				</div>
+			}
+		</section>
 
-    <section class="grid grid-cols-2 gap-2">
-      <button
-        class="h-[64px] rounded-[14px] bg-[#4a4a4a]"
-        data-action="start_node"
-      >
-        Start
-      </button>
+		<section class="space-y-1.5 text-center">
+			<div class="h-8 overflow-hidden rounded-[10px] bg-[#242424]">
+				<div
+					id="gather-progress-fill"
+					class="h-full rounded-[10px] bg-[#3cb7e8]"
+					style={ gatherProgressWidth(state) }
+				></div>
+			</div>
+			<div class="text-[16px] font-light">
+				{ gatherActivityLabel(state, reg) }
+			</div>
+		</section>
 
-      <button
-        class="h-[64px] rounded-[14px] bg-[#4a4a4a]"
-        data-action="stop_activity"
-      >
-        Stop
-      </button>
-    </section>
+		<section class="grid grid-cols-2 gap-2">
+			<button
+				class="flex h-[64px] items-center justify-center rounded-[14px] bg-[#4a4a4a]"
+				data-action="start_current_node"
+				aria-label="Start selected node"
+			>
+				<span class="icon-[mdi--play] icon-md text-white"></span>
+			</button>
 
-  </div>
+			<button
+				class="flex h-[64px] items-center justify-center rounded-[14px] bg-[#4a4a4a]"
+				data-action="stop_activity"
+				aria-label="Stop activity"
+			>
+				<span class="icon-[mdi--pause] icon-md text-white"></span>
+			</button>
+		</section>
+	</div>
 }
 
 func currentSkillName(state *game.GameState, reg *content.Registry) string {
-  if state == nil || reg == nil {
-    return "Skill"
-  }
-  if skill, ok := reg.Skills[state.UI.CurrentSkillID]; ok {
-    return skill.Name
-  }
-  return "Skill"
+	if state == nil || reg == nil {
+		return "Skill"
+	}
+	if skill, ok := reg.Skills[state.UI.CurrentSkillID]; ok && skill.Name != "" {
+		return skill.Name
+	}
+	return "Skill"
 }
 
-func progressWidth(state *game.GameState) string {
-  if state == nil {
-    return "width: 0%;"
-  }
-  pct := state.Activity.Progress
-  if pct < 0 {
-    pct = 0
-  }
-  if pct > 100 {
-    pct = 100
-  }
-  return fmt.Sprintf("width: %.2f%%;", pct)
+func currentSkillNodes(state *game.GameState, reg *content.Registry) []content.SkillNode {
+	if state == nil || reg == nil {
+		return nil
+	}
+	skill, ok := reg.Skills[state.UI.CurrentSkillID]
+	if !ok {
+		return nil
+	}
+	return skill.Nodes
 }
 
-func activityKindLabel(state *game.GameState) string {
-  if state == nil || state.Activity.Kind == "" {
-    return "--"
-  }
-  return state.Activity.Kind
+func gatherNodeButtonClass(state *game.GameState, nodeID string) string {
+	base := "block w-full rounded-[16px] bg-[#4a4a4a] px-3 py-3 text-left"
+	if state != nil && state.Activity.Kind == "node" && state.Activity.NodeID == nodeID {
+		return base + " border-[2px] border-[#3cb7e8]"
+	}
+	return base
+}
+
+func gatherNodeYieldLabel(node content.SkillNode) string {
+	if node.Yield.Item == "" {
+		return "--"
+	}
+	if node.Yield.Amount <= 0 {
+		return node.Yield.Item
+	}
+	return fmt.Sprintf("%s x%d", node.Yield.Item, node.Yield.Amount)
+}
+
+func gatherProgressWidth(state *game.GameState) string {
+	if state == nil {
+		return "width: 0%;"
+	}
+	pct := state.Activity.Progress
+	if pct < 0 {
+		pct = 0
+	}
+	if pct > 100 {
+		pct = 100
+	}
+	return fmt.Sprintf("width: %.2f%%;", pct)
+}
+
+func gatherActivityLabel(state *game.GameState, reg *content.Registry) string {
+	if state == nil {
+		return "--"
+	}
+	if state.Activity.Kind != "node" {
+		return "Idle"
+	}
+
+	for _, node := range currentSkillNodes(state, reg) {
+		if node.ID == state.Activity.NodeID {
+			return node.Name
+		}
+	}
+
+	return "Gathering"
 }
