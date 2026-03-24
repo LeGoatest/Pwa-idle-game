@@ -14,6 +14,11 @@ import (
 )
 
 func main() {
+	outDir := os.Getenv("OUT_DIR")
+	if outDir == "" {
+		outDir = "dist"
+	}
+
 	reg, err := content.LoadRegistry("./content")
 	if err != nil {
 		log.Fatal(err)
@@ -37,23 +42,23 @@ func main() {
 
 	ctx := context.Background()
 
-	mustRender("dist/index.html", func(f *os.File) error {
+	mustRender(filepath.Join(outDir, "index.html"), func(f *os.File) error {
 		return app.Root(state, reg).Render(ctx, f)
 	})
 
-	mustRender("dist/views/stats.html", func(f *os.File) error {
+	mustRender(filepath.Join(outDir, "views", "stats.html"), func(f *os.File) error {
 		return app.CharacterScreen(state).Render(ctx, f)
 	})
 
-	mustRender("dist/views/activity.html", func(f *os.File) error {
+	mustRender(filepath.Join(outDir, "views", "activity.html"), func(f *os.File) error {
 		return app.CombatScreen(state, reg).Render(ctx, f)
 	})
 
-	mustRender("dist/views/inventory.html", func(f *os.File) error {
+	mustRender(filepath.Join(outDir, "views", "inventory.html"), func(f *os.File) error {
 		return app.InventoryScreen(state).Render(ctx, f)
 	})
 
-	mustRender("dist/views/selections.html", func(f *os.File) error {
+	mustRender(filepath.Join(outDir, "views", "selections.html"), func(f *os.File) error {
 		if err := components.ZoneList(state, reg).Render(ctx, f); err != nil {
 			return err
 		}
