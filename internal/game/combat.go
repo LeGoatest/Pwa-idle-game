@@ -74,11 +74,13 @@ func ResetEnemyFromMonster(state *GameState, monster *content.Monster) {
 	if monster.HP > 0 {
 		state.EnemyHP = monster.HP
 		state.EnemyMaxHP = monster.HP
+		state.EnemyProgress = 0
 		return
 	}
 
 	state.EnemyHP = 12
 	state.EnemyMaxHP = 12
+	state.EnemyProgress = 0
 }
 
 func ProcessCombat(state *GameState, contentState ContentState, deltaMS int64, nowMS int64) bool {
@@ -87,18 +89,24 @@ func ProcessCombat(state *GameState, contentState ContentState, deltaMS int64, n
 		return false
 	}
 
-	state.Activity.Progress += float64(deltaMS)
-	state.Activity.LastProcessedAt = nowMS
-
-	duration := monster.DurationMS
-	if duration <= 0 {
-		duration = 2000
+	playerDuration := monster.DurationMS
+	if playerDuration <= 0 {
+		playerDuration = 2000
 	}
+
+	enemyDuration := monster.DurationMS
+	if enemyDuration <= 0 {
+		enemyDuration = 2000
+	}
+
+	state.Activity.Progress += float64(deltaMS)
+	state.EnemyProgress += float64(deltaMS)
+	state.Activity.LastProcessedAt = nowMS
 
 	changed := false
 
-	for state.Activity.Progress >= float64(duration) {
-		state.Activity.Progress -= float64(duration)
+	for state.Activity.Progress >= float64(playerDuration) {
+		state.Activity.Progress -= float64(playerDuration)
 
 		damage := int(math.Max(1, float64(state.Attack)))
 		state.EnemyHP -= damage
@@ -111,6 +119,18 @@ func ProcessCombat(state *GameState, contentState ContentState, deltaMS int64, n
 			}
 
 			ResetEnemyFromMonster(state, monster)
+		}
+
+		changed = true
+	}
+
+	for state.EnemyProgress >= float64(enemyDuration) {
+		state.EnemyProgress -= float64(enemyDuration)
+
+		damage := maxInt(1, monster.Attack-state.Defense)
+		state.HP -= damage
+		if state.HP < 0 {
+			state.HP = 0
 		}
 
 		changed = true
