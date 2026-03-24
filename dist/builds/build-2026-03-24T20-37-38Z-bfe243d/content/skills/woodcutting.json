@@ -1,0 +1,18 @@
+{
+  "id": "woodcutting",
+  "name": "Woodcutting",
+  "icon": "axe",
+  "nodes": [
+    {
+      "id": "oak_tree",
+      "name": "Oak Tree",
+      "levelRequired": 1,
+      "xp": 5,
+      "durationMs": 3000,
+      "yield": {
+        "item": "oak_log",
+        "amount": 1
+      }
+    }
+  ]
+}
