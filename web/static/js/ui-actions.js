@@ -80,6 +80,41 @@ document.addEventListener("click", async (event) => {
     return;
   }
 
+  if (action === "start_current_node") {
+    const state = window.GameAppRuntime?.state;
+    const currentSkillId = state?.ui?.currentSkillId || "";
+    const activeNodeId = state?.activity?.nodeId || "";
+
+    if (activeNodeId) {
+      await dispatchAction("start_node", activeNodeId);
+      return;
+    }
+
+    const reg = window.GameAppRuntime?.registry;
+    const skill =
+      reg?.skills?.[currentSkillId] ||
+      reg?.Skills?.[currentSkillId];
+
+    const firstNodeId =
+      Array.isArray(skill?.nodes) && skill.nodes.length > 0
+        ? skill.nodes[0]?.id || ""
+        : "";
+
+    if (firstNodeId) {
+      await dispatchAction("start_node", firstNodeId);
+    }
+    return;
+  }
+
+  if (action === "start_node") {
+    const nodeId = id;
+    if (nodeId) {
+      await dispatchAction("start_node", nodeId);
+      setMobileTab("gather");
+    }
+    return;
+  }
+
   if (action === "save_now") {
     await window.GameApp?.saveNow?.();
     return;
@@ -90,9 +125,17 @@ document.addEventListener("click", async (event) => {
 
     if (action === "start_combat" || action === "select_monster") {
       setMobileTab("combat");
-    } else if (action === "start_node" || action === "select_skill" || action === "open_zone") {
+    } else if (
+      action === "start_node" ||
+      action === "select_skill" ||
+      action === "open_zone"
+    ) {
       setMobileTab("gather");
-    } else if (action === "buy_item" || action === "equip_item" || action === "use_item") {
+    } else if (
+      action === "buy_item" ||
+      action === "equip_item" ||
+      action === "use_item"
+    ) {
       setMobileTab("inventory");
     }
   }
