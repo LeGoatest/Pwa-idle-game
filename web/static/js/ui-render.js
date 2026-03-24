@@ -71,11 +71,15 @@ function combatModeXP(state) {
   }
 }
 
-function actionSpeedLabel(state, runtime) {
+function combatDuration(state, runtime) {
   const monsterId = state?.ui?.currentMonsterId || "";
   const reg = runtime?.registry;
   const monster = reg?.monsters?.[monsterId] || reg?.Monsters?.[monsterId];
-  const duration = monster?.durationMs ?? monster?.DurationMS ?? 0;
+  return monster?.durationMs ?? monster?.DurationMS ?? 0;
+}
+
+function actionSpeedLabel(state, runtime) {
+  const duration = combatDuration(state, runtime);
   if (!duration || duration <= 0) return "--";
   return `${(duration / 1000).toFixed(2)}s`;
 }
@@ -136,6 +140,11 @@ function renderCombatTraining(state, runtime) {
   if (speed) {
     speed.textContent = actionSpeedLabel(state, runtime);
   }
+
+  const enemySpeed = byId("enemy-action-label");
+  if (enemySpeed) {
+    enemySpeed.textContent = actionSpeedLabel(state, runtime);
+  }
 }
 
 function renderStateBits(state, runtime) {
@@ -147,15 +156,22 @@ function renderStateBits(state, runtime) {
   if (byId("stats-combat-level")) byId("stats-combat-level").textContent = String(state.combatLevel ?? 1);
   if (byId("stats-wood-level")) byId("stats-wood-level").textContent = String(state.woodLevel ?? 1);
 
-  if (byId("enemy-hp")) byId("enemy-hp").textContent = `${state.enemyHp ?? 0} / ${state.enemyMaxHp ?? 0}`;
+  const enemyHpTop = byId("enemy-hp-top");
+  if (enemyHpTop) enemyHpTop.textContent = String(state.enemyHp ?? 0);
 
-  const enemyFill = byId("enemy-hp-fill");
-  if (enemyFill) enemyFill.style.width = pct(state.enemyHp ?? 0, state.enemyMaxHp ?? 0);
+  const playerHpBottom = byId("player-hp-bottom");
+  if (playerHpBottom) playerHpBottom.textContent = String(state.hp ?? 0);
 
   const progressFill = byId("activity-progress-fill");
   if (progressFill) {
-    const raw = Math.max(0, Math.min(100, state.activity?.progress ?? 0));
-    progressFill.style.width = `${raw.toFixed(2)}%`;
+    const duration = combatDuration(state, runtime);
+    progressFill.style.width = pct(state.activity?.progress ?? 0, duration);
+  }
+
+  const enemyActionFill = byId("enemy-action-fill");
+  if (enemyActionFill) {
+    const duration = combatDuration(state, runtime);
+    enemyActionFill.style.width = pct(state.enemyProgress ?? 0, duration);
   }
 
   renderCombatTraining(state, runtime);
