@@ -50,7 +50,7 @@ templ CombatScreen(state *game.GameState, reg *content.Registry) {
 
 				<div class="flex items-center justify-center gap-2">
 					<span class="icon-[mdi--heart] icon-sm text-rose-400"></span>
-					<span class="text-[18px] font-light leading-none">{ fmt.Sprintf("%d", safeEnemyHP(state)) }</span>
+					<span id="enemy-hp-top" class="text-[18px] font-light leading-none">{ fmt.Sprintf("%d", safeEnemyHP(state)) }</span>
 				</div>
 			</div>
 		</section>
@@ -72,13 +72,13 @@ templ CombatScreen(state *game.GameState, reg *content.Registry) {
 			<div class="space-y-1.5 text-center">
 				<div class="h-8 overflow-hidden rounded-[10px] bg-[#242424]">
 					<div
-						id="enemy-hp-fill"
+						id="enemy-action-fill"
 						class="h-full rounded-[10px] bg-[#53c95c]"
-						style={ enemyHPWidth(state) }
+						style={ enemyActionWidth(state, reg) }
 					></div>
 				</div>
-				<div id="enemy-hp" class="text-[16px] font-light leading-none">
-					{ fmt.Sprintf("%d / %d", safeEnemyHP(state), safeEnemyMaxHP(state)) }
+				<div id="enemy-action-label" class="text-[16px] font-light leading-none">
+					{ enemyActionSpeedLabel(state, reg) }
 				</div>
 			</div>
 		</section>
@@ -158,7 +158,7 @@ templ CombatScreen(state *game.GameState, reg *content.Registry) {
 					<div class="flex items-center justify-between gap-2">
 						<div class="flex items-center gap-1.5">
 							<span class="icon-[mdi--heart] icon-sm text-rose-400"></span>
-							<span class="text-[16px] font-light leading-none">{ fmt.Sprintf("%d", safeHP(state)) }</span>
+							<span id="player-hp-bottom" class="text-[16px] font-light leading-none">{ fmt.Sprintf("%d", safeHP(state)) }</span>
 							<span class="text-[14px] leading-none text-[#55d36a]">{ activityKindLabel(state) }</span>
 						</div>
 
@@ -173,11 +173,16 @@ templ CombatScreen(state *game.GameState, reg *content.Registry) {
 	</div>
 }
 
-func enemyHPWidth(state *game.GameState) string {
-	if state == nil || state.EnemyMaxHP <= 0 {
+func enemyActionWidth(state *game.GameState, reg *content.Registry) string {
+	if state == nil || reg == nil {
 		return "width: 0%;"
 	}
-	pct := (float64(state.EnemyHP) / float64(state.EnemyMaxHP)) * 100
+	monster, ok := reg.Monsters[state.UI.CurrentMonsterID]
+	if !ok || monster.DurationMS <= 0 {
+		return "width: 0%;"
+	}
+
+	pct := (state.EnemyProgress / float64(monster.DurationMS)) * 100
 	if pct < 0 {
 		pct = 0
 	}
@@ -222,6 +227,16 @@ func currentEnemyImage(state *game.GameState, reg *content.Registry) string {
 }
 
 func actionSpeedLabel(state *game.GameState, reg *content.Registry) string {
+	if state == nil || reg == nil {
+		return "--"
+	}
+	if monster, ok := reg.Monsters[state.UI.CurrentMonsterID]; ok && monster.DurationMS > 0 {
+		return fmt.Sprintf("%.2fs", float64(monster.DurationMS)/1000.0)
+	}
+	return "--"
+}
+
+func enemyActionSpeedLabel(state *game.GameState, reg *content.Registry) string {
 	if state == nil || reg == nil {
 		return "--"
 	}
@@ -384,11 +399,4 @@ func safeEnemyHP(state *game.GameState) int {
 		return 0
 	}
 	return state.EnemyHP
-}
-
-func safeEnemyMaxHP(state *game.GameState) int {
-	if state == nil {
-		return 0
-	}
-	return state.EnemyMaxHP
 }
