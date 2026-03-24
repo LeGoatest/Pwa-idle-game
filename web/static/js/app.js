@@ -1,3 +1,5 @@
+import "./wasm-loader.js";
+
 import "./ui-actions.js";
 import "./ui-render.js";
 import {
