@@ -1,0 +1,9 @@
+{
+  "zones": [
+    {
+      "id": "verdant_meadows",
+      "name": "Verdant Meadows",
+      "levelRequired": 1
+    }
+  ]
+}
