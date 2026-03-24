@@ -79,6 +79,15 @@ jobs:
           go mod tidy
           test -f go.sum
 
+      - name: Preserve existing historic builds
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/dist-history
+          if [ -d dist/builds ]; then
+            cp -R dist/builds /tmp/dist-history/builds
+          fi
+
       - name: Build dist
         shell: bash
         run: |
@@ -101,7 +110,7 @@ jobs:
           echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
           echo "build_id=${BUILD_ID}" >> "$GITHUB_OUTPUT"
 
-      - name: Copy dist into versioned folders
+      - name: Restore historic builds and publish new build
         shell: bash
         run: |
           set -euo pipefail
@@ -111,13 +120,22 @@ jobs:
           SHORT_SHA="${{ steps.meta.outputs.short_sha }}"
           TARGET_BRANCH="${{ github.event.inputs.target_branch }}"
 
+          mkdir -p dist
           mkdir -p dist/latest
           mkdir -p dist/builds
+
+          # Restore previous build history if it existed
+          if [ -d /tmp/dist-history/builds ]; then
+            rm -rf dist/builds
+            cp -R /tmp/dist-history/builds dist/builds
+          fi
+
           mkdir -p "dist/builds/${BUILD_ID}"
 
+          # Refresh latest only
           find dist/latest -mindepth 1 -maxdepth 1 -exec rm -rf {} + || true
-          find "dist/builds/${BUILD_ID}" -mindepth 1 -maxdepth 1 -exec rm -rf {} + || true
 
+          # Copy current build output into latest and versioned folder
           for entry in dist/*; do
             name="$(basename "$entry")"
             if [ "$name" = "latest" ] || [ "$name" = "builds" ]; then
