@@ -30,7 +30,7 @@
 
       <button
         class="game-header__settings icon-[game-icons--cog]"
-        hx-get="./views/settings.html?v=0.0.10"
+        hx-get="./views/settings.html"
         hx-target="#modal-content"
         hx-trigger="click"
         data-action="open-modal"
@@ -41,9 +41,10 @@
   <main
     id="view-root"
     class="game-main"
-    hx-get="./views/combat.html?v=0.0.10"
+    hx-get="./views/combat.html"
     hx-trigger="load"
     hx-swap="innerHTML"></main>
+
 
   <div id="modal-root" class="game-modal hidden">
     <div id="modal-content" class="game-modal__content"></div>
@@ -90,7 +91,7 @@
 
           <button
             class="game-bottom-nav__item"
-            hx-get="./views/settings.html?v=0.0.10"
+            hx-get="./views/settings.html"
             hx-target="#modal-content"
             hx-trigger="click"
             data-action="open-modal"
@@ -101,6 +102,16 @@
       </div>
     </div>
   </footer>
+
+
+
+  <script>
+    for (const el of document.querySelectorAll('[hx-get^="./views/"]')) {
+      const route = el.getAttribute('hx-get')
+      const cacheBust = encodeURIComponent(window.__ASSET_VERSION__ || Date.now())
+      el.setAttribute('hx-get', `${route}${route.includes('?') ? '&' : '?'}v=${cacheBust}`)
+    }
+  </script>
 
   <script>
     document.write(`<script src="./assets/js/htmx.min.js?v=${window.__ASSET_VERSION__}"><\/script>`)
