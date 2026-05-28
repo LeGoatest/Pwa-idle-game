@@ -1,5 +1,6 @@
 import { xpForLevel } from './systems/progression.js'
 import { getItem } from './item_registry.js'
+import { getEffectiveStats, getItemStatLines } from './systems/stats_system.js'
 
 let toastTimeoutId = null
 let toastRemoveTimeoutId = null
@@ -149,11 +150,14 @@ function renderNav(state) {
 }
 
 function renderStats(state) {
+  const stats = getEffectiveStats(state)
+
   setText('[data-bind="gold"]', String(state.gold ?? 0))
   setText('[data-bind="kills"]', String(state.kills ?? 0))
-  setText('[data-bind="attack"]', String(state.attack ?? 0))
-  setText('[data-bind="defense"]', String(state.defense ?? 0))
-  setText('[data-bind="hp"]', String(state.hp ?? 0))
+  setText('[data-bind="attack"]', String(stats.attack))
+  setText('[data-bind="defense"]', String(stats.defense))
+  setText('[data-bind="hp"]', `${state.hp ?? 0}/${stats.maxHp}`)
+  setText('[data-bind="actionSpeed"]', `${(stats.actionSpeedMs / 1000).toFixed(1)}s`)
 }
 
 function renderInventory(state) {
@@ -165,11 +169,18 @@ function renderInventory(state) {
 
   root.innerHTML = entries.map(([itemId, amount]) => {
     const item = getItem(itemId)
+    const statLines = getItemStatLines(item)
+    const foodLine = item?.type === 'food' && item.heal ? [`Heals ${item.heal} HP`] : []
+    const detail = [...statLines, ...foodLine].join(' · ')
+
     return `
-      <div class="pixel-card flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="icon-[${item?.icon || 'game-icons--cube'}] text-cyan-400 w-5 h-5"></span>
-          <div class="font-black">${item?.name || itemId}</div>
+      <div class="pixel-card flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <span class="icon-[${item?.icon || 'game-icons--cube'}] text-cyan-400 w-5 h-5 shrink-0"></span>
+          <div class="min-w-0">
+            <div class="font-black truncate">${item?.name || itemId}</div>
+            ${detail ? `<div class="text-xs text-zinc-500 truncate">${detail}</div>` : ''}
+          </div>
         </div>
         <div class="font-black">${amount}</div>
       </div>
@@ -189,6 +200,14 @@ function renderEquipment(state) {
 
     const name = slot.querySelector('[data-equip-name]')
     if (name) name.textContent = item?.name || 'Empty'
+
+    const meta = slot.querySelector('[data-equip-meta]')
+    if (meta) meta.textContent = item ? getItemStatLines(item).join(' · ') || 'No modifiers' : 'Nothing equipped'
+
+    const icon = slot.querySelector('[data-equip-icon]')
+    if (icon && item?.icon) {
+      icon.className = `icon-[${item.icon}] icon-lg text-cyan-400`
+    }
   })
 }
 
