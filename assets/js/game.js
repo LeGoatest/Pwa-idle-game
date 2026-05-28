@@ -151,6 +151,43 @@ function setCurrentSkill(skillId) {
   markDirty()
 }
 
+
+function getFirstZoneId() {
+  const firstZone = contentState.zonesIndex?.zones?.[0] || contentState.registry?.zonesList?.[0] || null
+  return typeof firstZone === 'string' ? firstZone : firstZone?.id || null
+}
+
+function getFirstMonsterId(zone = contentState.activeZone) {
+  return zone?.monsters?.[0] || null
+}
+
+function ensureActiveZoneAndMonster({ persist = true, resetEnemy = false } = {}) {
+  if (!contentState.activeZone) {
+    const zoneId = state.ui?.currentZoneId || getFirstZoneId()
+    if (zoneId) {
+      contentState.activeZone = contentState.registry?.zones?.[zoneId] || null
+      if (persist && contentState.activeZone && state.ui.currentZoneId !== zoneId) setCurrentZone(zoneId)
+    }
+  }
+
+  const selectedId = state.ui?.currentMonsterId || getFirstMonsterId(contentState.activeZone)
+  const monster = selectedId ? contentState.registry?.monsters?.[selectedId] || null : null
+
+  if (monster) {
+    contentState.activeMonster = monster
+    if (persist && state.ui.currentMonsterId !== monster.id) setCurrentMonster(monster.id)
+
+    if (resetEnemy || !state.enemyMaxHp || state.enemyMaxHp !== (monster.hp || 12)) {
+      state.enemyMaxHp = monster.hp || 12
+      state.enemyHp = Math.max(0, Math.min(state.enemyHp || state.enemyMaxHp, state.enemyMaxHp)) || state.enemyMaxHp
+    }
+  } else {
+    contentState.activeMonster = null
+  }
+
+  return contentState.activeMonster
+}
+
 function equipByItemId(itemId) {
   const item = getItem(itemId)
   if (!item?.equipSlot) return false
@@ -228,11 +265,12 @@ async function loadInitialContent() {
   hydrateActivityTargets()
 
   if (!state.ui?.currentZoneId && contentState.zonesIndex?.zones?.length) {
-    const firstZone = contentState.zonesIndex.zones[0]
-    openZone(typeof firstZone === 'string' ? firstZone : firstZone.id, true)
+    openZone(getFirstZoneId(), true)
   } else if (state.ui?.currentZoneId) {
     openZone(state.ui.currentZoneId, false)
   }
+
+  ensureActiveZoneAndMonster({ persist: true, resetEnemy: !state.ui?.currentMonsterId })
 
   if (!state.ui?.currentSkillId && contentState.skillsIndex?.skills?.length) {
     const firstSkill = contentState.skillsIndex.skills[0]
@@ -243,6 +281,8 @@ async function loadInitialContent() {
 
   if (state.ui?.currentMonsterId) {
     openMonster(state.ui.currentMonsterId, false)
+  } else {
+    ensureActiveZoneAndMonster({ persist: true })
   }
 }
 
@@ -258,10 +298,14 @@ async function openTab(tab, persist = true) {
     shop: './views/shop.html'
   }
 
+  if (tab === 'combat') ensureActiveZoneAndMonster({ persist: true })
+
   const route = routeMap[tab] || './views/combat.html'
+  const cacheBust = encodeURIComponent(window.__ASSET_VERSION__ || Date.now())
+  const versionedRoute = `${route}${route.includes('?') ? '&' : '?'}v=${cacheBust}`
 
   if (typeof htmx !== 'undefined') {
-    await htmx.ajax('GET', route, {
+    await htmx.ajax('GET', versionedRoute, {
       target: '#view-root',
       swap: 'innerHTML'
     })
@@ -275,14 +319,22 @@ async function openTab(tab, persist = true) {
 
 function openZone(zoneId, persist = true) {
   contentState.activeZone = contentState.registry?.zones?.[zoneId] || null
-  contentState.activeMonster = null
+  const firstMonsterId = getFirstMonsterId(contentState.activeZone)
+  contentState.activeMonster = firstMonsterId ? contentState.registry?.monsters?.[firstMonsterId] || null : null
 
   if (persist) {
     setCurrentZone(zoneId)
-    setCurrentMonster(null)
+    setCurrentMonster(contentState.activeMonster?.id || null)
+  } else if (!state.ui?.currentMonsterId && contentState.activeMonster) {
+    setCurrentMonster(contentState.activeMonster.id)
   }
 
-  state.ui.combatMode = 'zone'
+  if (contentState.activeMonster) {
+    state.enemyMaxHp = contentState.activeMonster.hp || 12
+    state.enemyHp = Math.max(0, Math.min(state.enemyHp || state.enemyMaxHp, state.enemyMaxHp)) || state.enemyMaxHp
+  }
+
+  state.ui.combatMode = contentState.activeMonster ? 'monster' : 'zone'
   markDirty()
   render(state, contentState)
 }
@@ -290,7 +342,12 @@ function openZone(zoneId, persist = true) {
 function openMonster(monsterId, persist = true) {
   contentState.activeMonster = contentState.registry?.monsters?.[monsterId] || null
 
-  if (persist) setCurrentMonster(monsterId)
+  if (!contentState.activeMonster) {
+    console.warn(`[content] Monster "${monsterId}" is not loaded. Falling back to the first monster in the active zone.`)
+    ensureActiveZoneAndMonster({ persist, resetEnemy: false })
+  }
+
+  if (persist && contentState.activeMonster) setCurrentMonster(contentState.activeMonster.id)
 
   if (contentState.activeMonster) {
     state.ui.combatMode = 'monster'
@@ -335,18 +392,21 @@ function startSkillNode(nodeId) {
 }
 
 function startFight() {
-  if (!contentState.activeMonster) return
+  const monster = contentState.activeMonster || ensureActiveZoneAndMonster({ persist: true, resetEnemy: true })
+  if (!monster) return
 
   startActivity(state, {
     kind: 'combat',
-    monsterId: contentState.activeMonster.id
+    monsterId: monster.id
   })
 
-  state.enemyHp = contentState.activeMonster.hp || 12
-  state.enemyMaxHp = contentState.activeMonster.hp || 12
+  state.enemyHp = monster.hp || 12
+  state.enemyMaxHp = monster.hp || 12
+  contentState.activeMonster = monster
+  setCurrentMonster(monster.id)
 
   markDirty()
-  showToast('Combat', `Fighting ${contentState.activeMonster.name}`)
+  showToast('Combat', `Fighting ${monster.name}`)
   render(state, contentState)
   void save()
 }

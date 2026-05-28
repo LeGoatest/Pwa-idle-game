@@ -4,7 +4,7 @@ async function fetchJSON(path) {
   if (cache.has(path)) return cache.get(path)
 
   const res = await fetch(path, { cache: 'no-store' })
-  if (!res.ok) throw new Error(`Failed to load ${path}`)
+  if (!res.ok) throw new Error(`Failed to load ${path} (${res.status})`)
 
   const json = await res.json()
   cache.set(path, json)
@@ -27,6 +27,32 @@ async function fetchJSONL(path) {
 
   cache.set(path, rows)
   return rows
+}
+
+function warnMissingContent(type, id, error) {
+  console.warn(`[content] Missing ${type} "${id}". Rendering a placeholder so the UI can continue.`, error)
+}
+
+function createMonsterPlaceholder(id, error) {
+  warnMissingContent('monster', id, error)
+
+  const name = id
+    .split('_')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ') || 'Unknown Monster'
+
+  return {
+    id,
+    name,
+    level: 1,
+    hp: 12,
+    attack: 1,
+    defense: 0,
+    durationMs: 3000,
+    xp: 1,
+    missingContent: true
+  }
 }
 
 function index(rows) {
@@ -70,11 +96,9 @@ async function loadMonsters(zones) {
     }
   }
 
-  const rows = await Promise.all(
-    [...ids].map((id) => fetchJSON(`./content/monsters/${id}.json`).catch(() => null))
+  return Promise.all(
+    [...ids].map((id) => fetchJSON(`./content/monsters/${id}.json`).catch((error) => createMonsterPlaceholder(id, error)))
   )
-
-  return rows.filter(Boolean)
 }
 
 async function loadShopItems(shopIndex) {
@@ -102,10 +126,11 @@ export async function loadRegistry() {
     fetchJSON('./content/shop_index.json').catch(() => ({ items: [] }))
   ])
 
-  const [skills, zones, monsters, shopItems] = await Promise.all([
+  const zones = await loadZones(zonesIndex)
+
+  const [skills, monsters, shopItems] = await Promise.all([
     loadSkills(skillsIndex),
-    loadZones(zonesIndex),
-    loadMonsters(await loadZones(zonesIndex)),
+    loadMonsters(zones),
     loadShopItems(shopIndex)
   ])
 

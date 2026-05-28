@@ -1,4 +1,4 @@
-const CACHE = 'idle-frontier-v0.0.8';
+const CACHE = 'idle-frontier-v0.0.9';
 
 const SHELL_ASSETS = [
   './',

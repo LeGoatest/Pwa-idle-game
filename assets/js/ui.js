@@ -158,10 +158,16 @@ function renderStats(state) {
   setText('[data-bind="defense"]', String(stats.defense))
   setText('[data-bind="hp"]', `${state.hp ?? 0}/${stats.maxHp}`)
   setText('[data-bind="actionSpeed"]', `${(stats.actionSpeedMs / 1000).toFixed(2)}s`)
-  setText('[data-bind="combatLevel"]', String(state.combatLevel ?? 1))
-  setText('[data-bind="combatXp"]', String(state.combatXp ?? 0))
-  setText('[data-bind="combatNextXp"]', String(xpForLevel((state.combatLevel ?? 1) + 1)))
+  const combatLevel = state.combatLevel ?? 1
+  const combatNextXp = xpForLevel(combatLevel)
+  const combatXp = state.combatXp ?? 0
+
+  setText('[data-bind="combatLevel"]', String(combatLevel))
+  setText('[data-bind="combatXp"]', String(combatXp))
+  setText('[data-bind="combatNextXp"]', String(combatNextXp))
+  setWidth('[data-task-bar]', Math.max(0, Math.min(100, (combatXp / combatNextXp) * 100)))
 }
+
 
 function renderMonsterList(contentState) {
   const root = document.querySelector('[data-monster-list]')
@@ -180,50 +186,74 @@ function renderMonsterList(contentState) {
   `).join('')
 }
 
+function resolvePanelMonster(state, contentState) {
+  const registry = contentState.registry?.monsters || {}
+  const zoneMonsterIds = contentState.activeZone?.monsters || []
+  const firstId = zoneMonsterIds[0] || null
+  const selectedId = state.ui?.currentMonsterId || firstId || contentState.activeMonster?.id || null
+
+  return registry[selectedId] || registry[firstId] || contentState.activeMonster || null
+}
+
 function renderMonsterPanel(state, contentState) {
   const root = document.querySelector('[data-monster-panel]')
   if (!root) return
 
-  const monster = contentState.activeMonster
-    || contentState.registry?.monsters?.[contentState.activeZone?.monsters?.[0]]
-    || null
+  const monster = resolvePanelMonster(state, contentState)
 
   if (!monster) {
     root.innerHTML = `
-      <div class="rounded-[2rem] bg-zinc-800/80 p-8 text-center text-zinc-500">
-        Select a monster
+      <div class="rounded-[2rem] bg-zinc-800/80 p-8 text-center text-zinc-400 border border-zinc-700/50">
+        <div class="text-4xl mb-3">◈</div>
+        <div class="text-lg font-black">No monster available</div>
+        <div class="text-xs text-zinc-500 mt-1">Choose a zone with monsters to begin combat.</div>
       </div>
     `
     return
   }
 
   const enemyMaxHp = monster.hp || state.enemyMaxHp || 1
-  const enemyHp = Math.max(0, Math.min(state.enemyHp || enemyMaxHp, enemyMaxHp))
+  const isSelectedActivity = state.activity?.kind === 'combat' && state.activity?.monsterId === monster.id
+  const visibleEnemyHp = isSelectedActivity ? state.enemyHp : enemyMaxHp
+  const enemyHp = Math.max(0, Math.min(visibleEnemyHp || enemyMaxHp, enemyMaxHp))
   const enemyPct = Math.max(0, Math.min(100, (enemyHp / enemyMaxHp) * 100))
+  const enemySpeed = monster.attackSpeedMs || monster.durationMs || 3000
+  const enemyProgressPct = isSelectedActivity
+    ? Math.max(0, Math.min(100, ((state.activity?.enemyProgress || 0) / enemySpeed) * 100))
+    : 0
+  const missingBadge = monster.missingContent
+    ? '<div class="mt-3 rounded-2xl bg-amber-500/10 border border-amber-400/30 px-3 py-2 text-xs font-black uppercase tracking-widest text-amber-300">Missing content placeholder</div>'
+    : ''
 
   root.innerHTML = `
-    <div class="rounded-[2rem] bg-zinc-700/80 p-5 text-center">
-      <div class="rounded-[1.5rem] bg-zinc-800/70 h-56 flex items-center justify-center mb-4">
-        <div class="rounded-3xl bg-zinc-800/80 w-44 h-44 flex items-center justify-center text-4xl text-zinc-400">◈</div>
-      </div>
-      <div class="text-3xl text-zinc-100">${monster.name}</div>
-    </div>
-
-    <div class="grid grid-cols-4 gap-2 rounded-3xl bg-zinc-700/80 px-4 py-3 text-center text-xl">
-      <div><span class="text-cyan-400">⚔</span> ${monster.attack || 1}</div>
-      <div><span class="text-zinc-300">💪</span> ${monster.level || 1}</div>
-      <div><span class="text-emerald-400">🛡</span> ${monster.defense || 0}</div>
-      <div><span class="text-rose-400">♥</span> ${enemyMaxHp}</div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-5">
-      <div>
-        <div class="h-12 rounded-2xl bg-zinc-800 overflow-hidden">
-          <div class="h-full bg-zinc-600" style="width:${enemyPct}%"></div>
+    <article class="rounded-[2rem] bg-zinc-700/80 p-5 text-center shadow-2xl border border-zinc-600/30">
+      <div class="rounded-[1.5rem] bg-zinc-800/70 h-56 flex items-center justify-center mb-4 border border-zinc-900/40 shadow-inner">
+        <div class="rounded-3xl bg-zinc-800/80 w-44 h-44 flex items-center justify-center border border-zinc-700/60 shadow-[inset_0_0_40px_rgba(0,0,0,0.35)]">
+          <span class="icon-[game-icons--rat] w-24 h-24 text-zinc-300"></span>
         </div>
-        <div class="mt-2 text-center text-xl text-zinc-300">${enemyHp} / ${enemyMaxHp}</div>
       </div>
-      <button class="rounded-2xl bg-green-500 h-12 font-black text-zinc-950" data-action="fightMonster">Fight</button>
+      <h2 class="text-3xl font-black text-zinc-100 tracking-tight">${monster.name}</h2>
+      ${missingBadge}
+    </article>
+
+    <div class="grid grid-cols-4 gap-2 rounded-3xl bg-zinc-700/80 px-4 py-3 text-center text-lg border border-zinc-600/30">
+      <div class="rounded-2xl bg-zinc-800/40 py-2"><span class="text-cyan-400">⚔</span> <span class="font-black tabular-nums">${monster.attack || 1}</span></div>
+      <div class="rounded-2xl bg-zinc-800/40 py-2"><span class="text-zinc-300">💪</span> <span class="font-black tabular-nums">${monster.level || 1}</span></div>
+      <div class="rounded-2xl bg-zinc-800/40 py-2"><span class="text-emerald-400">🛡</span> <span class="font-black tabular-nums">${monster.defense || 0}</span></div>
+      <div class="rounded-2xl bg-zinc-800/40 py-2"><span class="text-rose-400">♥</span> <span class="font-black tabular-nums">${enemyMaxHp}</span></div>
+    </div>
+
+    <div class="rounded-3xl bg-zinc-800/80 p-4 border border-zinc-700/50 space-y-3">
+      <div class="flex items-center justify-between text-xs font-black uppercase tracking-widest text-zinc-500">
+        <span>Enemy HP</span>
+        <span class="tabular-nums text-zinc-300">${enemyHp} / ${enemyMaxHp}</span>
+      </div>
+      <div class="h-8 rounded-2xl bg-zinc-950 overflow-hidden border border-zinc-700/70">
+        <div class="h-full bg-rose-500 transition-all duration-100" style="width:${enemyPct}%"></div>
+      </div>
+      <div class="h-3 rounded-full bg-zinc-950 overflow-hidden border border-zinc-700/70">
+        <div class="h-full bg-cyan-400 transition-all duration-100" style="width:${enemyProgressPct}%"></div>
+      </div>
     </div>
   `
 }
