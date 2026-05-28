@@ -157,7 +157,75 @@ function renderStats(state) {
   setText('[data-bind="attack"]', String(stats.attack))
   setText('[data-bind="defense"]', String(stats.defense))
   setText('[data-bind="hp"]', `${state.hp ?? 0}/${stats.maxHp}`)
-  setText('[data-bind="actionSpeed"]', `${(stats.actionSpeedMs / 1000).toFixed(1)}s`)
+  setText('[data-bind="actionSpeed"]', `${(stats.actionSpeedMs / 1000).toFixed(2)}s`)
+  setText('[data-bind="combatLevel"]', String(state.combatLevel ?? 1))
+  setText('[data-bind="combatXp"]', String(state.combatXp ?? 0))
+  setText('[data-bind="combatNextXp"]', String(xpForLevel((state.combatLevel ?? 1) + 1)))
+}
+
+function renderMonsterList(contentState) {
+  const root = document.querySelector('[data-monster-list]')
+  if (!root) return
+
+  const zone = contentState.activeZone
+  const monsters = (zone?.monsters || [])
+    .map((monsterId) => contentState.registry?.monsters?.[monsterId])
+    .filter(Boolean)
+
+  root.innerHTML = monsters.map((monster) => `
+    <button class="w-full rounded-3xl bg-zinc-800/80 p-4 text-left flex items-center justify-between" data-monster-open="${monster.id}">
+      <span class="font-black">${monster.name}</span>
+      <span class="text-xs text-zinc-400">Lv. ${monster.level || 1}</span>
+    </button>
+  `).join('')
+}
+
+function renderMonsterPanel(state, contentState) {
+  const root = document.querySelector('[data-monster-panel]')
+  if (!root) return
+
+  const monster = contentState.activeMonster
+    || contentState.registry?.monsters?.[contentState.activeZone?.monsters?.[0]]
+    || null
+
+  if (!monster) {
+    root.innerHTML = `
+      <div class="rounded-[2rem] bg-zinc-800/80 p-8 text-center text-zinc-500">
+        Select a monster
+      </div>
+    `
+    return
+  }
+
+  const enemyMaxHp = monster.hp || state.enemyMaxHp || 1
+  const enemyHp = Math.max(0, Math.min(state.enemyHp || enemyMaxHp, enemyMaxHp))
+  const enemyPct = Math.max(0, Math.min(100, (enemyHp / enemyMaxHp) * 100))
+
+  root.innerHTML = `
+    <div class="rounded-[2rem] bg-zinc-700/80 p-5 text-center">
+      <div class="rounded-[1.5rem] bg-zinc-800/70 h-56 flex items-center justify-center mb-4">
+        <div class="rounded-3xl bg-zinc-800/80 w-44 h-44 flex items-center justify-center text-4xl text-zinc-400">◈</div>
+      </div>
+      <div class="text-3xl text-zinc-100">${monster.name}</div>
+    </div>
+
+    <div class="grid grid-cols-4 gap-2 rounded-3xl bg-zinc-700/80 px-4 py-3 text-center text-xl">
+      <div><span class="text-cyan-400">⚔</span> ${monster.attack || 1}</div>
+      <div><span class="text-zinc-300">💪</span> ${monster.level || 1}</div>
+      <div><span class="text-emerald-400">🛡</span> ${monster.defense || 0}</div>
+      <div><span class="text-rose-400">♥</span> ${enemyMaxHp}</div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-5">
+      <div>
+        <div class="h-12 rounded-2xl bg-zinc-800 overflow-hidden">
+          <div class="h-full bg-zinc-600" style="width:${enemyPct}%"></div>
+        </div>
+        <div class="mt-2 text-center text-xl text-zinc-300">${enemyHp} / ${enemyMaxHp}</div>
+      </div>
+      <button class="rounded-2xl bg-green-500 h-12 font-black text-zinc-950" data-action="fightMonster">Fight</button>
+    </div>
+  `
 }
 
 function renderInventory(state) {
@@ -214,6 +282,8 @@ function renderEquipment(state) {
 export function render(state, contentState) {
   renderNav(state)
   renderStats(state)
+  renderMonsterList(contentState)
+  renderMonsterPanel(state, contentState)
   renderInventory(state)
   renderEquipment(state)
 }
