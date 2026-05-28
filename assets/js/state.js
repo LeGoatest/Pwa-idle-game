@@ -3,14 +3,16 @@ export const MAX_OFFLINE_MS = 8 * 60 * 60 * 1000
 export const SAVE_DEBOUNCE_MS = 5000
 
 export const defaultState = {
-  version: 8,
+  version: 9,
 
   gold: 0,
   kills: 0,
 
   attack: 2,
   defense: 1,
+  maxHp: 20,
   hp: 20,
+  actionSpeedMs: 3000,
 
   woodXp: 0,
   mineXp: 0,
@@ -43,9 +45,11 @@ export const defaultState = {
 
   activity: {
     kind: 'none',
-    progress: 0
+    progress: 0,
+    enemyProgress: 0
   },
 
+  lastFoodEaten: null,
   updatedAt: Date.now()
 }
 
