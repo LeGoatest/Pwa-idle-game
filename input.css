@@ -135,8 +135,28 @@
     @apply text-[10px] font-black uppercase tracking-widest text-game-muted;
   }
 
+  .game-header__pulse {
+    @apply h-2 w-2 rounded-full bg-cyan-500;
+  }
+
+  .game-header__actions {
+    @apply flex shrink-0 items-center gap-3;
+  }
+
+  .game-header__settings {
+    @apply h-6 w-6 text-zinc-400 transition-colors hover:text-white;
+  }
+
   .game-resource-pill {
     @apply flex items-center gap-1.5 rounded-full border border-zinc-700/50 bg-zinc-800/50 px-2.5 py-1;
+  }
+
+  .game-resource-pill__icon {
+    @apply text-yellow-500;
+  }
+
+  .game-resource-pill__value {
+    @apply text-sm font-medium tabular-nums;
   }
 
   .game-main {
@@ -176,6 +196,22 @@
     @apply absolute -top-10 flex h-20 w-20 items-center justify-center rounded-full border-4 border-zinc-900 bg-zinc-950 text-zinc-100 shadow-[0_10px_30px_rgb(0_0_0_/_0.35)];
   }
 
+  .game-bottom-nav__primary[aria-selected="true"] {
+    @apply text-accent-cyan;
+  }
+
+  .game-bottom-nav__spacer {
+    @apply h-10;
+  }
+
+  .game-modal {
+    @apply fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/80 p-4 backdrop-blur-sm;
+  }
+
+  .game-modal__content {
+    @apply pointer-events-auto w-full max-w-sm;
+  }
+
   .game-card,
   .pixel-card,
   .card {
@@ -200,7 +236,99 @@
   }
 
   .game-icon-button {
-    @apply game-icon-center rounded-2xl bg-zinc-700/80 text-zinc-100 transition active:scale-95;
+    @apply grid place-items-center rounded-2xl bg-zinc-700/80 text-zinc-100 transition active:scale-95;
+  }
+
+  .game-toast {
+    @apply fixed bottom-28 left-1/2 z-[200] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 rounded-2xl border border-cyan-500/30 bg-zinc-900/95 p-4 shadow-[0_0_30px_rgb(34_211_238_/_0.2)] backdrop-blur-md;
+  }
+
+  .game-toast__content {
+    @apply flex items-center gap-3;
+  }
+
+  .game-toast__icon-box {
+    @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-500/30 bg-cyan-500/10;
+  }
+
+  .game-toast__icon {
+    @apply h-6 w-6 text-cyan-400;
+  }
+
+  .game-toast__body {
+    @apply min-w-0;
+  }
+
+  .game-toast__title {
+    @apply text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500/70;
+  }
+
+  .game-toast__text {
+    @apply truncate text-sm font-black text-zinc-100;
+  }
+
+  .game-toast.is-dismissing {
+    @apply translate-y-2 opacity-0 transition-all duration-300;
+  }
+
+  .htmx-error-card {
+    @apply text-center text-red-400;
+  }
+
+  .offline-summary {
+    @apply border-cyan-500/30 bg-zinc-900 shadow-[0_0_50px_rgb(34_211_238_/_0.15)];
+  }
+
+  .offline-summary__header {
+    @apply mb-6 text-center;
+  }
+
+  .offline-summary__icon-box {
+    @apply mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full border border-cyan-500/20 bg-cyan-500/10;
+  }
+
+  .offline-summary__icon {
+    @apply h-10 w-10 text-cyan-400;
+  }
+
+  .offline-summary__title {
+    @apply text-2xl font-black uppercase italic tracking-tighter;
+  }
+
+  .offline-summary__meta {
+    @apply text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500;
+  }
+
+  .offline-summary__grid {
+    @apply mb-6 grid grid-cols-2 gap-3;
+  }
+
+  .offline-summary__item {
+    @apply flex items-center gap-3 rounded-xl border border-zinc-700/30 bg-zinc-800/50 p-3;
+  }
+
+  .offline-summary__item-icon {
+    @apply h-5 w-5 text-cyan-400;
+  }
+
+  .offline-summary__item-name {
+    @apply text-[8px] font-black uppercase text-zinc-500;
+  }
+
+  .offline-summary__item-amount {
+    @apply text-sm font-black tabular-nums;
+  }
+
+  .offline-summary__button {
+    @apply flex w-full items-center justify-center gap-2 py-4;
+  }
+
+  .offline-summary__button-text {
+    @apply text-xs font-black uppercase tracking-widest;
+  }
+
+  .page-title {
+    @apply text-xl font-black uppercase italic tracking-tight;
   }
 
   .combat-screen {
@@ -215,20 +343,48 @@
     @apply rounded-[2rem] bg-zinc-700/80 p-5 text-center;
   }
 
+  .monster-card--placeholder {
+    @apply bg-zinc-800/80 p-8 text-zinc-400;
+  }
+
+  .monster-card__placeholder-icon {
+    @apply mb-3 text-4xl;
+  }
+
+  .monster-card__placeholder-title {
+    @apply text-lg font-black;
+  }
+
+  .monster-card__placeholder-copy {
+    @apply mt-1 text-xs text-zinc-500;
+  }
+
+  .monster-card__missing-badge {
+    @apply mt-3 rounded-2xl border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs font-black uppercase tracking-widest text-amber-300;
+  }
+
   .monster-card__media {
     @apply mb-4 flex h-56 items-center justify-center rounded-[1.5rem] bg-zinc-800/70;
   }
 
   .monster-card__sprite-box {
-    @apply center-items h-44 w-44 rounded-3xl bg-zinc-800/80 text-4xl text-zinc-400;
+    @apply grid h-44 w-44 place-items-center rounded-3xl bg-zinc-800/80 text-4xl text-zinc-400;
   }
 
   .monster-card__title {
-    @apply text-3xl text-zinc-100;
+    @apply text-3xl font-black tracking-tight text-zinc-100;
+  }
+
+  .monster-card__sprite-icon {
+    @apply h-24 w-24 text-zinc-300;
   }
 
   .monster-stat-row {
     @apply grid grid-cols-4 gap-2 rounded-3xl bg-zinc-700/80 px-4 py-3 text-center text-xl;
+  }
+
+  .monster-stat-row__item {
+    @apply rounded-2xl bg-zinc-800/40 py-2 font-black tabular-nums;
   }
 
   .monster-stat-row__attack { @apply text-accent-cyan; }
@@ -242,6 +398,34 @@
 
   .combat-meter {
     @apply h-12 overflow-hidden rounded-2xl bg-zinc-800;
+  }
+
+  .combat-meter--enemy-hp {
+    @apply h-8 bg-zinc-950;
+  }
+
+  .combat-meter--enemy-action {
+    @apply h-3 rounded-full bg-zinc-950;
+  }
+
+  .combat-meter__fill--hp {
+    @apply bg-rose-500;
+  }
+
+  .combat-meter__fill--action {
+    @apply bg-cyan-400;
+  }
+
+  .combat-meter-panel {
+    @apply space-y-3 rounded-3xl border border-zinc-700/50 bg-zinc-800/80 p-4;
+  }
+
+  .combat-meter-panel__label-row {
+    @apply flex items-center justify-between text-xs font-black uppercase tracking-widest text-zinc-500;
+  }
+
+  .combat-meter-panel__value {
+    @apply tabular-nums text-zinc-300;
   }
 
   .combat-meter__fill {
@@ -261,7 +445,11 @@
   }
 
   .combat-weapon-button {
-    @apply center-items aspect-square w-full rounded-3xl border-4 border-orange-400 bg-zinc-700/80 shadow-game-orange-glow;
+    @apply grid aspect-square place-items-center w-full rounded-3xl border-4 border-orange-400 bg-zinc-700/80 shadow-game-orange-glow;
+  }
+
+  .combat-weapon-button__text {
+    @apply text-xl font-black text-zinc-100;
   }
 
   .combat-weapon-icon {
@@ -276,8 +464,12 @@
     @apply flex gap-3;
   }
 
+  .combat-action-row {
+    @apply justify-center;
+  }
+
   .combat-action-button {
-    @apply game-icon-button h-20 w-20 text-xl;
+    @apply grid h-20 w-20 place-items-center rounded-2xl bg-zinc-700/80 text-xl text-zinc-100 transition active:scale-95;
   }
 
   .combat-skill-panel {
@@ -286,6 +478,10 @@
 
   .combat-attack-button {
     @apply rounded-2xl bg-zinc-700/80 px-6 py-5 text-lg font-black text-zinc-100;
+  }
+
+  .combat-attack-button {
+    @apply w-full text-left;
   }
 
   .combat-skill-title {
@@ -300,6 +496,10 @@
     @apply h-full bg-zinc-600 transition-all duration-100;
   }
 
+  .combat-xp-bar__fill {
+    @apply w-0 bg-cyan-500;
+  }
+
   .combat-xp-count {
     @apply text-right text-xl text-zinc-300;
   }
@@ -309,11 +509,120 @@
   }
 
   .combat-utility-button {
-    @apply game-icon-button h-24 text-3xl;
+    @apply grid h-24 place-items-center rounded-2xl bg-zinc-700/80 text-3xl text-zinc-100 transition active:scale-95;
+  }
+
+  .combat-utility-button--guide {
+    @apply text-yellow-300;
+  }
+
+  .combat-utility-button--locked {
+    @apply bg-zinc-800/80 text-zinc-500;
   }
 
   .combat-resource-footer {
     @apply flex items-center justify-between rounded-full bg-zinc-700/80 px-5 py-3 text-xl;
+  }
+
+  .combat-resource-footer__hp-icon { @apply text-rose-400; }
+  .combat-resource-footer__heal { @apply text-emerald-400; }
+  .combat-resource-footer__gold-icon { @apply text-yellow-300; }
+
+  .monster-list.is-hidden {
+    @apply hidden;
+  }
+
+  .monster-list__button {
+    @apply flex w-full items-center justify-between rounded-3xl bg-zinc-800/80 p-4 text-left;
+  }
+
+  .monster-list__name {
+    @apply font-black;
+  }
+
+  .monster-list__meta {
+    @apply text-xs text-zinc-400;
+  }
+
+  .inventory-screen,
+  .equipment-screen {
+    @apply space-y-4;
+  }
+
+  .inventory-list {
+    @apply space-y-3;
+  }
+
+  .inventory-item {
+    @apply relative flex items-center justify-between gap-3 overflow-hidden rounded-[var(--radius-game-lg)] border border-game-border-soft bg-game-panel p-4 shadow-game-soft;
+  }
+
+  .inventory-item__body-wrap {
+    @apply flex min-w-0 items-center gap-3;
+  }
+
+  .inventory-item__icon {
+    @apply h-5 w-5 shrink-0 text-cyan-400;
+  }
+
+  .inventory-item__body {
+    @apply min-w-0;
+  }
+
+  .inventory-item__name {
+    @apply truncate font-black;
+  }
+
+  .inventory-item__meta {
+    @apply truncate text-xs text-zinc-500;
+  }
+
+  .inventory-item__amount {
+    @apply font-black;
+  }
+
+  .equipment-list {
+    @apply grid grid-cols-1 gap-3;
+  }
+
+  .equipment-slot {
+    @apply relative flex items-center gap-4 overflow-hidden rounded-[var(--radius-game-lg)] border border-game-border-soft bg-game-panel p-4 shadow-game-soft;
+  }
+
+  .equipment-slot__icon {
+    @apply h-10 w-10 text-zinc-600;
+  }
+
+  .equipment-slot__icon--equipped {
+    @apply text-cyan-400;
+  }
+
+  .equipment-slot__body {
+    @apply min-w-0;
+  }
+
+  .equipment-slot__name {
+    @apply font-black;
+  }
+
+  .equipment-slot__meta {
+    @apply text-xs text-zinc-500;
+  }
+
+  .shop-list {
+    @apply space-y-4;
+  }
+
+  .shop-item {
+    @apply relative flex items-center justify-between gap-4 overflow-hidden rounded-[var(--radius-game-lg)] border border-game-border-soft bg-game-panel p-4 shadow-game-soft;
+  }
+
+  .shop-item__name {
+    @apply font-black;
+  }
+
+  .shop-item__description {
+    @apply text-sm text-zinc-500;
   }
 
   .stat-ribbon {
@@ -346,7 +655,7 @@
   }
 
   .ui-grid-item-slot {
-    @apply center-items aspect-square cursor-pointer rounded-xl border-2 border-dashed border-zinc-800 bg-zinc-900 transition-colors hover:border-cyan-500/50;
+    @apply grid aspect-square place-items-center cursor-pointer rounded-xl border-2 border-dashed border-zinc-800 bg-zinc-900 transition-colors hover:border-cyan-500/50;
   }
 
   .ui-grid-item-slot.active,
@@ -357,6 +666,8 @@
   .icon-sm { @apply h-4 w-4; }
   .icon-md { @apply h-6 w-6; }
   .icon-lg { @apply h-10 w-10; }
+  .icon-nav { @apply h-7 w-7; }
+  .icon-nav-primary { @apply h-9 w-9; }
 
   .icon-active {
     @apply text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)];

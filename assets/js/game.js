@@ -312,7 +312,7 @@ async function openTab(tab, persist = true) {
   } else {
     const root = document.getElementById('view-root')
     if (root) {
-      root.innerHTML = `<div class="pixel-card text-center text-red-400">HTMX not loaded</div>`
+      root.innerHTML = `<div class="game-card htmx-error-card">HTMX not loaded</div>`
     }
   }
 }
@@ -513,12 +513,12 @@ function renderShop() {
   if (!root) return
 
   root.innerHTML = (contentState.shopItems || []).map((item) => `
-    <div class="pixel-card flex items-center justify-between gap-4">
+    <div class="shop-item">
       <div>
-        <div class="font-black">${item.name}</div>
-        <div class="text-sm text-zinc-500">${item.description}</div>
+        <div class="shop-item__name">${item.name}</div>
+        <div class="shop-item__description">${item.description}</div>
       </div>
-      <button class="btn-primary" data-action="buyItem" data-item-id="${item.id}">
+      <button class="game-button game-button--primary" data-action="buyItem" data-item-id="${item.id}">
         Buy (${item.price})
       </button>
     </div>
