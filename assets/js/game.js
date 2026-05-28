@@ -162,16 +162,28 @@ function getFirstMonsterId(zone = contentState.activeZone) {
 }
 
 function ensureActiveZoneAndMonster({ persist = true, resetEnemy = false } = {}) {
+  const preferredZoneId = state.ui?.currentZoneId || getFirstZoneId()
+  contentState.activeZone = preferredZoneId ? contentState.registry?.zones?.[preferredZoneId] || null : null
+
   if (!contentState.activeZone) {
-    const zoneId = state.ui?.currentZoneId || getFirstZoneId()
-    if (zoneId) {
-      contentState.activeZone = contentState.registry?.zones?.[zoneId] || null
-      if (persist && contentState.activeZone && state.ui.currentZoneId !== zoneId) setCurrentZone(zoneId)
-    }
+    const firstZoneId = getFirstZoneId()
+    contentState.activeZone = firstZoneId ? contentState.registry?.zones?.[firstZoneId] || null : null
+    if (persist && contentState.activeZone && state.ui.currentZoneId !== firstZoneId) setCurrentZone(firstZoneId)
+  } else if (persist && state.ui.currentZoneId !== preferredZoneId) {
+    setCurrentZone(preferredZoneId)
   }
 
   const selectedId = state.ui?.currentMonsterId || getFirstMonsterId(contentState.activeZone)
-  const monster = selectedId ? contentState.registry?.monsters?.[selectedId] || null : null
+  let monster = selectedId ? contentState.registry?.monsters?.[selectedId] || null : null
+
+  if (!monster && selectedId) {
+    console.warn(`[content] Monster "${selectedId}" is not loaded. Falling back to the first monster in the active zone.`)
+  }
+
+  const fallbackMonsterId = getFirstMonsterId(contentState.activeZone)
+  if (!monster && fallbackMonsterId) {
+    monster = contentState.registry?.monsters?.[fallbackMonsterId] || null
+  }
 
   if (monster) {
     contentState.activeMonster = monster

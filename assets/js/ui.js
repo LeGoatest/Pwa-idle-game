@@ -152,18 +152,41 @@ function renderMonsterList(contentState) {
   `).join('')
 }
 
-function resolvePanelMonster(state, contentState) {
-  const registry = contentState.registry?.monsters || {}
-  const zoneMonsterIds = contentState.activeZone?.monsters || []
-  const firstId = zoneMonsterIds[0] || null
-  const selectedId = state.ui?.currentMonsterId || firstId || contentState.activeMonster?.id || null
+function getFirstZoneFromIndex(contentState) {
+  const firstZone = contentState.zonesIndex?.zones?.[0] || contentState.registry?.zonesList?.[0] || null
+  const firstZoneId = typeof firstZone === 'string' ? firstZone : firstZone?.id || null
+  return firstZoneId ? contentState.registry?.zones?.[firstZoneId] || null : null
+}
 
-  if (selectedId && !registry[selectedId] && !warnedMissingMonsters.has(selectedId)) {
-    console.warn(`[content] Monster "${selectedId}" is missing. Rendering the first active-zone monster or placeholder card.`)
-    warnedMissingMonsters.add(selectedId)
+function createMissingMonsterCard(monsterId) {
+  if (monsterId && !warnedMissingMonsters.has(monsterId)) {
+    console.warn(`[content] Monster "${monsterId}" is missing. Rendering a placeholder monster card.`)
+    warnedMissingMonsters.add(monsterId)
   }
 
-  return registry[selectedId] || registry[firstId] || contentState.activeMonster || null
+  return {
+    id: monsterId || 'missing_monster',
+    name: monsterId ? monsterId.replace(/_/g, ' ') : 'Unknown Monster',
+    level: 1,
+    hp: 1,
+    attack: 0,
+    defense: 0,
+    durationMs: 3000,
+    missingContent: true
+  }
+}
+
+function resolvePanelMonster(state, contentState) {
+  const registry = contentState.registry?.monsters || {}
+  const firstZone = contentState.activeZone || getFirstZoneFromIndex(contentState)
+  const firstZoneMonsterId = firstZone?.monsters?.[0] || null
+  const selectedId = state.ui?.currentMonsterId || firstZoneMonsterId || contentState.activeMonster?.id || null
+
+  if (!selectedId) return contentState.activeMonster || null
+
+  if (registry[selectedId]) return registry[selectedId]
+
+  return createMissingMonsterCard(selectedId)
 }
 
 function renderMonsterPanel(state, contentState) {
