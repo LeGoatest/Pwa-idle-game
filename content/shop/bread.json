@@ -1,0 +1,1 @@
+{"id":"bread","name":"Bread","description":"Simple food.","price":8,"effect":{"type":"item","itemKey":"bread","amount":1}}
