@@ -7,7 +7,10 @@
   <title>Idle Frontier PWA</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/icons/icon.svg">
-  <link rel="stylesheet" href="./assets/css/style.css?v=15">
+  <script>
+    window.__ASSET_VERSION__ = new Date().toISOString().replace(/[-:.TZ]/g, '')
+    document.write(`<link rel="stylesheet" href="./assets/css/style.css?v=${window.__ASSET_VERSION__}">`)
+  </script>
 </head>
 <body class="mx-auto max-w-md bg-gamebg text-zinc-100 min-h-screen flex flex-col pb-24 shadow-2xl">
   <header class="w-full bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800 p-4 flex items-center justify-between">
@@ -100,13 +103,15 @@
     </div>
   </div>
   </footer>
-  
-  <script src="./assets/js/htmx.min.js"></script>
-  <script type="module" src="./assets/js/game.js?v=15"></script>
+
+  <script>
+    document.write(`<script src="./assets/js/htmx.min.js?v=${window.__ASSET_VERSION__}"><\/script>`)
+    document.write(`<script type="module" src="./assets/js/game.js?v=${window.__ASSET_VERSION__}"><\/script>`)
+  </script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
-        .register('./sw.js')
+        .register(`./sw.js?v=${window.__ASSET_VERSION__}`)
         .then((reg) => console.log('SW Registered', reg))
         .catch((err) => console.log('SW Failed', err));
     }
