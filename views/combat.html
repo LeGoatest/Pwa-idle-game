@@ -1,47 +1,47 @@
-<div class="space-y-5">
-  <section data-monster-panel class="space-y-4"></section>
+<div class="combat-screen">
+  <section data-monster-panel class="combat-screen__monster-panel"></section>
 
-  <section class="grid grid-cols-2 gap-5">
-    <div class="space-y-3">
+  <section class="combat-controls">
+    <div class="combat-weapon-panel">
       <button
-        class="w-full aspect-square rounded-[2rem] bg-zinc-700/80 border-4 border-orange-400 shadow-[0_0_25px_rgba(251,146,60,0.35)] flex flex-col items-center justify-center gap-3 active:scale-95 transition"
+        class="combat-weapon-button"
         data-action="fightMonster"
         aria-label="Fight selected monster">
-        <span class="icon-[game-icons--broadsword] w-20 h-20 text-orange-300"></span>
-        <span class="text-xl font-black text-zinc-100">Fight</span>
+        <span class="icon-[game-icons--broadsword] combat-weapon-icon"></span>
+        <span class="combat-weapon-button__text">Fight</span>
       </button>
-      <div class="text-center text-2xl text-zinc-200">Weapon</div>
+      <div class="combat-weapon-label">Weapon</div>
 
-      <div class="flex justify-center gap-3">
-        <button class="rounded-2xl bg-zinc-700/80 w-20 h-20 text-xl font-black active:scale-95 transition" data-action="fightMonster" aria-label="Start combat">▶</button>
-        <button class="rounded-2xl bg-zinc-700/80 w-20 h-20 text-xl font-black active:scale-95 transition" data-action="stopActivity" aria-label="Pause combat">Ⅱ</button>
+      <div class="combat-action-row">
+        <button class="combat-action-button" data-action="fightMonster" aria-label="Start combat">▶</button>
+        <button class="combat-action-button" data-action="stopActivity" aria-label="Pause combat">Ⅱ</button>
       </div>
     </div>
 
-    <div class="space-y-3">
-      <button class="rounded-2xl bg-zinc-700/80 px-6 py-5 text-lg font-black text-zinc-100 w-full text-left">
+    <div class="combat-skill-panel">
+      <button class="combat-attack-button">
         ⚔ ATK
       </button>
-      <div class="text-2xl text-zinc-200">ATK Lv. <span data-bind="combatLevel">1</span></div>
-      <div class="h-7 rounded-xl bg-zinc-800 overflow-hidden border border-zinc-700/50">
-        <div data-task-bar class="h-full w-0 bg-cyan-500 transition-all duration-100"></div>
+      <div class="combat-skill-title">ATK Lv. <span data-bind="combatLevel">1</span></div>
+      <div class="combat-xp-bar">
+        <div data-task-bar class="combat-xp-bar__fill"></div>
       </div>
-      <div class="text-right text-xl text-zinc-300"><span data-bind="combatXp">0</span> / <span data-bind="combatNextXp">20</span></div>
+      <div class="combat-xp-count"><span data-bind="combatXp">0</span> / <span data-bind="combatNextXp">20</span></div>
 
-      <div class="grid grid-cols-2 gap-3">
-        <button class="rounded-3xl bg-zinc-700/80 h-24 text-3xl text-yellow-300 active:scale-95 transition" aria-label="Combat guide">📖</button>
-        <button class="rounded-3xl bg-zinc-800/80 h-24 text-3xl text-zinc-500" aria-label="Locked utility">▧</button>
+      <div class="combat-utility-grid">
+        <button class="combat-utility-button combat-utility-button--guide" aria-label="Combat guide">📖</button>
+        <button class="combat-utility-button combat-utility-button--locked" aria-label="Locked utility">▧</button>
       </div>
 
-      <div class="rounded-full bg-zinc-700/80 px-5 py-3 flex items-center justify-between text-xl">
-        <span class="text-rose-400">♥</span>
+      <div class="combat-resource-footer">
+        <span class="combat-resource-footer__hp-icon">♥</span>
         <span data-bind="hp">20</span>
-        <span class="text-emerald-400">+0</span>
-        <span class="text-yellow-300">▰</span>
+        <span class="combat-resource-footer__heal">+0</span>
+        <span class="combat-resource-footer__gold-icon">▰</span>
         <span data-bind="gold">0</span>
       </div>
     </div>
   </section>
 
-  <div data-monster-list class="hidden"></div>
+  <div data-monster-list class="monster-list is-hidden"></div>
 </div>
