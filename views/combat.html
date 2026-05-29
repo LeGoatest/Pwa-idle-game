@@ -1,7 +1,7 @@
 <section class="combat-screen">
   <header class="combat-topbar" aria-label="Combat header">
     <h2 class="combat-topbar__title">Combat</h2>
-    <button class="combat-topbar__help" type="button" aria-label="Combat help">?</button>
+    <button class="combat-topbar__help" type="button" data-action="combatHelp" aria-label="Combat help">?</button>
   </header>
 
   <div data-monster-panel class="combat-monster-stage"></div>
@@ -16,7 +16,7 @@
 
     <div class="combat-timer">
       <div class="combat-timer__track" aria-hidden="true">
-        <div data-enemy-hp-bar class="combat-timer__fill combat-timer__fill--hp"></div>
+        <div data-enemy-action-bar class="combat-timer__fill combat-timer__fill--enemy"></div>
       </div>
       <div class="combat-timer__label" data-bind="enemySpeed">2.4s</div>
     </div>
@@ -44,10 +44,10 @@
   </div>
 
   <div class="combat-actions" aria-label="Combat actions">
-    <button class="combat-action" data-action="fightMonster" aria-label="Start combat">▶</button>
-    <button class="combat-action" data-action="stopActivity" aria-label="Pause combat">↻</button>
-    <button class="combat-action combat-action--locked" type="button" aria-label="Locked action">▧</button>
-    <button class="combat-action combat-action--locked" type="button" aria-label="Locked action">▧</button>
+    <button class="combat-action combat-action--play" data-action="fightMonster" aria-label="Start combat">▶</button>
+    <button class="combat-action combat-action--selector" data-action="openTargetSelector" aria-label="Choose monster">↔</button>
+    <button class="combat-action combat-action--locked" data-action="lockedAction" type="button" aria-label="Locked action">🔒</button>
+    <button class="combat-action combat-action--locked" data-action="lockedAction" type="button" aria-label="Locked action">🔒</button>
   </div>
 
   <div class="combat-status-pill" aria-label="Player status">
@@ -55,5 +55,6 @@
     <span class="combat-status-pill__food">+<span data-bind="lastFoodHeal">0</span></span>
   </div>
 
+  <div data-combat-select-overlay class="combat-select-overlay" aria-hidden="true"></div>
   <div data-monster-list class="is-hidden"></div>
 </section>
