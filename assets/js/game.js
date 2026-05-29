@@ -408,12 +408,14 @@ function openSkill(skillId, persist = true) {
 
 function getScreenHelpText(tab) {
   const helpText = {
-    combat: 'Choose a monster, press play to fight, or use ↔ to change area.',
-    equipment: 'Equip weapons and armor to improve your stats.',
-    skills: 'Choose an activity to gather or craft resources.',
-    items: 'View items, food, and gear.',
-    inventory: 'View items, food, and gear.',
-    shop: 'Buy supplies and equipment.'
+    combat: 'Choose a monster, press play to fight, or use ↔ to change area. The heart stat under the enemy shows current enemy HP.',
+    equipment: 'Equip weapons and armor to improve attack, defense, max health, and action speed.',
+    skills: 'Choose an activity to gather or craft resources. Active work appears under the screen title.',
+    items: 'View items, food, materials, and gear. Food is used to survive longer in combat.',
+    inventory: 'View items, food, materials, and gear. Food is used to survive longer in combat.',
+    shop: 'Buy supplies, food, and equipment when available.',
+    map: 'Choose zones and enemies as they unlock.',
+    settings: 'Manage save data, updates, and app options.'
   }
 
   return helpText[tab] || 'This screen shows current game information.'
@@ -434,9 +436,30 @@ function getScreenHelpTitle(tab) {
   return titleMap[tab] || 'Help'
 }
 
-function showScreenHelp() {
+function openScreenHelpModal() {
   const tab = state.ui?.tab || 'combat'
-  showToast(getScreenHelpTitle(tab), getScreenHelpText(tab))
+  const modalRoot = document.getElementById('modal-root')
+  const modalContent = document.getElementById('modal-content')
+
+  if (!modalRoot || !modalContent) return
+
+  modalContent.innerHTML = `
+    <section class="screen-help-modal">
+      <header class="screen-help-modal__header">
+        <div>
+          <div class="screen-help-modal__eyebrow">Help</div>
+          <h2 class="screen-help-modal__title">${getScreenHelpTitle(tab)}</h2>
+        </div>
+        <button class="screen-help-modal__close" data-action="close-modal" aria-label="Close help" type="button">×</button>
+      </header>
+      <p class="screen-help-modal__body">${getScreenHelpText(tab)}</p>
+      <button class="game-button game-button--primary screen-help-modal__button" data-action="close-modal" type="button">
+        Got it
+      </button>
+    </section>
+  `
+
+  modalRoot.classList.remove('hidden')
 }
 
 function ensureEnemyHpForMonster(monster) {
@@ -576,7 +599,7 @@ async function act(action, button = null) {
   }
 
   if (action === 'screenHelp' || action === 'combatHelp') {
-    showScreenHelp()
+    openScreenHelpModal()
     return
   }
 

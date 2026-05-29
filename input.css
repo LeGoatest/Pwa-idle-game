@@ -231,7 +231,17 @@
   }
 
   .game-toast {
-    @apply fixed bottom-28 left-1/2 z-[200] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 rounded-2xl border border-cyan-500/30 bg-zinc-900/95 p-4 shadow-[0_0_30px_rgb(34_211_238_/_0.2)] backdrop-blur-md;
+    position: fixed;
+    left: 50%;
+    right: auto;
+    bottom: calc(var(--bottom-nav-height, 6.5rem) + env(safe-area-inset-bottom) + 0.75rem);
+    width: min(calc(100vw - 2rem), 20rem);
+    max-width: 20rem;
+    box-sizing: border-box;
+    transform: translateX(-50%);
+    margin: 0;
+    z-index: 200;
+    @apply rounded-2xl border border-cyan-500/30 bg-zinc-900/95 p-4 shadow-[0_0_30px_rgb(34_211_238_/_0.2)] backdrop-blur-md;
   }
 
   .game-toast__content {
@@ -259,7 +269,37 @@
   }
 
   .game-toast.is-dismissing {
-    @apply translate-y-2 opacity-0 transition-all duration-300;
+    transform: translateX(-50%) translateY(0.5rem);
+    opacity: 0;
+    @apply transition-all duration-300;
+  }
+
+  .screen-help-modal {
+    @apply rounded-[2rem] border border-zinc-700/70 bg-zinc-900/95 p-5 shadow-2xl;
+  }
+
+  .screen-help-modal__header {
+    @apply mb-4 flex items-start justify-between gap-4;
+  }
+
+  .screen-help-modal__eyebrow {
+    @apply text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400/80;
+  }
+
+  .screen-help-modal__title {
+    @apply text-2xl font-black tracking-tight text-zinc-100;
+  }
+
+  .screen-help-modal__close {
+    @apply grid h-9 w-9 shrink-0 place-items-center rounded-full bg-zinc-800 text-xl font-black text-zinc-300 transition active:scale-95;
+  }
+
+  .screen-help-modal__body {
+    @apply mb-5 text-sm leading-6 text-zinc-300;
+  }
+
+  .screen-help-modal__button {
+    @apply w-full py-3 text-center font-black;
   }
 
   .htmx-error-card {
