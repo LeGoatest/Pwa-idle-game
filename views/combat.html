@@ -1,56 +1,58 @@
 <section class="combat-screen">
-  <div data-monster-panel class="combat-screen__monster-panel"></div>
+  <header class="combat-topbar" aria-label="Combat header">
+    <h2 class="combat-topbar__title">Combat</h2>
+    <button class="combat-topbar__help" type="button" aria-label="Combat help">?</button>
+  </header>
 
-  <div class="combat-bars">
-    <div class="combat-bars__track">
-      <div data-task-bar class="combat-bars__fill"></div>
+  <div data-monster-panel class="combat-monster-stage"></div>
+
+  <div class="combat-timers" aria-label="Combat timers">
+    <div class="combat-timer">
+      <div class="combat-timer__track" aria-hidden="true">
+        <div data-task-bar class="combat-timer__fill"></div>
+      </div>
+      <div class="combat-timer__label" data-bind="actionSpeed">3s</div>
     </div>
-    <div class="combat-bars__track combat-bars__track--hp">
-      <div data-enemy-hp-bar class="combat-bars__fill combat-bars__fill--hp"></div>
+
+    <div class="combat-timer">
+      <div class="combat-timer__track" aria-hidden="true">
+        <div data-enemy-hp-bar class="combat-timer__fill combat-timer__fill--hp"></div>
+      </div>
+      <div class="combat-timer__label" data-bind="enemySpeed">2.4s</div>
     </div>
-    <div class="combat-bars__label" data-bind="actionSpeed">2.00s</div>
-    <div class="combat-bars__label" data-bind="enemyHpText">12 / 12</div>
   </div>
 
   <div class="combat-layout">
-    <section class="combat-weapon-panel" aria-label="Weapon controls">
-      <button
-        class="combat-weapon-button"
-        data-action="fightMonster"
-        aria-label="Fight selected monster">
-        <span class="icon-[game-icons--broadsword] combat-weapon-icon"></span>
+    <section class="combat-weapon" aria-label="Weapon slot">
+      <button class="combat-weapon__slot" data-action="fightMonster" aria-label="Fight selected monster">
+        <span class="icon-[game-icons--broadsword] combat-weapon__icon"></span>
       </button>
-      <div class="combat-weapon-label">Weapon</div>
-
-      <div class="combat-action-row">
-        <button class="combat-action-button" data-action="fightMonster" aria-label="Start combat">▶</button>
-        <button class="combat-action-button" data-action="stopActivity" aria-label="Pause combat">Ⅱ</button>
-      </div>
+      <div class="combat-weapon__name">Training Sword</div>
     </section>
 
-    <section class="combat-skill-panel" aria-label="Attack skill">
-      <button class="combat-attack-button" data-action="fightMonster">
-        ⚔ ATK
+    <section class="combat-skill" aria-label="Attack skill">
+      <button class="combat-skill__button" data-action="fightMonster" aria-label="Attack skill">
+        <span>⚔ ATK</span>
+        <span>Lv. <span data-bind="combatLevel">1</span></span>
       </button>
-      <div class="combat-skill-title">ATK Lv. <span data-bind="combatLevel">1</span></div>
-      <div class="combat-xp-bar">
-        <div data-combat-xp-bar class="combat-xp-bar__fill"></div>
+      <div class="combat-skill__title">Attack</div>
+      <div class="combat-skill__xp" aria-hidden="true">
+        <div data-combat-xp-bar class="combat-skill__xp-fill"></div>
       </div>
-      <div class="combat-xp-count"><span data-bind="combatXp">0</span> / <span data-bind="combatNextXp">20</span></div>
-
-      <div class="combat-utility-grid">
-        <button class="combat-utility-button combat-utility-button--guide" aria-label="Combat guide">📖</button>
-        <button class="combat-utility-button combat-utility-button--locked" aria-label="Locked utility">▧</button>
-      </div>
-
-      <div class="combat-resource-footer">
-        <span class="combat-resource-footer__hp-icon">♥</span>
-        <span data-bind="hp">20</span>
-        <span class="combat-resource-footer__heal">+0</span>
-        <span class="combat-resource-footer__gold-icon">▰</span>
-        <span data-bind="gold">0</span>
-      </div>
+      <div class="combat-skill__xp-text"><span data-bind="combatXp">0</span> / <span data-bind="combatNextXp">20</span></div>
     </section>
+  </div>
+
+  <div class="combat-actions" aria-label="Combat actions">
+    <button class="combat-action" data-action="fightMonster" aria-label="Start combat">▶</button>
+    <button class="combat-action" data-action="stopActivity" aria-label="Pause combat">↻</button>
+    <button class="combat-action combat-action--locked" type="button" aria-label="Locked action">▧</button>
+    <button class="combat-action combat-action--locked" type="button" aria-label="Locked action">▧</button>
+  </div>
+
+  <div class="combat-status-pill" aria-label="Player status">
+    <span class="combat-status-pill__hp">♥ <span data-bind="hp">20/20</span></span>
+    <span class="combat-status-pill__food">+<span data-bind="lastFoodHeal">0</span></span>
   </div>
 
   <div data-monster-list class="is-hidden"></div>
