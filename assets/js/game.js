@@ -547,6 +547,19 @@ async function act(action, button = null) {
     return
   }
 
+  if (action === 'toggleCombat') {
+    if (state.activity?.kind === 'combat') {
+      stopActivity(state)
+      state.activity.reason = 'paused'
+      markDirty()
+      render(state, contentState)
+      await save()
+    } else {
+      startFight()
+    }
+    return
+  }
+
   if (action === 'openTargetSelector') {
     openTargetSelector()
     return
