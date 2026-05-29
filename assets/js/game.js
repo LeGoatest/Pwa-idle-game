@@ -365,10 +365,34 @@ function openMonster(monsterId, persist = true) {
     state.ui.combatMode = 'monster'
     state.enemyMaxHp = contentState.activeMonster.hp || 12
     state.enemyHp = state.enemyMaxHp
+    state.activity.progress = 0
+    state.activity.enemyProgress = 0
   }
 
   markDirty()
   render(state, contentState)
+}
+
+function openTargetSelector() {
+  ensureActiveZoneAndMonster({ persist: true })
+  state.ui.targetSelectorOpen = true
+  markDirty()
+  render(state, contentState)
+}
+
+function closeTargetSelector() {
+  state.ui.targetSelectorOpen = false
+  markDirty()
+  render(state, contentState)
+}
+
+function selectMonster(monsterId) {
+  openMonster(monsterId, true)
+  state.ui.targetSelectorOpen = false
+  markDirty()
+  showToast('Combat', `${contentState.activeMonster?.name || 'Monster'} selected`)
+  render(state, contentState)
+  void save()
 }
 
 function openSkill(skillId, persist = true) {
@@ -474,6 +498,26 @@ async function act(action, button = null) {
     return
   }
 
+  if (action === 'openTargetSelector') {
+    openTargetSelector()
+    return
+  }
+
+  if (action === 'closeTargetSelector') {
+    closeTargetSelector()
+    return
+  }
+
+  if (action === 'lockedAction') {
+    showToast('Locked', 'Unlocks later')
+    return
+  }
+
+  if (action === 'combatHelp') {
+    showToast('Combat', 'Choose a monster, then press play to fight.')
+    return
+  }
+
   if (action === 'buyItem') {
     const itemId = button?.dataset.itemId
     if (itemId) await buyItem(itemId)
@@ -542,13 +586,15 @@ function wireEvents() {
   eventsWired = true
 
   document.body.addEventListener('click', (e) => {
-    const button = e.target.closest('[data-action], [data-tab], [data-nav-tab], [data-zone-open], [data-monster-open], [data-skill-open], [data-skill-node]')
+    const button = e.target.closest('[data-action], [data-tab], [data-nav-tab], [data-zone-open], [data-monster-open], [data-monster-select], [data-locked-requirement], [data-skill-open], [data-skill-node]')
     if (!button) return
 
     const action = button.dataset.action
     const tab = button.dataset.tab || button.dataset.navTab
     const zoneOpen = button.dataset.zoneOpen
     const monsterOpen = button.dataset.monsterOpen
+    const monsterSelect = button.dataset.monsterSelect
+    const lockedRequirement = button.dataset.lockedRequirement
     const skillOpen = button.dataset.skillOpen
     const skillNode = button.dataset.skillNode
 
@@ -579,6 +625,16 @@ function wireEvents() {
 
     if (monsterOpen) {
       openMonster(monsterOpen, true)
+      return
+    }
+
+    if (monsterSelect) {
+      selectMonster(monsterSelect)
+      return
+    }
+
+    if (lockedRequirement) {
+      showToast('Locked', `Requires Combat Lv. ${lockedRequirement}`)
       return
     }
 

@@ -40,6 +40,7 @@ export const defaultState = {
     currentMonsterId: null,
     currentSkillId: null,
     combatMode: 'zone',
+    targetSelectorOpen: false,
     skillsMode: 'list'
   },
 

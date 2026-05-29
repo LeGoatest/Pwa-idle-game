@@ -105,6 +105,15 @@ function setWidth(selector, pct) {
   })
 }
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+}
+
 function renderNav(state) {
   const activeTab = state.ui?.tab || 'combat'
 
@@ -136,14 +145,21 @@ function renderStats(state) {
 
 
 
-function renderCombatBars(state) {
+function renderCombatBars(state, contentState) {
   const stats = getEffectiveStats(state)
+  const monster = contentState?.activeMonster || null
+  const enemyDuration = monster?.attackSpeedMs || monster?.durationMs || 3000
   const progress = state.activity?.kind === 'combat'
     ? Math.max(0, Math.min(100, ((state.activity?.progress || 0) / stats.actionSpeedMs) * 100))
     : 0
+  const enemyProgress = state.activity?.kind === 'combat'
+    ? Math.max(0, Math.min(100, ((state.activity?.enemyProgress || 0) / enemyDuration) * 100))
+    : 0
 
-  setText('[data-bind="actionSpeed"]', `${(stats.actionSpeedMs / 1000).toFixed(2)}s`)
+  setText('[data-bind="actionSpeed"]', `${(stats.actionSpeedMs / 1000).toFixed(1)}s`)
+  setText('[data-bind="enemySpeed"]', monster ? `${(enemyDuration / 1000).toFixed(1)}s` : '--')
   setWidth('[data-task-bar]', progress)
+  setWidth('[data-enemy-action-bar]', enemyProgress)
 }
 
 function renderMonsterList(contentState) {
@@ -221,7 +237,7 @@ function renderMonsterPanel(state, contentState) {
       </div>
     `
     setText('[data-bind="enemySpeed"]', '--')
-    setWidth('[data-enemy-hp-bar]', 0)
+    setWidth('[data-enemy-action-bar]', 0)
     return
   }
 
@@ -230,7 +246,6 @@ function renderMonsterPanel(state, contentState) {
   const hasMatchingEnemy = state.enemyMaxHp === enemyMaxHp
   const visibleEnemyHp = isSelectedMonster && hasMatchingEnemy ? state.enemyHp : enemyMaxHp
   const enemyHp = Math.max(0, Math.min(visibleEnemyHp ?? enemyMaxHp, enemyMaxHp))
-  const enemyPct = Math.max(0, Math.min(100, (enemyHp / enemyMaxHp) * 100))
   const enemyDuration = monster.attackSpeedMs || monster.durationMs || 3000
   const missingBadge = monster.missingContent
     ? '<div class="combat-monster-card__missing-badge">Missing content placeholder</div>'
@@ -241,7 +256,7 @@ function renderMonsterPanel(state, contentState) {
       <div class="combat-monster-card__sprite-frame">
         <span class="icon-[game-icons--rat] combat-monster-card__sprite"></span>
       </div>
-      <h2 class="combat-monster-card__name">${monster.name}</h2>
+      <h2 class="combat-monster-card__name">${escapeHtml(monster.name)}</h2>
       ${missingBadge}
     </article>
 
@@ -254,7 +269,77 @@ function renderMonsterPanel(state, contentState) {
   `
 
   setText('[data-bind="enemySpeed"]', `${(enemyDuration / 1000).toFixed(1)}s`)
-  setWidth('[data-enemy-hp-bar]', enemyPct)
+}
+
+
+function getZoneLevelRange(zone, contentState) {
+  const levels = (zone?.monsters || [])
+    .map((monsterId) => contentState.registry?.monsters?.[monsterId]?.level)
+    .filter((level) => Number.isFinite(level))
+
+  if (!levels.length) return '?-?'
+  return `${Math.min(...levels)}-${Math.max(...levels)}`
+}
+
+function renderTargetSelector(state, contentState) {
+  const root = document.querySelector('[data-combat-select-overlay]')
+  if (!root) return
+
+  const isOpen = Boolean(state.ui?.targetSelectorOpen)
+  root.classList.toggle('is-open', isOpen)
+  root.setAttribute('aria-hidden', isOpen ? 'false' : 'true')
+
+  if (!isOpen) {
+    root.innerHTML = ''
+    return
+  }
+
+  const activeZone = contentState.activeZone || getFirstZoneFromIndex(contentState)
+  const zoneTitle = activeZone?.name || 'The Hayloft'
+  const zoneRange = getZoneLevelRange(activeZone, contentState)
+  const selectedMonsterId = state.ui?.currentMonsterId || contentState.activeMonster?.id || ''
+  const monsterIds = activeZone?.monsters || []
+  const enemyCards = monsterIds.slice(0, 4).map((monsterId) => {
+    const monster = contentState.registry?.monsters?.[monsterId] || createMissingMonsterCard(monsterId)
+    const activeClass = monster.id === selectedMonsterId ? ' is-active' : ''
+    return `
+      <button class="combat-enemy-option${activeClass}" data-monster-select="${escapeHtml(monster.id)}" type="button">
+        <span class="combat-enemy-option__sprite">${monster.missingContent ? '?' : '🦇'}</span>
+        <span class="combat-enemy-option__level">${escapeHtml(monster.name)} · ${monster.level || 1}</span>
+      </button>
+    `
+  }).join('')
+  const unknownCards = Array.from({ length: Math.max(0, 4 - monsterIds.slice(0, 4).length) }, () => `
+    <div class="combat-enemy-option combat-enemy-option--unknown">
+      <span class="combat-enemy-option__sprite">?</span>
+      <span class="combat-enemy-option__level">Unknown</span>
+    </div>
+  `).join('')
+  const lockedRows = [5, 10, 15].map((level) => `
+    <button class="combat-locked-area" data-locked-requirement="${level}" type="button">
+      <span class="combat-locked-area__title">Locked</span>
+      <span class="combat-locked-area__range">?-?</span>
+      <span class="combat-locked-area__requirement">⚔ ${level}</span>
+    </button>
+  `).join('')
+
+  root.innerHTML = `
+    <button class="combat-select-overlay__backdrop" data-action="closeTargetSelector" aria-label="Close monster selector"></button>
+    <div class="combat-select-overlay__panel" role="dialog" aria-modal="true" aria-label="Monster and area select">
+      <section class="combat-area-card">
+        <header class="combat-area-card__header">
+          <h3 class="combat-area-card__title">${escapeHtml(zoneTitle)}</h3>
+          <span class="combat-area-card__range">${escapeHtml(zoneRange)}</span>
+        </header>
+        <div class="combat-area-card__enemy-grid">
+          ${enemyCards}${unknownCards}
+        </div>
+      </section>
+      <div class="combat-locked-area-list">
+        ${lockedRows}
+      </div>
+    </div>
+  `
 }
 
 function renderInventory(state) {
@@ -311,9 +396,10 @@ function renderEquipment(state) {
 export function render(state, contentState) {
   renderNav(state)
   renderStats(state)
-  renderCombatBars(state)
+  renderCombatBars(state, contentState)
   renderMonsterList(contentState)
   renderMonsterPanel(state, contentState)
+  renderTargetSelector(state, contentState)
   renderInventory(state)
   renderEquipment(state)
 }
