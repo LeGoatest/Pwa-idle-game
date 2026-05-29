@@ -123,7 +123,6 @@ function renderStats(state) {
   setText('[data-bind="attack"]', String(stats.attack))
   setText('[data-bind="defense"]', String(stats.defense))
   setText('[data-bind="hp"]', `${state.hp ?? 0}/${stats.maxHp}`)
-  setText('[data-bind="actionSpeed"]', `${(stats.actionSpeedMs / 1000).toFixed(2)}s`)
   const combatLevel = state.combatLevel ?? 1
   const combatNextXp = xpForLevel(combatLevel)
   const combatXp = state.combatXp ?? 0
@@ -131,9 +130,20 @@ function renderStats(state) {
   setText('[data-bind="combatLevel"]', String(combatLevel))
   setText('[data-bind="combatXp"]', String(combatXp))
   setText('[data-bind="combatNextXp"]', String(combatNextXp))
-  setWidth('[data-task-bar]', Math.max(0, Math.min(100, (combatXp / combatNextXp) * 100)))
+  setWidth('[data-combat-xp-bar]', Math.max(0, Math.min(100, (combatXp / combatNextXp) * 100)))
 }
 
+
+
+function renderCombatBars(state) {
+  const stats = getEffectiveStats(state)
+  const progress = state.activity?.kind === 'combat'
+    ? Math.max(0, Math.min(100, ((state.activity?.progress || 0) / stats.actionSpeedMs) * 100))
+    : 0
+
+  setText('[data-bind="actionSpeed"]', `${(stats.actionSpeedMs / 1000).toFixed(2)}s`)
+  setWidth('[data-task-bar]', progress)
+}
 
 function renderMonsterList(contentState) {
   const root = document.querySelector('[data-monster-list]')
@@ -211,10 +221,6 @@ function renderMonsterPanel(state, contentState) {
   const visibleEnemyHp = isSelectedActivity ? state.enemyHp : enemyMaxHp
   const enemyHp = Math.max(0, Math.min(visibleEnemyHp || enemyMaxHp, enemyMaxHp))
   const enemyPct = Math.max(0, Math.min(100, (enemyHp / enemyMaxHp) * 100))
-  const enemySpeed = monster.attackSpeedMs || monster.durationMs || 3000
-  const enemyProgressPct = isSelectedActivity
-    ? Math.max(0, Math.min(100, ((state.activity?.enemyProgress || 0) / enemySpeed) * 100))
-    : 0
   const missingBadge = monster.missingContent
     ? '<div class="monster-card__missing-badge">Missing content placeholder</div>'
     : ''
@@ -231,25 +237,15 @@ function renderMonsterPanel(state, contentState) {
     </article>
 
     <div class="monster-stat-row">
-      <div class="monster-stat-row__item"><span class="monster-stat-row__attack">⚔</span> <span>${monster.attack || 1}</span></div>
-      <div class="monster-stat-row__item"><span class="monster-stat-row__level">💪</span> <span>${monster.level || 1}</span></div>
-      <div class="monster-stat-row__item"><span class="monster-stat-row__defense">🛡</span> <span>${monster.defense || 0}</span></div>
-      <div class="monster-stat-row__item"><span class="monster-stat-row__hp">♥</span> <span>${enemyMaxHp}</span></div>
-    </div>
-
-    <div class="combat-meter-panel">
-      <div class="combat-meter-panel__label-row">
-        <span>Enemy HP</span>
-        <span class="combat-meter-panel__value">${enemyHp} / ${enemyMaxHp}</span>
-      </div>
-      <div class="combat-meter combat-meter--enemy-hp">
-        <div class="combat-meter__fill combat-meter__fill--hp" style="width:${enemyPct}%"></div>
-      </div>
-      <div class="combat-meter combat-meter--enemy-action">
-        <div class="combat-meter__fill combat-meter__fill--action" style="width:${enemyProgressPct}%"></div>
-      </div>
+      <div class="monster-stat-row__item monster-stat-row__attack"><span>⚔</span><span>${monster.attack || 1}</span></div>
+      <div class="monster-stat-row__item monster-stat-row__level"><span>💪</span><span>${monster.level || 1}</span></div>
+      <div class="monster-stat-row__item monster-stat-row__defense"><span>🛡</span><span>${monster.defense || 0}</span></div>
+      <div class="monster-stat-row__item monster-stat-row__hp"><span>♥</span><span>${enemyMaxHp}</span></div>
     </div>
   `
+
+  setText('[data-bind="enemyHpText"]', `${enemyHp} / ${enemyMaxHp}`)
+  setWidth('[data-enemy-hp-bar]', enemyPct)
 }
 
 function renderInventory(state) {
@@ -306,6 +302,7 @@ function renderEquipment(state) {
 export function render(state, contentState) {
   renderNav(state)
   renderStats(state)
+  renderCombatBars(state)
   renderMonsterList(contentState)
   renderMonsterPanel(state, contentState)
   renderInventory(state)
