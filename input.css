@@ -61,13 +61,11 @@
 
   html,
   body {
-    width: 100%;
-    overflow-x: hidden;
+    @apply w-full overflow-x-hidden;
   }
 
   body {
-    @apply min-h-screen bg-game-bg text-game-text antialiased selection:bg-cyan-500/30;
-    font-family: var(--font-game);
+    @apply min-h-screen bg-game-bg font-game text-game-text antialiased selection:bg-cyan-500/30;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -104,25 +102,19 @@
 }
 
 @utility center-content {
-  display: grid;
-  place-content: center;
+  @apply grid place-content-center;
 }
 
 @utility center-items {
-  display: grid;
-  place-items: center;
+  @apply grid place-items-center;
 }
 
 @utility center-cluster {
-  display: flex;
-  flex-wrap: wrap;
-  place-content: center;
+  @apply flex flex-wrap place-content-center;
 }
 
 @utility abs-center {
-  position: absolute;
-  inset: 0;
-  place-self: center;
+  @apply absolute inset-0 place-self-center;
 }
 
 @layer components {
@@ -160,7 +152,7 @@
 
   .app-bottom-nav,
   .game-bottom-nav {
-    @apply fixed bottom-0 left-0 right-0 z-50 pointer-events-none;
+    @apply fixed inset-x-0 bottom-0 z-50 pointer-events-none;
     min-height: var(--bottom-nav-height);
   }
 
@@ -169,7 +161,7 @@
   }
 
   .game-bottom-nav__surface {
-    @apply mb-0 w-full relative overflow-visible rounded-t-[2rem] border-t border-game-border bg-zinc-900/95 shadow-2xl backdrop-blur-md;
+    @apply relative mb-0 w-full overflow-visible rounded-t-[2rem] border-t border-game-border bg-zinc-900/95 shadow-2xl backdrop-blur-md;
   }
 
   .game-bottom-nav__list {
@@ -237,17 +229,8 @@
   }
 
   .game-toast {
-    position: fixed;
-    left: 50%;
-    right: auto;
-    bottom: calc(var(--bottom-nav-height, 6.5rem) + env(safe-area-inset-bottom) + 0.75rem);
-    width: min(calc(100vw - 2rem), 20rem);
-    max-width: 20rem;
-    box-sizing: border-box;
-    transform: translateX(-50%);
-    margin: 0;
-    z-index: 200;
-    @apply rounded-2xl border border-cyan-500/30 bg-zinc-900/95 p-4 shadow-[0_0_30px_rgb(34_211_238_/_0.2)] backdrop-blur-md;
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 0.75rem);
+    @apply fixed left-1/2 z-[200] box-border w-[min(calc(100vw-2rem),20rem)] max-w-xs -translate-x-1/2 rounded-2xl border border-cyan-500/30 bg-zinc-900/95 p-4 shadow-[0_0_30px_rgb(34_211_238_/_0.2)] backdrop-blur-md;
   }
 
   .game-toast__content {
@@ -275,9 +258,7 @@
   }
 
   .game-toast.is-dismissing {
-    transform: translateX(-50%) translateY(0.5rem);
-    opacity: 0;
-    @apply transition-all duration-300;
+    @apply -translate-x-1/2 translate-y-2 opacity-0 transition-all duration-300;
   }
 
   .screen-help-modal {
@@ -405,9 +386,7 @@
   }
 
   .combat-monster-card__sprite-frame {
-    width: clamp(8rem, 17vh, 11rem);
-    height: clamp(8rem, 17vh, 11rem);
-    @apply grid place-items-center rounded-[1.25rem] bg-zinc-800/90 text-zinc-300 shadow-[inset_0_0_2rem_rgb(0_0_0_/_0.24)];
+    @apply grid h-[clamp(8rem,17vh,11rem)] w-[clamp(8rem,17vh,11rem)] place-items-center rounded-[1.25rem] bg-zinc-800/90 text-zinc-300 shadow-[inset_0_0_2rem_rgb(0_0_0_/_0.24)];
   }
 
   .combat-monster-card__sprite {
@@ -419,8 +398,7 @@
   }
 
   .combat-stat-pill {
-    min-height: 3.25rem;
-    @apply grid w-full grid-cols-4 items-center gap-1 rounded-full bg-zinc-700/85 px-3 py-2 text-base shadow-game-soft;
+    @apply grid min-h-13 w-full grid-cols-4 items-center gap-1 rounded-full bg-zinc-700/85 px-3 py-2 text-base shadow-game-soft;
   }
 
   .combat-stat-pill__item {
@@ -745,12 +723,11 @@
   .progress-bar-fill,
   .xp-fill {
     @apply relative h-full rounded-full transition-all duration-500;
-    background: linear-gradient(90deg, var(--color-cyan-600), var(--color-cyan-400));
+    background-image: linear-gradient(90deg, var(--color-cyan-600), var(--color-cyan-400));
   }
 
   .progress-bar-glow {
-    @apply absolute inset-0 opacity-50 blur-sm;
-    background: inherit;
+    @apply absolute inset-0 bg-inherit opacity-50 blur-sm;
   }
 
   .ui-grid-inventory {
@@ -791,19 +768,7 @@
 
   [class^="icon-"],
   [class*=" icon-"] {
-    display: inline-block;
-    vertical-align: middle;
-  }
-
-  #game-toast {
-    left: 50% !important;
-    right: auto !important;
-    bottom: calc(6rem + env(safe-area-inset-bottom)) !important;
-    width: min(90vw, 20rem) !important;
-    max-width: 20rem !important;
-    transform: translateX(-50%) !important;
-    margin: 0 !important;
-    z-index: 200 !important;
+    @apply inline-block align-middle;
   }
 }
 
@@ -871,11 +836,5 @@
   to {
     transform: translateY(0);
     opacity: 1;
-  }
-}
-
-@media (min-width: 768px) {
-  #game-toast {
-    bottom: calc(5.5rem + env(safe-area-inset-bottom)) !important;
   }
 }

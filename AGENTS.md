@@ -64,6 +64,7 @@ If a user request conflicts with higher-precedence canon, refuse the request and
 - For general changes, at minimum run `git diff --check` before committing.
 - For PWA/service-worker changes, inspect cache/version behavior carefully and test with the local server when possible.
 - Local serving command: `npm run serve`, then open `http://localhost:4173`.
+- Do not run browser-binary probe commands such as `command -v chromium || command -v chromium-browser || command -v google-chrome || command -v firefox || true`; rely on explicit environment/tool availability instead.
 
 ## Repository hygiene
 - Do not edit files in `node_modules/`.
