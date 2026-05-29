@@ -114,7 +114,6 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;')
 }
 
-
 function getScreenTitle(state) {
   const titleMap = {
     combat: 'Combat',
@@ -165,7 +164,6 @@ function renderNav(state) {
   })
 }
 
-
 function renderStats(state) {
   const stats = getEffectiveStats(state)
 
@@ -185,16 +183,19 @@ function renderStats(state) {
   setWidth('[data-combat-xp-bar]', Math.max(0, Math.min(100, (combatXp / combatNextXp) * 100)))
 }
 
-
-
 function renderCombatPrimaryAction(state) {
   const isCombatActive = state.activity?.kind === 'combat'
-  const icon = isCombatActive ? '⏸' : '▶'
+  const icon = isCombatActive ? 'Ⅱ' : '▶'
   const ariaLabel = isCombatActive ? 'Stop combat' : 'Start combat'
 
-  document.querySelectorAll('[data-bind="combatPrimaryIcon"]').forEach((button) => {
-    button.textContent = icon
+  document.querySelectorAll('[data-combat-primary-icon], [data-bind="combatPrimaryIcon"]').forEach((el) => {
+    el.textContent = icon
+  })
+
+  document.querySelectorAll('[data-combat-primary-button], [data-bind="combatPrimaryIcon"]').forEach((button) => {
     button.setAttribute('aria-label', ariaLabel)
+    button.setAttribute('title', ariaLabel)
+    button.dataset.state = isCombatActive ? 'active' : 'idle'
     button.classList.toggle('is-active', isCombatActive)
   })
 }
@@ -324,7 +325,6 @@ function renderMonsterPanel(state, contentState) {
 
   setText('[data-bind="enemySpeed"]', `${(enemyDuration / 1000).toFixed(1)}s`)
 }
-
 
 function getZoneLevelRange(zone, contentState) {
   const levels = (zone?.monsters || [])
