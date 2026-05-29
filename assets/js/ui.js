@@ -105,6 +105,42 @@ function setWidth(selector, pct) {
   })
 }
 
+function getEquippedWeapon(state) {
+  const weaponId = state.equipment?.weapon || null
+  return weaponId ? getItem(weaponId) : null
+}
+
+function getWeaponName(state) {
+  const weapon = getEquippedWeapon(state)
+  const trainingSword = getItem('training_sword')
+  return weapon?.name || trainingSword?.name || 'Unarmed'
+}
+
+function getWeaponIcon(state) {
+  const iconAliases = {
+    'game-icons--wooden-sword': 'game-icons--rusty-sword',
+    'game-icons--dagger': 'game-icons--plain-dagger'
+  }
+  const weapon = getEquippedWeapon(state)
+  const icon = weapon?.icon || getItem('training_sword')?.icon || 'game-icons--broadsword'
+  return iconAliases[icon] || icon
+}
+
+function getFoodCount(state) {
+  return Object.entries(state.inventory || {}).reduce((total, [itemId, amount]) => {
+    const item = getItem(itemId)
+    return item?.type === 'food' ? total + Math.max(0, amount || 0) : total
+  }, 0)
+}
+
+function renderWeaponIcon(state) {
+  const icon = getWeaponIcon(state)
+
+  document.querySelectorAll('[data-weapon-icon]').forEach((el) => {
+    el.className = `combat-weapon__icon icon-[${icon}]`
+  })
+}
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -172,7 +208,11 @@ function renderStats(state) {
   setText('[data-bind="attack"]', String(stats.attack))
   setText('[data-bind="defense"]', String(stats.defense))
   setText('[data-bind="hp"]', `${state.hp ?? 0}/${stats.maxHp}`)
+  setText('[data-bind="hpCurrent"]', String(state.hp ?? 0))
   setText('[data-bind="lastFoodHeal"]', String(state.lastFoodEaten?.heal ?? 0))
+  setText('[data-bind="foodCount"]', String(getFoodCount(state)))
+  setText('[data-bind="weaponName"]', getWeaponName(state))
+  renderWeaponIcon(state)
   const combatLevel = state.combatLevel ?? 1
   const combatNextXp = xpForLevel(combatLevel)
   const combatXp = state.combatXp ?? 0
