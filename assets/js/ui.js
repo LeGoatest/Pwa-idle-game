@@ -187,6 +187,18 @@ function renderStats(state) {
 
 
 
+function renderCombatPrimaryAction(state) {
+  const isCombatActive = state.activity?.kind === 'combat'
+  const icon = isCombatActive ? '⏸' : '▶'
+  const ariaLabel = isCombatActive ? 'Stop combat' : 'Start combat'
+
+  document.querySelectorAll('[data-bind="combatPrimaryIcon"]').forEach((button) => {
+    button.textContent = icon
+    button.setAttribute('aria-label', ariaLabel)
+    button.classList.toggle('is-active', isCombatActive)
+  })
+}
+
 function renderCombatBars(state, contentState) {
   const stats = getEffectiveStats(state)
   const monster = contentState?.activeMonster || null
@@ -439,6 +451,7 @@ export function render(state, contentState) {
   renderHeader(state, contentState)
   renderNav(state)
   renderStats(state)
+  renderCombatPrimaryAction(state)
   renderCombatBars(state, contentState)
   renderMonsterList(contentState)
   renderMonsterPanel(state, contentState)
