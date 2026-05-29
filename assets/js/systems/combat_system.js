@@ -112,6 +112,7 @@ export function processCombat(state, contentState, deltaMs) {
 
       if (state.hp <= 0) {
         state.hp = 0
+        // TODO: Surface the video-style defeat modal when the player reaches 0 HP.
         stopCombat(state, 'defeated')
         return true
       }

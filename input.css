@@ -51,7 +51,6 @@
   :root {
     --game-max-width: 28rem;
     --game-footer-height: 6rem;
-    --game-header-height: 7.5rem;
     --bottom-nav-height: 6.5rem;
     --app-header-height: 4.5rem;
     --combat-card-width: min(18.25rem, 74vw);
@@ -125,46 +124,25 @@
     @apply mx-auto flex min-h-screen max-w-md flex-col overflow-x-hidden bg-game-bg text-game-text shadow-2xl;
   }
 
-  .app-header,
-  .game-header {
+  .app-header {
     min-height: var(--app-header-height);
-    @apply flex w-full shrink-0 items-center justify-between border-b border-game-border bg-zinc-900/80 p-4 backdrop-blur-md;
+    @apply flex w-full shrink-0 items-center justify-between gap-4 border-b border-game-border bg-zinc-900/80 p-4 backdrop-blur-md;
   }
 
-  .game-header__title {
-    @apply text-xl font-bold tracking-tight text-zinc-100;
+  .app-header__text {
+    @apply min-w-0;
   }
 
-  .game-header__status {
-    @apply mt-0.5 flex items-center gap-1.5;
+  .app-header__title {
+    @apply truncate text-xl font-black tracking-tight text-zinc-100;
   }
 
-  .game-header__status-text {
-    @apply text-[10px] font-black uppercase tracking-widest text-game-muted;
+  .app-header__subtitle {
+    @apply mt-0.5 truncate text-[10px] font-black uppercase tracking-widest text-game-muted;
   }
 
-  .game-header__pulse {
-    @apply h-2 w-2 rounded-full bg-cyan-500;
-  }
-
-  .game-header__actions {
-    @apply flex shrink-0 items-center gap-3;
-  }
-
-  .game-header__settings {
-    @apply h-6 w-6 text-zinc-400 transition-colors hover:text-white;
-  }
-
-  .game-resource-pill {
-    @apply flex items-center gap-1.5 rounded-full border border-zinc-700/50 bg-zinc-800/50 px-2.5 py-1;
-  }
-
-  .game-resource-pill__icon {
-    @apply text-yellow-500;
-  }
-
-  .game-resource-pill__value {
-    @apply text-sm font-medium tabular-nums;
+  .app-header__help {
+    @apply grid h-8 w-8 shrink-0 place-items-center rounded-full bg-zinc-700/80 text-base font-black text-zinc-100 transition active:scale-95;
   }
 
   .app-main,
@@ -347,18 +325,6 @@
   .combat-screen {
     min-height: calc(100dvh - var(--app-header-height) - var(--combat-bottom-safe));
     @apply mx-auto flex w-full max-w-md flex-col gap-2 overflow-x-hidden pb-2;
-  }
-
-  .combat-topbar {
-    @apply relative flex min-h-10 items-center justify-center rounded-2xl bg-zinc-700/80 px-4 py-2 shadow-game-soft;
-  }
-
-  .combat-topbar__title {
-    @apply text-lg font-black tracking-tight text-zinc-100;
-  }
-
-  .combat-topbar__help {
-    @apply absolute right-3 grid h-7 w-7 place-items-center rounded-full bg-zinc-600/80 text-sm font-black text-zinc-200 transition active:scale-95;
   }
 
   .combat-monster-stage {

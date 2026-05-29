@@ -406,6 +406,51 @@ function openSkill(skillId, persist = true) {
   render(state, contentState)
 }
 
+function getScreenHelpText(tab) {
+  const helpText = {
+    combat: 'Choose a monster, press play to fight, or use ↔ to change area.',
+    equipment: 'Equip weapons and armor to improve your stats.',
+    skills: 'Choose an activity to gather or craft resources.',
+    items: 'View items, food, and gear.',
+    inventory: 'View items, food, and gear.',
+    shop: 'Buy supplies and equipment.'
+  }
+
+  return helpText[tab] || 'This screen shows current game information.'
+}
+
+function getScreenHelpTitle(tab) {
+  const titleMap = {
+    combat: 'Combat',
+    equipment: 'Equipment',
+    skills: 'Skills',
+    items: 'Inventory',
+    inventory: 'Inventory',
+    shop: 'Shop',
+    map: 'Map',
+    settings: 'Settings'
+  }
+
+  return titleMap[tab] || 'Help'
+}
+
+function showScreenHelp() {
+  const tab = state.ui?.tab || 'combat'
+  showToast(getScreenHelpTitle(tab), getScreenHelpText(tab))
+}
+
+function ensureEnemyHpForMonster(monster) {
+  const maxHp = monster.hp || 12
+  const enemyHpInvalid = !Number.isFinite(state.enemyHp) || state.enemyHp <= 0 || state.enemyHp > maxHp
+  const enemyMaxInvalid = !Number.isFinite(state.enemyMaxHp) || state.enemyMaxHp !== maxHp
+
+  state.enemyMaxHp = maxHp
+
+  if (enemyHpInvalid || enemyMaxInvalid) {
+    state.enemyHp = maxHp
+  }
+}
+
 function startSkillNode(nodeId) {
   const skill = contentState.activeSkill
   if (!skill) return
@@ -427,17 +472,21 @@ function startSkillNode(nodeId) {
   void save()
 }
 
+// TODO: Add the video-style “No equipped food!” confirmation modal before starting combat without healing supplies.
 function startFight() {
-  const monster = contentState.activeMonster || ensureActiveZoneAndMonster({ persist: true, resetEnemy: true })
+  const monster = contentState.activeMonster || ensureActiveZoneAndMonster({ persist: true })
   if (!monster) return
 
-  startActivity(state, {
-    kind: 'combat',
-    monsterId: monster.id
-  })
+  ensureEnemyHpForMonster(monster)
 
-  state.enemyHp = monster.hp || 12
-  state.enemyMaxHp = monster.hp || 12
+  if (state.activity?.kind !== 'combat' || state.activity.monsterId !== monster.id) {
+    startActivity(state, {
+      kind: 'combat',
+      monsterId: monster.id,
+      enemyProgress: state.activity?.enemyProgress || 0
+    })
+  }
+
   contentState.activeMonster = monster
   setCurrentMonster(monster.id)
 
@@ -513,8 +562,8 @@ async function act(action, button = null) {
     return
   }
 
-  if (action === 'combatHelp') {
-    showToast('Combat', 'Choose a monster, then press play to fight.')
+  if (action === 'screenHelp' || action === 'combatHelp') {
+    showScreenHelp()
     return
   }
 
