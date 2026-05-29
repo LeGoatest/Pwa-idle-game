@@ -114,6 +114,48 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;')
 }
 
+
+function getScreenTitle(state) {
+  const titleMap = {
+    combat: 'Combat',
+    equipment: 'Equipment',
+    skills: 'Skills',
+    items: 'Inventory',
+    inventory: 'Inventory',
+    shop: 'Shop',
+    map: 'Map',
+    settings: 'Settings'
+  }
+
+  return titleMap[state.ui?.tab] || 'Combat'
+}
+
+function getActiveTaskName(state, contentState) {
+  if (state.activity?.reason === 'defeated') return 'Defeated'
+  if (state.activity?.reason === 'paused') return 'Paused'
+
+  if (state.activity?.kind === 'combat') {
+    const monsterName =
+      contentState.activeMonster?.name ||
+      contentState.registry?.monsters?.[state.activity.monsterId]?.name ||
+      'Monster'
+    return `Fighting ${monsterName}`
+  }
+
+  if (state.activity?.kind === 'node') {
+    const activeNode = contentState.activeNode ||
+      contentState.registry?.skills?.[state.activity.skillId]?.nodes?.find((node) => node.id === state.activity.nodeId)
+    return activeNode?.name || 'Working'
+  }
+
+  return 'Idle'
+}
+
+function renderHeader(state, contentState) {
+  setText('[data-bind="screenTitle"]', getScreenTitle(state))
+  setText('[data-bind="activeTaskName"]', getActiveTaskName(state, contentState))
+}
+
 function renderNav(state) {
   const activeTab = state.ui?.tab || 'combat'
 
@@ -394,6 +436,7 @@ function renderEquipment(state) {
 }
 
 export function render(state, contentState) {
+  renderHeader(state, contentState)
   renderNav(state)
   renderStats(state)
   renderCombatBars(state, contentState)

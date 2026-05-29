@@ -13,29 +13,13 @@
   </script>
 </head>
 <body class="app-screen game-shell">
-  <header class="app-header game-header">
-    <div>
-      <h1 id="station-title" class="game-header__title">Idle Frontier</h1>
-      <div class="game-header__status">
-        <div id="active-pulse" class="game-header__pulse hidden"></div>
-        <span data-bind="activeTaskName" class="game-header__status-text">Idle</span>
-      </div>
+  <header class="app-header">
+    <div class="app-header__text">
+      <h1 class="app-header__title" data-bind="screenTitle">Combat</h1>
+      <div class="app-header__subtitle" data-bind="activeTaskName">Idle</div>
     </div>
 
-    <div class="game-header__actions">
-      <div class="game-resource-pill">
-        <span class="icon-[game-icons--coins] icon-sm game-resource-pill__icon"></span>
-        <span data-bind="gold" class="game-resource-pill__value">0</span>
-      </div>
-
-      <button
-        class="game-header__settings icon-[game-icons--cog]"
-        hx-get="./views/settings.html"
-        hx-target="#modal-content"
-        hx-trigger="click"
-        data-action="open-modal"
-        aria-label="Open settings"></button>
-    </div>
+    <button class="app-header__help" data-action="screenHelp" type="button" aria-label="Current screen help">?</button>
   </header>
 
   <main
