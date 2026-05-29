@@ -1,14 +1,24 @@
-<div class="combat-screen">
-  <section data-monster-panel class="combat-screen__monster-panel"></section>
+<section class="combat-screen">
+  <div data-monster-panel class="combat-screen__monster-panel"></div>
 
-  <section class="combat-controls">
-    <div class="combat-weapon-panel">
+  <div class="combat-bars">
+    <div class="combat-bars__track">
+      <div data-task-bar class="combat-bars__fill"></div>
+    </div>
+    <div class="combat-bars__track combat-bars__track--hp">
+      <div data-enemy-hp-bar class="combat-bars__fill combat-bars__fill--hp"></div>
+    </div>
+    <div class="combat-bars__label" data-bind="actionSpeed">2.00s</div>
+    <div class="combat-bars__label" data-bind="enemyHpText">12 / 12</div>
+  </div>
+
+  <div class="combat-layout">
+    <section class="combat-weapon-panel" aria-label="Weapon controls">
       <button
         class="combat-weapon-button"
         data-action="fightMonster"
         aria-label="Fight selected monster">
         <span class="icon-[game-icons--broadsword] combat-weapon-icon"></span>
-        <span class="combat-weapon-button__text">Fight</span>
       </button>
       <div class="combat-weapon-label">Weapon</div>
 
@@ -16,15 +26,15 @@
         <button class="combat-action-button" data-action="fightMonster" aria-label="Start combat">▶</button>
         <button class="combat-action-button" data-action="stopActivity" aria-label="Pause combat">Ⅱ</button>
       </div>
-    </div>
+    </section>
 
-    <div class="combat-skill-panel">
-      <button class="combat-attack-button">
+    <section class="combat-skill-panel" aria-label="Attack skill">
+      <button class="combat-attack-button" data-action="fightMonster">
         ⚔ ATK
       </button>
       <div class="combat-skill-title">ATK Lv. <span data-bind="combatLevel">1</span></div>
       <div class="combat-xp-bar">
-        <div data-task-bar class="combat-xp-bar__fill"></div>
+        <div data-combat-xp-bar class="combat-xp-bar__fill"></div>
       </div>
       <div class="combat-xp-count"><span data-bind="combatXp">0</span> / <span data-bind="combatNextXp">20</span></div>
 
@@ -40,8 +50,8 @@
         <span class="combat-resource-footer__gold-icon">▰</span>
         <span data-bind="gold">0</span>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <div data-monster-list class="monster-list is-hidden"></div>
-</div>
+  <div data-monster-list class="is-hidden"></div>
+</section>
