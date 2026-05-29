@@ -6,6 +6,7 @@
 @source "./assets/js/**/*.js";
 @source "./content/**/*.json";
 @source "./content/**/*.jsonl";
+@source inline("icon-[game-icons--rusty-sword] icon-[game-icons--plain-dagger] icon-[game-icons--broadsword] icon-[game-icons--two-handed-sword]");
 
 @theme {
   --font-game: "Inter", system-ui, ui-sans-serif, sans-serif;
@@ -51,6 +52,7 @@
   :root {
     --game-max-width: 28rem;
     --game-footer-height: 6rem;
+    --bottom-nav-height: var(--game-footer-height);
     --app-header-height: 4.5rem;
     --combat-card-width: min(18.25rem, 74vw);
     --combat-monster-card-height: clamp(13rem, 26vh, 18rem);
@@ -444,16 +446,17 @@
     @apply pt-0.5 text-center text-xs font-black tabular-nums text-zinc-300;
   }
 
+  .combat-lower,
   .combat-layout {
-    @apply grid grid-cols-2 items-start gap-3;
+    @apply grid grid-cols-[auto_1fr] items-start gap-6 px-5;
   }
 
   .combat-weapon {
-    @apply min-w-0 space-y-1;
+    @apply flex flex-col items-center gap-2;
   }
 
   .combat-weapon__slot {
-    @apply mx-auto grid aspect-square max-h-28 w-full max-w-32 place-items-center rounded-[1.35rem] border-3 border-orange-400 bg-zinc-700/85 text-zinc-100 shadow-game-orange-glow transition active:scale-95;
+    @apply grid aspect-square w-28 place-items-center rounded-3xl border-4 border-orange-500 bg-zinc-700/80 shadow-game-orange-glow transition active:scale-95;
   }
 
   .combat-weapon__icon {
@@ -461,63 +464,79 @@
   }
 
   .combat-weapon__name {
-    @apply truncate text-center text-sm font-black text-zinc-200;
+    @apply max-w-32 truncate text-center text-xl font-semibold tracking-wide text-zinc-200;
   }
 
   .combat-skill {
-    @apply min-w-0 space-y-1;
+    @apply grid grid-cols-[5rem_1fr] items-center gap-4 pt-2;
   }
 
-  .combat-skill__button {
-    @apply flex w-full items-center justify-between rounded-2xl bg-zinc-700/85 px-3 py-2 text-sm font-black text-zinc-100 transition active:scale-95;
+  .combat-skill__icon-button {
+    @apply grid aspect-square w-20 place-items-center rounded-2xl bg-zinc-700/80 transition active:scale-95;
   }
 
-  .combat-skill__title {
-    @apply truncate text-sm font-black text-zinc-200;
+  .combat-skill__icon {
+    @apply h-12 w-12 text-cyan-300;
+  }
+
+  .combat-skill__body {
+    @apply min-w-0;
+  }
+
+  .combat-skill__level {
+    @apply mb-2 text-center text-3xl font-normal tracking-wide text-zinc-200;
   }
 
   .combat-skill__xp {
-    @apply h-3 overflow-hidden rounded-full bg-zinc-800 shadow-inner;
+    @apply h-6 overflow-hidden rounded-lg bg-zinc-800;
   }
 
   .combat-skill__xp-fill {
-    @apply h-full w-0 rounded-full bg-cyan-500 transition-all duration-100;
+    @apply h-full w-0 rounded-lg bg-cyan-400 transition-all duration-100;
   }
 
   .combat-skill__xp-text {
-    @apply text-right text-xs font-black tabular-nums text-zinc-300;
+    @apply mt-1 text-center text-2xl font-normal tabular-nums text-zinc-200;
   }
 
   .combat-actions {
-    @apply grid grid-cols-4 gap-2;
+    @apply mx-auto grid grid-cols-4 gap-8 px-6 pt-6;
   }
 
   .combat-action {
-    @apply grid h-10 place-items-center rounded-2xl bg-zinc-700/85 text-lg font-black text-zinc-100 transition active:scale-95;
+    @apply grid aspect-square w-20 place-items-center rounded-2xl bg-zinc-700/80 text-4xl font-black text-zinc-100 transition active:scale-95;
   }
 
-  .combat-action--play {
-    @apply bg-cyan-600/90 text-white shadow-game-glow;
+  .combat-action--play.is-active {
+    @apply bg-cyan-600;
   }
 
   .combat-action--selector {
-    @apply bg-zinc-600/90 text-zinc-100;
+    @apply text-3xl;
   }
 
   .combat-action--locked {
-    @apply bg-zinc-800/85 text-zinc-500;
+    @apply text-zinc-200 opacity-90;
   }
 
   .combat-status-pill {
-    @apply mx-auto flex items-center justify-center gap-3 rounded-full bg-zinc-700/85 px-4 py-1.5 text-xs font-black tabular-nums shadow-game-soft;
+    @apply mx-auto mt-4 flex w-fit items-center justify-center gap-3 rounded-xl bg-zinc-700/80 px-5 py-2 text-2xl font-normal tabular-nums text-zinc-200;
   }
 
   .combat-status-pill__hp {
-    @apply text-rose-300;
+    @apply text-red-300;
   }
 
-  .combat-status-pill__food {
-    @apply text-emerald-300;
+  .combat-status-pill__heal {
+    @apply text-green-400;
+  }
+
+  .combat-status-pill__food-icon {
+    @apply text-xl;
+  }
+
+  .combat-status-pill__food-count {
+    @apply text-zinc-200;
   }
 
   .combat-select-overlay {
@@ -789,6 +808,49 @@
 
   .animate-in.slide-in-from-bottom-4 {
     animation: slideInFromBottom 0.3s ease-out forwards;
+  }
+}
+
+@media (max-width: 28rem) {
+  .combat-lower,
+  .combat-layout {
+    @apply gap-4 px-3;
+  }
+
+  .combat-weapon__slot {
+    @apply w-24;
+  }
+
+  .combat-weapon__name {
+    @apply max-w-24 text-lg;
+  }
+
+  .combat-skill {
+    @apply grid-cols-[4rem_1fr] gap-3;
+  }
+
+  .combat-skill__icon-button {
+    @apply w-16;
+  }
+
+  .combat-skill__icon {
+    @apply h-10 w-10;
+  }
+
+  .combat-skill__level {
+    @apply text-2xl;
+  }
+
+  .combat-skill__xp-text {
+    @apply text-xl;
+  }
+
+  .combat-actions {
+    @apply gap-4 px-4;
+  }
+
+  .combat-action {
+    @apply w-16;
   }
 }
 

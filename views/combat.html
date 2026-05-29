@@ -17,24 +17,28 @@
     </div>
   </div>
 
-  <div class="combat-layout">
+  <div class="combat-lower combat-layout">
     <section class="combat-weapon" aria-label="Weapon slot">
       <button class="combat-weapon__slot" data-action="fightMonster" aria-label="Fight selected monster">
-        <span class="icon-[game-icons--broadsword] combat-weapon__icon"></span>
+        <span class="combat-weapon__icon icon-[game-icons--broadsword]" data-weapon-icon></span>
       </button>
-      <div class="combat-weapon__name">Training Sword</div>
+      <div class="combat-weapon__name" data-bind="weaponName">Training Sword</div>
     </section>
 
     <section class="combat-skill" aria-label="Attack skill">
-      <button class="combat-skill__button" data-action="fightMonster" aria-label="Attack skill">
-        <span>⚔ ATK</span>
-        <span>Lv. <span data-bind="combatLevel">1</span></span>
+      <button class="combat-skill__icon-button" data-action="fightMonster" aria-label="Attack skill">
+        <span class="combat-skill__icon icon-[game-icons--sword-array]"></span>
       </button>
-      <div class="combat-skill__title">Attack</div>
-      <div class="combat-skill__xp" aria-hidden="true">
-        <div data-combat-xp-bar class="combat-skill__xp-fill"></div>
+
+      <div class="combat-skill__body">
+        <div class="combat-skill__level">Level <span data-bind="combatLevel">1</span></div>
+        <div class="combat-skill__xp" aria-hidden="true">
+          <div data-combat-xp-bar class="combat-skill__xp-fill"></div>
+        </div>
+        <div class="combat-skill__xp-text">
+          <span data-bind="combatXp">0</span> / <span data-bind="combatNextXp">20</span>
+        </div>
       </div>
-      <div class="combat-skill__xp-text"><span data-bind="combatXp">0</span> / <span data-bind="combatNextXp">20</span></div>
     </section>
   </div>
 
@@ -42,14 +46,16 @@
     <button class="combat-action combat-action--play" data-action="toggleCombat" data-combat-primary-button type="button" aria-label="Start combat">
       <span data-combat-primary-icon>▶</span>
     </button>
-    <button class="combat-action combat-action--selector" data-action="openTargetSelector" aria-label="Choose monster">↔</button>
+    <button class="combat-action combat-action--selector" data-action="openTargetSelector" type="button" aria-label="Choose monster">↔</button>
     <button class="combat-action combat-action--locked" data-action="lockedAction" type="button" aria-label="Locked action">🔒</button>
     <button class="combat-action combat-action--locked" data-action="lockedAction" type="button" aria-label="Locked action">🔒</button>
   </div>
 
   <div class="combat-status-pill" aria-label="Player status">
-    <span class="combat-status-pill__hp">♥ <span data-bind="hp">20/20</span></span>
-    <span class="combat-status-pill__food">+<span data-bind="lastFoodHeal">0</span></span>
+    <span class="combat-status-pill__hp">♥ <span data-bind="hpCurrent">20</span></span>
+    <span class="combat-status-pill__heal">+<span data-bind="lastFoodHeal">0</span></span>
+    <span class="combat-status-pill__food-icon">🐟</span>
+    <span class="combat-status-pill__food-count" data-bind="foodCount">0</span>
   </div>
 
   <div data-combat-select-overlay class="combat-select-overlay" aria-hidden="true"></div>
