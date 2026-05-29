@@ -51,8 +51,6 @@
 @layer base {
   :root {
     --game-max-width: 28rem;
-    --game-footer-height: 6rem;
-    --bottom-nav-height: var(--game-footer-height);
     --app-header-height: 4.5rem;
     --combat-card-width: min(18.25rem, 74vw);
     --combat-monster-card-height: clamp(13rem, 26vh, 18rem);
