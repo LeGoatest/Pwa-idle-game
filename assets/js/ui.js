@@ -123,6 +123,7 @@ function renderStats(state) {
   setText('[data-bind="attack"]', String(stats.attack))
   setText('[data-bind="defense"]', String(stats.defense))
   setText('[data-bind="hp"]', `${state.hp ?? 0}/${stats.maxHp}`)
+  setText('[data-bind="lastFoodHeal"]', String(state.lastFoodEaten?.heal ?? 0))
   const combatLevel = state.combatLevel ?? 1
   const combatNextXp = xpForLevel(combatLevel)
   const combatXp = state.combatXp ?? 0
@@ -207,44 +208,52 @@ function renderMonsterPanel(state, contentState) {
 
   if (!monster) {
     root.innerHTML = `
-      <div class="monster-card monster-card--placeholder">
-        <div class="monster-card__placeholder-icon">◈</div>
-        <div class="monster-card__placeholder-title">No monster available</div>
-        <div class="monster-card__placeholder-copy">Choose a zone with monsters to begin combat.</div>
+      <article class="combat-monster-card combat-monster-card--placeholder">
+        <div class="combat-monster-card__placeholder-icon">◈</div>
+        <div class="combat-monster-card__placeholder-title">No monster available</div>
+        <div class="combat-monster-card__placeholder-copy">Choose a zone with monsters to begin combat.</div>
+      </article>
+      <div class="combat-stat-pill" aria-label="Enemy stats">
+        <div class="combat-stat-pill__item combat-stat-pill__item--attack"><span class="combat-stat-pill__icon">⚔</span><span class="combat-stat-pill__value">0</span></div>
+        <div class="combat-stat-pill__item combat-stat-pill__item--level"><span class="combat-stat-pill__icon">💪</span><span class="combat-stat-pill__value">0</span></div>
+        <div class="combat-stat-pill__item combat-stat-pill__item--defense"><span class="combat-stat-pill__icon">🛡</span><span class="combat-stat-pill__value">0</span></div>
+        <div class="combat-stat-pill__item combat-stat-pill__item--hp"><span class="combat-stat-pill__icon">♥</span><span class="combat-stat-pill__value">0</span></div>
       </div>
     `
+    setText('[data-bind="enemySpeed"]', '--')
+    setWidth('[data-enemy-hp-bar]', 0)
     return
   }
 
   const enemyMaxHp = monster.hp || state.enemyMaxHp || 1
-  const isSelectedActivity = state.activity?.kind === 'combat' && state.activity?.monsterId === monster.id
-  const visibleEnemyHp = isSelectedActivity ? state.enemyHp : enemyMaxHp
-  const enemyHp = Math.max(0, Math.min(visibleEnemyHp || enemyMaxHp, enemyMaxHp))
+  const isSelectedMonster = state.ui?.currentMonsterId === monster.id || contentState.activeMonster?.id === monster.id
+  const hasMatchingEnemy = state.enemyMaxHp === enemyMaxHp
+  const visibleEnemyHp = isSelectedMonster && hasMatchingEnemy ? state.enemyHp : enemyMaxHp
+  const enemyHp = Math.max(0, Math.min(visibleEnemyHp ?? enemyMaxHp, enemyMaxHp))
   const enemyPct = Math.max(0, Math.min(100, (enemyHp / enemyMaxHp) * 100))
+  const enemyDuration = monster.attackSpeedMs || monster.durationMs || 3000
   const missingBadge = monster.missingContent
-    ? '<div class="monster-card__missing-badge">Missing content placeholder</div>'
+    ? '<div class="combat-monster-card__missing-badge">Missing content placeholder</div>'
     : ''
 
   root.innerHTML = `
-    <article class="monster-card">
-      <div class="monster-card__media">
-        <div class="monster-card__sprite-box">
-          <span class="icon-[game-icons--rat] monster-card__sprite-icon"></span>
-        </div>
+    <article class="combat-monster-card">
+      <div class="combat-monster-card__sprite-frame">
+        <span class="icon-[game-icons--rat] combat-monster-card__sprite"></span>
       </div>
-      <h2 class="monster-card__title">${monster.name}</h2>
+      <h2 class="combat-monster-card__name">${monster.name}</h2>
       ${missingBadge}
     </article>
 
-    <div class="monster-stat-row">
-      <div class="monster-stat-row__item monster-stat-row__attack"><span>⚔</span><span>${monster.attack || 1}</span></div>
-      <div class="monster-stat-row__item monster-stat-row__level"><span>💪</span><span>${monster.level || 1}</span></div>
-      <div class="monster-stat-row__item monster-stat-row__defense"><span>🛡</span><span>${monster.defense || 0}</span></div>
-      <div class="monster-stat-row__item monster-stat-row__hp"><span>♥</span><span>${enemyMaxHp}</span></div>
+    <div class="combat-stat-pill" aria-label="Enemy stats">
+      <div class="combat-stat-pill__item combat-stat-pill__item--attack"><span class="combat-stat-pill__icon">⚔</span><span class="combat-stat-pill__value">${monster.attack || 1}</span></div>
+      <div class="combat-stat-pill__item combat-stat-pill__item--level"><span class="combat-stat-pill__icon">💪</span><span class="combat-stat-pill__value">${monster.level || 1}</span></div>
+      <div class="combat-stat-pill__item combat-stat-pill__item--defense"><span class="combat-stat-pill__icon">🛡</span><span class="combat-stat-pill__value">${monster.defense || 0}</span></div>
+      <div class="combat-stat-pill__item combat-stat-pill__item--hp"><span class="combat-stat-pill__icon">♥</span><span class="combat-stat-pill__value">${enemyHp}</span></div>
     </div>
   `
 
-  setText('[data-bind="enemyHpText"]', `${enemyHp} / ${enemyMaxHp}`)
+  setText('[data-bind="enemySpeed"]', `${(enemyDuration / 1000).toFixed(1)}s`)
   setWidth('[data-enemy-hp-bar]', enemyPct)
 }
 

@@ -52,6 +52,11 @@
     --game-max-width: 28rem;
     --game-footer-height: 6rem;
     --game-header-height: 7.5rem;
+    --bottom-nav-height: 6.5rem;
+    --app-header-height: 4.5rem;
+    --combat-card-width: min(18.25rem, 74vw);
+    --combat-monster-card-height: clamp(15rem, 28vh, 19rem);
+    --combat-bottom-safe: calc(var(--bottom-nav-height) + var(--spacing-safe-bottom) + 0.75rem);
   }
 
   body {
@@ -115,12 +120,15 @@
 }
 
 @layer components {
+  .app-screen,
   .game-shell {
-    @apply mx-auto flex min-h-screen max-w-md flex-col bg-game-bg pb-24 text-game-text shadow-2xl;
+    @apply mx-auto flex min-h-screen max-w-md flex-col overflow-x-hidden bg-game-bg text-game-text shadow-2xl;
   }
 
+  .app-header,
   .game-header {
-    @apply flex w-full items-center justify-between border-b border-game-border bg-zinc-900/80 p-4 backdrop-blur-md;
+    min-height: var(--app-header-height);
+    @apply flex w-full shrink-0 items-center justify-between border-b border-game-border bg-zinc-900/80 p-4 backdrop-blur-md;
   }
 
   .game-header__title {
@@ -159,11 +167,16 @@
     @apply text-sm font-medium tabular-nums;
   }
 
+  .app-main,
   .game-main {
-    @apply flex-1 overflow-y-auto p-4;
+    min-height: calc(100dvh - var(--app-header-height));
+    @apply flex-1 overflow-x-hidden overflow-y-auto p-3;
+    padding-bottom: var(--combat-bottom-safe);
   }
 
+  .app-bottom-nav,
   .game-bottom-nav {
+    min-height: var(--bottom-nav-height);
     @apply fixed bottom-0 left-0 right-0 z-50;
   }
 
@@ -332,171 +345,190 @@
   }
 
   .combat-screen {
-    @apply space-y-3 pb-2;
+    min-height: calc(100dvh - var(--app-header-height) - var(--combat-bottom-safe));
+    @apply mx-auto flex w-full max-w-md flex-col gap-2 overflow-x-hidden pb-2;
   }
 
-  .combat-screen__monster-panel {
-    @apply space-y-3;
+  .combat-topbar {
+    @apply flex min-h-10 items-center justify-between rounded-2xl bg-zinc-700/80 px-4 py-2 shadow-game-soft;
   }
 
-  .monster-card {
-    @apply rounded-[2rem] bg-zinc-700/85 p-3 text-center shadow-game-soft;
-    background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.03), rgb(0 0 0 / 0.08));
+  .combat-topbar__title {
+    @apply text-lg font-black tracking-tight text-zinc-100;
   }
 
-  .monster-card--placeholder {
-    @apply bg-zinc-800/80 p-8 text-zinc-400;
+  .combat-topbar__help {
+    @apply grid h-7 w-7 place-items-center rounded-full bg-zinc-600/80 text-sm font-black text-zinc-200 transition active:scale-95;
   }
 
-  .monster-card__placeholder-icon {
-    @apply mb-3 text-4xl;
+  .combat-monster-stage {
+    @apply mx-auto flex w-full max-w-[var(--combat-card-width)] flex-col items-center gap-2;
   }
 
-  .monster-card__placeholder-title {
-    @apply text-lg font-black;
+  .combat-monster-card {
+    width: var(--combat-card-width);
+    height: var(--combat-monster-card-height);
+    @apply flex flex-col items-center justify-between overflow-hidden rounded-[1.8rem] bg-zinc-700/85 p-3 text-center shadow-game-soft;
+    background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.04), rgb(0 0 0 / 0.10));
   }
 
-  .monster-card__placeholder-copy {
-    @apply mt-1 text-xs text-zinc-500;
+  .combat-monster-card--placeholder {
+    @apply justify-center gap-2 bg-zinc-800/80 text-zinc-400;
   }
 
-  .monster-card__missing-badge {
-    @apply mt-3 rounded-2xl bg-amber-500/10 px-3 py-2 text-xs font-black uppercase tracking-widest text-amber-300;
+  .combat-monster-card__placeholder-icon {
+    @apply text-4xl;
   }
 
-  .monster-card__media {
-    @apply mb-3 flex h-[min(18rem,36vh)] min-h-44 items-center justify-center rounded-[1.55rem] bg-zinc-800/75 p-4 shadow-inner;
+  .combat-monster-card__placeholder-title {
+    @apply text-base font-black;
   }
 
-  .monster-card__sprite-box {
-    @apply grid aspect-square h-[min(12rem,24vh)] min-h-28 place-items-center rounded-[1.45rem] bg-zinc-800/95 text-zinc-400 shadow-[inset_0_0_2rem_rgb(0_0_0_/_0.22)];
+  .combat-monster-card__placeholder-copy {
+    @apply text-center text-xs text-zinc-500;
   }
 
-  .monster-card__title {
-    @apply text-3xl font-black tracking-tight text-zinc-100;
+  .combat-monster-card__missing-badge {
+    @apply rounded-full bg-amber-500/10 px-3 py-1 text-[0.6rem] font-black uppercase tracking-widest text-amber-300;
   }
 
-  .monster-card__sprite-icon {
-    @apply h-24 w-24 text-zinc-300;
+  .combat-monster-card__sprite-frame {
+    width: clamp(8rem, 18vh, 11rem);
+    height: clamp(8rem, 18vh, 11rem);
+    @apply grid place-items-center rounded-[1.35rem] bg-zinc-800/90 text-zinc-300 shadow-[inset_0_0_2rem_rgb(0_0_0_/_0.24)];
   }
 
-  .monster-stat-row {
-    @apply grid grid-cols-4 items-center gap-1 rounded-full bg-zinc-700/85 px-3 py-2 text-lg shadow-game-soft;
+  .combat-monster-card__sprite {
+    @apply h-20 w-20 text-zinc-200;
   }
 
-  .monster-stat-row__item {
-    @apply inline-flex items-center justify-center gap-1 rounded-full px-1 py-1.5 font-black tabular-nums;
+  .combat-monster-card__name {
+    @apply max-w-full truncate text-2xl font-black tracking-tight text-zinc-100;
   }
 
-  .monster-stat-row__attack { @apply text-accent-cyan; }
-  .monster-stat-row__level { @apply text-zinc-300; }
-  .monster-stat-row__defense { @apply text-accent-green; }
-  .monster-stat-row__hp { @apply text-accent-red; }
-
-  .combat-bars {
-    @apply grid grid-cols-2 gap-x-5 gap-y-1;
+  .combat-stat-pill {
+    min-height: 3.5rem;
+    @apply grid w-full grid-cols-4 items-center gap-1 rounded-full bg-zinc-700/85 px-3 py-2 text-base shadow-game-soft;
   }
 
-  .combat-bars__track {
-    @apply h-10 overflow-hidden rounded-2xl bg-zinc-800 shadow-inner;
+  .combat-stat-pill__item {
+    @apply inline-flex min-w-0 items-center justify-center gap-1 rounded-full px-1 py-1 font-black tabular-nums;
   }
 
-  .combat-bars__track--hp {
-    @apply bg-zinc-950;
+  .combat-stat-pill__icon {
+    @apply shrink-0 text-sm leading-none;
   }
 
-  .combat-bars__fill {
-    @apply h-full w-0 rounded-2xl bg-zinc-600 transition-all duration-100;
+  .combat-stat-pill__value {
+    @apply min-w-0 text-base leading-none;
   }
 
-  .combat-bars__fill--hp {
+  .combat-stat-pill__item--attack { @apply text-accent-cyan; }
+  .combat-stat-pill__item--level { @apply text-zinc-300; }
+  .combat-stat-pill__item--defense { @apply text-accent-green; }
+  .combat-stat-pill__item--hp { @apply text-accent-red; }
+
+  .combat-timers {
+    @apply grid grid-cols-2 gap-x-5 gap-y-1 px-1;
+  }
+
+  .combat-timer {
+    @apply min-w-0;
+  }
+
+  .combat-timer__track {
+    @apply h-6 overflow-hidden rounded-xl bg-zinc-800 shadow-inner;
+  }
+
+  .combat-timer__fill {
+    @apply h-full w-0 rounded-xl bg-zinc-500 transition-all duration-100;
+  }
+
+  .combat-timer__fill--hp {
     @apply bg-accent-green;
   }
 
-  .combat-bars__label {
-    @apply text-center text-xl font-medium tabular-nums text-zinc-300;
+  .combat-timer__label {
+    @apply pt-0.5 text-center text-sm font-black tabular-nums text-zinc-300;
   }
 
-  .combat-layout,
-  .combat-controls {
-    @apply grid grid-cols-2 items-start gap-5;
+  .combat-layout {
+    @apply grid grid-cols-2 items-start gap-3;
   }
 
-  .combat-weapon-panel {
-    @apply space-y-2;
+  .combat-weapon {
+    @apply min-w-0 space-y-1.5;
   }
 
-  .combat-weapon-button {
-    @apply grid aspect-square w-full place-items-center rounded-3xl border-4 border-orange-400 bg-zinc-700/85 text-zinc-100 shadow-game-orange-glow transition active:scale-95;
+  .combat-weapon__slot {
+    @apply grid aspect-square max-h-32 w-full place-items-center rounded-[1.5rem] border-3 border-orange-400 bg-zinc-700/85 text-zinc-100 shadow-game-orange-glow transition active:scale-95;
   }
 
-  .combat-weapon-button__text {
-    @apply text-xl font-black text-zinc-100;
+  .combat-weapon__icon {
+    @apply h-16 w-16 text-zinc-100;
   }
 
-  .combat-weapon-icon {
-    @apply h-24 w-24 text-zinc-100;
+  .combat-weapon__name {
+    @apply truncate text-center text-base font-black text-zinc-200;
   }
 
-  .combat-weapon-label {
-    @apply text-center text-2xl font-medium text-zinc-200;
+  .combat-skill {
+    @apply min-w-0 space-y-1.5;
   }
 
-  .combat-action-row {
-    @apply grid grid-cols-2 gap-3;
+  .combat-skill__button {
+    @apply flex w-full items-center justify-between rounded-2xl bg-zinc-700/85 px-3 py-2 text-sm font-black text-zinc-100 transition active:scale-95;
   }
 
-  .combat-action-button {
-    @apply grid aspect-square place-items-center rounded-2xl bg-zinc-700/85 text-2xl text-zinc-100 transition active:scale-95;
+  .combat-skill__title {
+    @apply truncate text-base font-black text-zinc-200;
   }
 
-  .combat-skill-panel {
-    @apply space-y-2;
+  .combat-skill__xp {
+    @apply h-4 overflow-hidden rounded-full bg-zinc-800 shadow-inner;
   }
 
-  .combat-attack-button {
-    @apply w-full rounded-2xl bg-zinc-700/85 px-5 py-4 text-left text-lg font-black text-zinc-100 transition active:scale-95;
+  .combat-skill__xp-fill {
+    @apply h-full w-0 rounded-full bg-cyan-500 transition-all duration-100;
   }
 
-  .combat-skill-title {
-    @apply text-2xl font-medium text-zinc-200;
+  .combat-skill__xp-text {
+    @apply text-right text-sm font-black tabular-nums text-zinc-300;
   }
 
-  .combat-xp-bar {
-    @apply h-7 overflow-hidden rounded-xl bg-zinc-800 shadow-inner;
+  .combat-actions {
+    @apply grid grid-cols-4 gap-2;
   }
 
-  .combat-xp-bar__fill {
-    @apply h-full w-0 rounded-xl bg-cyan-500 transition-all duration-100;
+  .combat-action {
+    @apply grid h-11 place-items-center rounded-2xl bg-zinc-700/85 text-xl font-black text-zinc-100 transition active:scale-95;
   }
 
-  .combat-xp-count {
-    @apply text-right text-xl font-medium tabular-nums text-zinc-300;
+  .combat-action--locked {
+    @apply bg-zinc-800/85 text-zinc-500;
   }
 
-  .combat-utility-grid {
-    @apply grid grid-cols-2 gap-3;
+  .combat-status-pill {
+    @apply mx-auto flex items-center justify-center gap-3 rounded-full bg-zinc-700/85 px-4 py-2 text-sm font-black tabular-nums shadow-game-soft;
   }
 
-  .combat-utility-button {
-    @apply grid aspect-square place-items-center rounded-2xl bg-zinc-700/85 text-3xl text-zinc-100 transition active:scale-95;
+  .combat-status-pill__hp {
+    @apply text-rose-300;
   }
 
-  .combat-utility-button--guide {
-    @apply text-yellow-300;
+  .combat-status-pill__food {
+    @apply text-emerald-300;
   }
 
-  .combat-utility-button--locked {
-    @apply bg-zinc-800/80 text-zinc-500;
-  }
-
+  .monster-card,
+  .monster-stat-row,
+  .combat-bars,
+  .combat-weapon-panel,
+  .combat-skill-panel,
+  .combat-action-row,
   .combat-resource-footer {
-    @apply flex items-center justify-between gap-2 rounded-full bg-zinc-700/85 px-4 py-3 text-xl font-medium tabular-nums;
+    @apply hidden;
   }
-
-  .combat-resource-footer__hp-icon { @apply text-rose-400; }
-  .combat-resource-footer__heal { @apply text-emerald-400; }
-  .combat-resource-footer__gold-icon { @apply text-yellow-300; }
 
   .is-hidden,
   .monster-list.is-hidden {

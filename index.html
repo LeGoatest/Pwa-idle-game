@@ -12,8 +12,8 @@
     document.write(`<link rel="stylesheet" href="./assets/css/style.css?v=${window.__ASSET_VERSION__}">`)
   </script>
 </head>
-<body class="game-shell">
-  <header class="game-header">
+<body class="app-screen game-shell">
+  <header class="app-header game-header">
     <div>
       <h1 id="station-title" class="game-header__title">Idle Frontier</h1>
       <div class="game-header__status">
@@ -40,7 +40,7 @@
 
   <main
     id="view-root"
-    class="game-main"
+    class="app-main game-main"
     hx-get="./views/combat.html"
     hx-trigger="load"
     hx-swap="innerHTML"></main>
@@ -50,7 +50,7 @@
     <div id="modal-content" class="game-modal__content"></div>
   </div>
 
-  <footer class="game-bottom-nav">
+  <footer class="app-bottom-nav game-bottom-nav">
     <div class="game-bottom-nav__inner">
       <div class="game-bottom-nav__surface">
         <nav class="game-bottom-nav__list">
